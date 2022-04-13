@@ -1,0 +1,5 @@
+*.db
+*.db-wal
+*.db-shm
+*.apsimx.bak
+__pycache__/
