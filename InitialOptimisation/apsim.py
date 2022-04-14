@@ -1,13 +1,11 @@
-
-# APSIM-related imports (these should be moved when apsim code is moved to another file)
 from argparse import ArgumentTypeError
 from collections import Counter
 from subprocess import CalledProcessError, run, PIPE, STDOUT
 from os import remove
 from os.path import splitext, join
+from pandas import read_sql_query
 from tempfile import NamedTemporaryFile
 import sqlite3
-# end apsim-related imports
 
 """
 Options related to an apsim run
@@ -58,10 +56,11 @@ class ApsimRunner:
         """
         Read outputs from apsim
 
-        @param dbFile: Path to the .db file.
+        @param dbFile:      Path to the .db file.
         @param outputNames: array of the names of outputs to be read.
-        @param tableName: Name of the report table.
-        @return dict mapping output names to arrays of output values.
+        @param tableName:   Name of the report table.
+        @return             dataframe containing one column per output name,
+                            plus an extra column containing simulation names.
         """
 
         # Ensure outputNames contains no duplicates.
@@ -70,22 +69,14 @@ class ApsimRunner:
         if len(duplicates) > 0:
             raise Exception("Attempted to read %d duplicate outputs (%s), this is probably a mistake" % (len(duplicates), duplicates))
 
-        # Connect to database.
-        conn = sqlite3.connect(dbFile)
-        cursor = conn.cursor()
-
-        # Read one output at a time.
-        # todo: we are executing 1 query per variable. This could easily be
-        # refactored to only use a single query, which would be much faster.
-        results = dict()
-        for variable in outputNames:
-            query = 'SELECT [%s] from [%s]' % (variable, tableName)
-            data = []
-            for row in cursor.execute(query):
-                data.append(row[0])
-            results[variable] = data
-
-        return results
+        # Read outputs from DB.
+        with sqlite3.connect(dbFile) as conn:
+            # Construct comma-separated list of variable names.
+            # Need to enclose each variable names in square brackets, in case
+            # they contain spaces (or, more frequently, periods).
+            variables = ', '.join(['[%s]' % x for x in outputNames])
+            query = 'SELECT %s, s.Name as SimulationName FROM [%s], _Simulations s WHERE SimulationID = s.ID' % (variables, tableName)
+            return read_sql_query(query, conn)
 
     def _runInternal(self, opts, parameterFile):
         """
@@ -125,8 +116,8 @@ class ApsimRunner:
                            values are the parameter values
         @param outputs:    Array of names of outputs to be read.
         @param tableName:  Name of the table from which outputs should be read.
-        @return            dict with one key per item in outputs array, with the
-                           corresponding output values stored in the key values.
+        @return            Dataframe containing one column per output plus an
+                           extra column containing simulation names.
         """
 
         # Validate input arguments.

@@ -53,9 +53,10 @@ class ApsimTests(TestCase):
         outputNames = ['Sorghum.Grain.Wt', 'Sorghum.AboveGround.Wt', 'Sorghum.Leaf.LAI']
         tableName = 'DailyReport'
         outputs = runner.run(opts, dict(), outputNames, tableName)
-        keys = list(outputs)
-        self.assertEqual(outputNames, keys)
-        for i in range(0, len(keys)):
-            data = outputs[keys[i]]
-            self.assertEqual(517, len(data), msg = '%s: wrong number of outputs' % keys[i])
 
+        # Number of columns should be # outputs + 1 (for simulation name).
+        self.assertEqual(len(outputNames) + 1, len(outputs.columns))
+
+        for i in range(0, len(outputs.columns)):
+            data = outputs[outputs.columns[i]]
+            self.assertEqual(517, len(data), msg = '%s: wrong number of outputs' % outputs.columns[i])
