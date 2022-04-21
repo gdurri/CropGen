@@ -2,7 +2,7 @@ from argparse import ArgumentTypeError
 from collections import Counter
 from subprocess import CalledProcessError, run, PIPE, STDOUT
 from os import remove
-from os.path import splitext, join
+from os.path import splitext
 from pandas import read_sql_query
 from tempfile import NamedTemporaryFile
 import sqlite3
@@ -87,7 +87,9 @@ class ApsimRunner:
         """
         # Arguments to be passed to the Models invocation.
         arguments = [
-            '--edit "%s"' % parameterFile,
+            opts.exe,
+            '--edit',
+            parameterFile,
             opts.apsimFile
         ]
 
@@ -95,7 +97,6 @@ class ApsimRunner:
         # non-zero exit code (ie if apsim runs with error).
         try:
             run(
-                executable = opts.exe,
                 args = arguments,
                 encoding = 'utf8', # stdout/stderr encoding
                 check = True, # Automatically throw an exception upon apsim error

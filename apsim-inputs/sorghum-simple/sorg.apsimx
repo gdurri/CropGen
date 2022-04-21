@@ -9254,7 +9254,8 @@
                 "[Sorghum].Leaf.LAI",
                 "[Sorghum].Grain.Wt",
                 "[Sorghum].AboveGround.Wt",
-                "[Sorghum].DaysAfterSowing as DaysAfterSowing"
+                "[Sorghum].DaysAfterSowing as DaysAfterSowing",
+                "[Sorghum].SowingData.Population"
               ],
               "EventNames": [
                 "[Sorghum].Harvesting"
