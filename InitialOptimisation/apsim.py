@@ -23,14 +23,14 @@ class ApsimOptions:
         self.exe = exe
         self.apsimFile = apsimFile
 
-"""
-This class encapsulates the running of apsim and reading results.
-
-Currently the run method works by calling the apsim CLI (Models.exe). In the
-long run we will probably want to move to using the apsim server feature, as
-the CLI is relatively inefficient for an optimisation workload.
-"""
 class ApsimRunner:
+    """
+    This class encapsulates the running of apsim and reading results.
+
+    Currently the run method works by calling the apsim CLI (Models.exe). In the
+    long run we will probably want to move to using the apsim server feature, as
+    the CLI is relatively inefficient for an optimisation workload.
+    """
     def _writeParameterFile(self, parameters):
         """
         Write an apsim parameters file and return the filename.
