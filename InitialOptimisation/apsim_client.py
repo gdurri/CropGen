@@ -3,6 +3,11 @@ from ctypes import c_ushort, c_int, c_void_p, c_char_p, c_int32
 from multiprocessing.dummy import Array
 from pandas import DataFrame
 from struct import unpack
+from enum import Enum
+
+class PropertyType(Enum):
+    STRING = 0
+    DOUBLE = 1
 
 class Replacement(Structure):
     """
@@ -39,6 +44,9 @@ class ApsimClient:
 
     Need to also think about memory management and ensure that we don't have
     any leaks.
+
+    Also need to consider how best to count the number of rows of output, given
+    the presence of variable-length outputs such as strings.
     """
 
     def __init__(self):
@@ -108,13 +116,58 @@ class ApsimClient:
             result.append(self.__createDoubleReplacement(name, value))
         return result
 
-    def __readOutput(self, sock, outputNames, tableName):
+    def __getDouble(self, bytes, i):
+        width = sizeof(c_double)
+        startIndex = i * width # 0, 8, 16, ...
+        endIndex = startIndex + width # 8, 16, 24, ...
+        raw = bytes[startIndex:endIndex]
+        bits = b''.join([c_byte(x) for x in raw])
+
+        # Server protocol is little-endian.
+        return unpack('<d', bits)[0]
+
+    def __unpackArray(self, format, arr):
+        bytes = [c_byte(x) for x in arr]
+        (result,) = unpack(format, b''.join(bytes))
+        return result
+
+    def __getString(self, bytes, i):
+        totalRead = 0
+        elem = 0
+
+        while True:
+            # Each output object contains a byte array of all rows of data for this
+            # parameter. We need to take the i-th slice, where i is the row number,
+            # and the slice width will be sizeof(double).
+            lengthStartIndex = totalRead
+            lengthEndIndex = totalRead + sizeof(c_int32)
+            length = self.__unpackArray('<i', bytes[lengthStartIndex:lengthEndIndex])
+
+            strBytes = bytes[lengthEndIndex:lengthEndIndex + length]
+            result = b''.join([c_byte(x) for x in strBytes]).decode('utf-8')
+            if elem == i:
+                return result
+
+            totalRead = totalRead + length + sizeof(c_int32)
+            elem += 1
+
+    def __getValue(self, bytes, i, propertyType):
+        if propertyType == PropertyType.DOUBLE:
+            return self.__getDouble(bytes, i)
+
+        if propertyType == PropertyType.STRING:
+            return self.__getString(bytes, i)
+
+        raise ValueError("Unknown property type %s" % propertyType)
+
+    def __readOutput(self, sock, outputNames, outputTypes, tableName):
         """
         Read outputs from apsim.
 
-        @param sock:      Socket connection to server.
-        @param outputs:   Array of output variable names to be read.
-        @param tableName: Name of the table from which to read.
+        @param sock:        Socket connection to server.
+        @param outputs:     Array of output variable names to be read. Note: for now, the first item MUST be a numeric (double) type.
+        @param outputTypes: Array of PropertyType enum values, indicating the expected type of the outputs.
+        @param tableName:   Name of the table from which to read.
 
         @return:          Dataframe of results.
         """
@@ -141,17 +194,7 @@ class ApsimClient:
         df = DataFrame(columns = outputNames)
         for i in range(0, numRows):
             for j in range(0, numCols):
-                # Each output object contains a byte array of all rows of data for this
-                # parameter. We need to take the i-th slice, where i is the row number,
-                # and the slice width will be sizeof(double).
-                startIndex = i * sizeof(c_double) # 0, 8, 16, ...
-                endIndex = startIndex + sizeof(c_double) # 8, 16, 24, ...
-                raw = outputs[j].contents.data[startIndex:endIndex]
-                bits = b''.join([c_byte(x) for x in raw])
-
-                # Server protocol is little-endian.
-                value = unpack('<d', bits)[0]
-
+                value = self.__getValue(outputs[j].contents.data, i, outputTypes[j])
                 df.at[i, outputNames[j]] = value
         return df
 
@@ -160,7 +203,7 @@ class ApsimClient:
         Run apsim.
 
         @param replacements: Changes to be applied before the simulation run.
-        @param outputs:      Array of names of outputs to be read from the server.
+        @param outputs:      Array of names of outputs to be read from the server. Note: for now, the first item MUST be a numeric (double) type.
         @param tableName:    Table from which outputs should be read.
         @param sock:         Socket connection to server.
 
@@ -181,20 +224,21 @@ class ApsimClient:
         # Send RUN command.
         self.__client.runWithChanges(socket, changes, numChanges)
 
-    def run(self, parameters, outputs, tableName, serverIP, serverPort):
+    def run(self, parameters, outputs, outputTypes, tableName, serverIP, serverPort):
         """
         Run apsim using apsim server mechanism
 
-        @param opts:       APSIM options (an ApsimOptions instance)
-        @param parameters: Parameters to be changed. This should be a dict in
-                           which the keys are the parameter names, and the
-                           values are the parameter values
-        @param outputs:    Array of names of outputs to be read.
-        @param tableName:  Name of the table from which outputs should be read.
-        @param serverIP:   IP Address of the server as a string
-        @param serverPort: Port on which the server is listening.
-        @return            Dataframe containing one column per output plus an
-                           extra column containing simulation names.
+        @param opts:        APSIM options (an ApsimOptions instance)
+        @param parameters:  Parameters to be changed. This should be a dict in
+                            which the keys are the parameter names, and the
+                            values are the parameter values
+        @param outputs:     Array of names of outputs to be read.
+        @param outputTypes: Array of PropertyType enum values, indicating the expected type of the outputs.
+        @param tableName:   Name of the table from which outputs should be read.
+        @param serverIP:    IP Address of the server as a string
+        @param serverPort:  Port on which the server is listening.
+        @return             Dataframe containing one column per output plus an
+                            extra column containing simulation names.
         """
 
         # Connect to the server.
@@ -209,7 +253,7 @@ class ApsimClient:
                 self.__runOnServer(replacements, sock)
 
                 # Read results.
-                return self.__readOutput(sock, outputs, tableName)
+                return self.__readOutput(sock, outputs, outputTypes, tableName)
             finally:
                 # Free replacements memory
                 for r in replacements:

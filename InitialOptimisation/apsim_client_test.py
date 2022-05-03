@@ -1,4 +1,4 @@
-from apsim_client import ApsimClient
+from apsim_client import ApsimClient, PropertyType
 import os
 from pathlib import Path
 from shutil import which
@@ -11,8 +11,9 @@ class ApsimClientTests(TestCase):
         """
         client = ApsimClient()
         outputNames = ['Sorghum.Grain.Wt', 'Sorghum.AboveGround.Wt', 'Sorghum.Leaf.LAI']
+        outputTypes = [PropertyType.DOUBLE, PropertyType.DOUBLE, PropertyType.DOUBLE]
         tableName = 'DailyReport'
-        outputs = client.run(dict(), outputNames, tableName, "127.0.0.1", 27746)
+        outputs = client.run(dict(), outputNames, outputTypes, tableName, "127.0.0.1", 27746)
 
         # Number of columns should be # outputs + 1 (for simulation name).
         self.assertEqual(len(outputNames), len(outputs.columns))
@@ -31,11 +32,27 @@ class ApsimClientTests(TestCase):
             changes = dict()
             changes['[SowingRule].Script.Population'] = popn
             outputNames = ['Sorghum.SowingData.Population', 'Yield', 'Biomass']
+            outputTypes = [PropertyType.DOUBLE, PropertyType.DOUBLE, PropertyType.DOUBLE]
             tableName = 'HarvestReport'
 
             runner = ApsimClient()
-            outputs = runner.run(changes, outputNames, tableName, "127.0.0.1", 27746)
+            outputs = runner.run(changes, outputNames, outputTypes, tableName, "127.0.0.1", 27746)
             self.assertEqual(len(outputNames), len(outputs.columns))
             popnColumn = outputs[outputNames[0]]
             self.assertEqual(1, len(popnColumn))
             self.assertAlmostEqual(popn, popnColumn[0])
+
+    def testReadStringParameter(self):
+        """
+        Test a complete run, changing sowing population.
+        """
+        outputNames = ['SimulationName', 'Yield']
+        outputTypes = [PropertyType.STRING, PropertyType.DOUBLE]
+        tableName = 'HarvestReport'
+
+        runner = ApsimClient()
+        outputs = runner.run(dict(), outputNames, outputTypes, tableName, "127.0.0.1", 27746)
+        self.assertEqual(len(outputNames), len(outputs.columns))
+        simulationNameColumn = outputs[outputNames[0]]
+        self.assertEqual(1, len(simulationNameColumn))
+        self.assertAlmostEqual('Simulation', simulationNameColumn[0])
