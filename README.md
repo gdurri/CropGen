@@ -41,3 +41,5 @@ a remote (Linux) VM.
      is the default behaviour in the GUI, as long as the .met files are in the
      same directory as the .apsimx file
 3. Do development as normal in vscode
+
+test
