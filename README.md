@@ -1,6 +1,7 @@
 # CropGen
 
-The goal of CropGen is to optimise crop design through the connection of an optimisation algorithm with APSIM-Sorghum
+The goal of CropGen is to optimise crop design through the connection of an
+optimisation algorithm with APSIM-Sorghum
 
 ## APSIM Wrapper
 
@@ -19,3 +20,24 @@ this file must be passed as the `exe` argument to the `ApsimOptions`
 constructor. The other required option is the path to the .apsimx file to be
 run. There is a sample .apsimx file included in this repository, located at
 `apsim-inputs/sorghum-simple/sorg.apsimx`.
+
+## APSIM Server Wrapper
+
+The apsim server wrapper uses the
+[apsim server](https://apsimnextgeneration.netlify.app/usage/server) feature to
+run simulations. This should be faster than using the "standard" apsim wrapper,
+although the differences will be more significant for shorter simulations. The
+caveat is that the apsim server wrapper cannot be run on windows. The workaround
+is to use visual studio code for
+[remote debugging](https://code.visualstudio.com/docs/remote/remote-overview) on
+a remote (Linux) VM.
+
+1. Connect to the remote VM from inside vscode
+   - See above link for vscode instructions. You need to install the remote
+     debugging extension.
+   - See Drew/Jason for login details (ssh keypair)
+2. Upload your .apsimx/.met files [here](https://cropgen.cgmwgp.com)
+   - Ensure that your .apsimx file uses relative paths for the .met files. This
+     is the default behaviour in the GUI, as long as the .met files are in the
+     same directory as the .apsimx file
+3. Do development as normal in vscode
