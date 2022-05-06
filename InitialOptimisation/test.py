@@ -1,20 +1,22 @@
 from time import process_time, time
 from apsim_client import ApsimClient, PropertyType
 
-# client = ApsimClient()
-# for i in range(0, 50):
-#     # popns = range(2, 10)
-#     popns = [2, 10]
-#     for popn in popns:
-#         changes = dict()
-#         changes['[SowingRule].Script.Population'] = popn
-#         outputNames = ['Sorghum.SowingData.Population', 'Yield', 'Biomass']
-#         table = 'HarvestReport'
-#         ip = "127.0.0.1"
-#         port = 27746
+client = ApsimClient()
+# popns = range(2, 10)
+popns = [2, 10]
+for popn in popns:
+    changes = dict()
+    changes['[Sow on a fixed date].Script.Population'] = popn
+    outputNames = ['Yield', 'Biomass']
+    outputTypes = [PropertyType.DOUBLE, PropertyType.DOUBLE]
+    table = 'HarvestReport'
+    ip = "127.0.0.1"
+    port = 27746
 
-#         outputs = client.run(changes, outputNames, table, ip, port)
-#         print(outputs)
+    outputs = client.run(changes, outputNames, outputTypes,  table, ip, port)
+    print(outputs)
+
+"""
 
 outputNames = ['Yield', 'SimulationName']
 outputTypes = [PropertyType.DOUBLE, PropertyType.STRING]
@@ -28,7 +30,9 @@ numIter = 10
 
 for i in range(0, numIter):
     iterStart = time()
-    outputs = runner.run(dict(), outputNames, outputTypes, tableName, "127.0.0.1", 27746)
+    changes = dict()
+    changes['[SowingRule].Script.Population'] = 3
+    outputs = runner.run(changes, outputNames, outputTypes, tableName, "127.0.0.1", 27746)
     iterEnd = time()
     print('Iter %d duration: %.2fs' % (i, iterEnd - iterStart))
     print(outputs)
@@ -42,3 +46,4 @@ print('Ran %d iterations in %.2fs.' % (numIter, duration))
 # simulationNameColumn = outputs[outputNames[0]]
 # self.assertEqual(1, len(simulationNameColumn))
 # self.assertAlmostEqual('Simulation', simulationNameColumn[0])
+"""
