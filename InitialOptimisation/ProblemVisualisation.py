@@ -3,7 +3,7 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_sampling, get_crossover, get_mutation
 from pymoo.optimize import minimize
 import numpy as np
-from apsim import ApsimRunner, ApsimOptions
+from apsim_client import ApsimClient, PropertyType
 import plotly.express as px
 import plotly
 import statistics as stats
@@ -16,11 +16,15 @@ indivs=[]
 
 f1 = 'WaterUse'
 f2 = 'Yield'
-options = ApsimOptions(r"C:\Program Files\APSIM2022.4.7023.0\bin\Models.exe",
-                       r"C:\Users\uqgdurri\OneDrive - The University of Queensland\Desktop\PhD\CropGen_WorkingCopy\CropGen_Sorghum.apsimx")
+
+client = ApsimClient()
+ip = "127.0.0.1"
+port = 27746
+outputNames = [f1, f2]
+outputTypes = [PropertyType.DOUBLE, PropertyType.DOUBLE]
 table = 'HarvestReport'
-outs = [f1, f2]
-test = ApsimRunner()
+params={}
+
 
 class OptProblem(Problem):
 
@@ -47,7 +51,7 @@ class OptProblem(Problem):
             params['[Sow on a fixed date].Script.Tillering']= x[1]
             print(params)
 
-            obj=test.run(options, params, outs, table)
+            obj=client.run(params, outputNames, outputTypes, table, ip, port)
             print(obj)
 
             f1val=1*(obj[f1][0]) # one year
@@ -124,7 +128,7 @@ fig.update_traces(mode="markers", marker=dict(size=12,line=dict(width=2, color='
 fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
 fig.update_xaxes(range=[xl[0], xu[0]], gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
 fig.update_yaxes(range=[xl[1], xu[1]], gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
-plotly.offline.plot(fig)
+fig.show()
 
 fig = px.scatter(all_df, x="Total Crop Water Use (mm)", y="Yield (t/ha)", title="All Objectives", template='plotly_white',
                  hover_data={"Total Crop Water Use (mm)": False, "Yield (t/ha)": False, "EndJuvtoFI Thermal Time (DD)": ':.2f', "Fertile Tiller Number": ':.2f'},
