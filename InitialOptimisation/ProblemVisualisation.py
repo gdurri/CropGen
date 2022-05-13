@@ -69,15 +69,17 @@ class OptProblem(Problem):
 #Create problem object
 problem=OptProblem()
 
+genNumber= 5
+popSize= 10
+
 #Create algorithm object
 algorithm = NSGA2(
-    pop_size=5,
+    pop_size=popSize,
     sampling=get_sampling("real_random"),
     crossover=get_crossover("real_sbx", prob=0.9, eta=15),
     mutation=get_mutation("real_pm", eta=20),
     eliminate_duplicates=True)
 
-genNumber=5
 
 #Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
 # so problems must be framed such that each objective is minimised
