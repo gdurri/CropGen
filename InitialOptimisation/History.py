@@ -1,4 +1,4 @@
-import ProblemVisualisation as prb
+import SingleYear_ProblemVisualisation as prb #Make sure to pick the correct version for single/ multi year runs
 import matplotlib.pyplot as plt
 
 #Generations for which to plot historical information

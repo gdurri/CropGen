@@ -14,13 +14,18 @@ start_time = time.time()
 
 indivs=[]
 
-f1 = 'WaterUse'
-f2 = 'Yield'
+f1_apsim = 'WaterUse'
+f2_apsim = 'Yield'
+
+x1 = 'EndJuvtoFI Thermal Time (DD)'
+x2 = 'Fertile Tiller Number'
+f1 = 'Total Crop Water Use (mm)'
+f2 = 'Yield (t/ha)'
 
 client = ApsimClient()
 ip = "127.0.0.1"
 port = 27746
-outputNames = [f1, f2]
+outputNames = [f1_apsim, f2_apsim]
 outputTypes = [PropertyType.DOUBLE, PropertyType.DOUBLE]
 table = 'HarvestReport'
 params={}
@@ -54,10 +59,9 @@ class OptProblem(Problem):
             obj=client.run(params, outputNames, outputTypes, table, ip, port)
             print(obj)
 
-            f1val=1*(obj[f1][0]) # one year
-            #f1 = -1 * (stats.median(obj['Yield'])) # multiple years
-            f2val=-1*(obj[f2][0]) #one year
-            #f2 = -1 * (stats.median(obj['Biomass']))  # multiple years
+            f1val=1*(obj[f1_apsim][0]) 
+            f2val=-1*(obj[f2_apsim][0]) 
+            
 
             results.append([f1val,f2val])
 
@@ -69,8 +73,8 @@ class OptProblem(Problem):
 #Create problem object
 problem=OptProblem()
 
-genNumber= 5
-popSize= 10
+genNumber= 2
+popSize= 5
 
 #Create algorithm object
 algorithm = NSGA2(
@@ -90,13 +94,14 @@ F=res.F #Objective values for non-dominated individuals in the last generation
 hist=res.history #History of data from all generations
 
 tot=list(zip(X[:,0], X[:,1], F[:,0], ( -0.01 * F[:,1])))
-opt_df=pd.DataFrame(tot, columns =['EndJuvtoFI Thermal Time (DD)', 'Fertile Tiller Number',
-                                   'Total Crop Water Use (mm)', 'Yield (t/ha)'])
-all_df=pd.DataFrame(indivs, columns =['EndJuvtoFI Thermal Time (DD)', 'Fertile Tiller Number',
-                                      'Total Crop Water Use (mm)', 'Yield (t/ha)'])
+opt_df=pd.DataFrame(tot, columns =[x1, x2, f1, f2])
+all_df=pd.DataFrame(indivs, columns =[x1, x2, f1, f2])
 
-print(opt_df.sort_values('Yield (t/ha)', ascending=False))
-print(all_df.sort_values('Yield (t/ha)', ascending=False))
+#all_df.to_csv('C:/Users/uqgdurri/OneDrive - The University of Queensland/Desktop/PhD/CropGen_WorkingCopy/Results/All_individuals.csv', encoding='utf-8', index=False)
+
+print(opt_df.sort_values(f2, ascending=False))
+#print(all_df.sort_values('Yield (t/ha)', ascending=False))
+
 
 #Only running when script is run directly, i.e. no results plotted when imported
 #if __name__ =='__main__':
@@ -105,8 +110,8 @@ print(all_df.sort_values('Yield (t/ha)', ascending=False))
 
 xl, xu = problem.bounds()
 
-fig = px.scatter(opt_df, x="EndJuvtoFI Thermal Time (DD)", y="Fertile Tiller Number", title="Design Space", template = 'plotly_white',
-                 hover_data={"Total Crop Water Use (mm)": ':.2f', "Yield (t/ha)": ':.2f', "EndJuvtoFI Thermal Time (DD)": False, "Fertile Tiller Number": False},
+fig = px.scatter(opt_df, x= x1, y= x2, title="Design Space", template = 'plotly_white',
+                 hover_data={f1: ':.2f', f2: ':.2f', x1: False, x2: False},
                  width=1400, height=700)
 fig.update_traces(mode="markers", marker=dict(size=12, line=dict(width=2, color='DarkSlateGrey')))
 fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
@@ -114,8 +119,8 @@ fig.update_xaxes(range=[xl[0], xu[0]], gridcolor='lightgray', mirror= True, tick
 fig.update_yaxes(range=[xl[1], xu[1]], gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
 fig.show()
 
-fig = px.scatter(opt_df, x="Total Crop Water Use (mm)", y="Yield (t/ha)", title="Objective Space", template='plotly_white',
-                 hover_data={"Total Crop Water Use (mm)": False, "Yield (t/ha)": False, "EndJuvtoFI Thermal Time (DD)": ':.2f', "Fertile Tiller Number": ':.2f'},
+fig = px.scatter(opt_df, x= f1, y= f2, title="Objective Space", template='plotly_white',
+                 hover_data={f1: False, f2: False, x1: ':.2f', x2: ':.2f'},
                  width=1400, height=700)
 fig.update_traces(mode="markers", marker=dict(size=12,line=dict(width=2, color='DarkSlateGrey')))
 fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
@@ -123,8 +128,8 @@ fig.update_xaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=
 fig.update_yaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
 fig.show()
 
-fig = px.scatter(all_df, x="EndJuvtoFI Thermal Time (DD)", y="Fertile Tiller Number", color="Yield (t/ha)", title="All Individuals", template='plotly_white',
-                 hover_data={"Total Crop Water Use (mm)": ':.2f', "Yield (t/ha)": ':.2f', "EndJuvtoFI Thermal Time (DD)": False, "Fertile Tiller Number": False},
+fig = px.scatter(all_df, x= x1, y= x2, color="Yield (t/ha)", title="All Individuals", template='plotly_white',
+                 hover_data={f1: ':.2f', f2: ':.2f', x1: False, x2: False},
                  width=1400, height=700)
 fig.update_traces(mode="markers", marker=dict(size=12,line=dict(width=2, color='DarkSlateGrey')))
 fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
@@ -132,8 +137,8 @@ fig.update_xaxes(range=[xl[0], xu[0]], gridcolor='lightgray', mirror= True, tick
 fig.update_yaxes(range=[xl[1], xu[1]], gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
 fig.show()
 
-fig = px.scatter(all_df, x="Total Crop Water Use (mm)", y="Yield (t/ha)", title="All Objectives", template='plotly_white',
-                 hover_data={"Total Crop Water Use (mm)": False, "Yield (t/ha)": False, "EndJuvtoFI Thermal Time (DD)": ':.2f', "Fertile Tiller Number": ':.2f'},
+fig = px.scatter(all_df, x= f1, y= f2, title="All Objectives", template='plotly_white',
+                 hover_data={f1: False, f2: False, x1: ':.2f', x2: ':.2f'},
                  width=1400, height=700)
 fig.update_traces(mode="markers", marker=dict(size=12,line=dict(width=2, color='DarkSlateGrey')))
 fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
@@ -141,42 +146,13 @@ fig.update_xaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=
 fig.update_yaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
 fig.show()
 
-"""
-xl, xu = problem.bounds()
-plt.figure(figsize=(7, 5))
-plt.scatter(X[:, 0], X[:, 1], s=30, facecolors='r', edgecolors='r')
-plt.xlim(xl[0], xu[0])
-plt.ylim(xl[1], xu[1])
-plt.title("Design Space")
-plt.ylabel("Fertile Tiller Number")
-plt.xlabel("EndJuvtoFI Thermal Time (DD)")
-plt.show()
-
-plt.figure(figsize=(7, 5))
-plt.scatter((F[:, 0] * 1), (F[:, 1] * -0.01), s=30, facecolors='b', edgecolors='b')
-#plt.xlim(0, 1000)
-#plt.ylim(0, 2000)
-plt.title("Objective Space")
-plt.xlabel("Total Crop Water Use (mm)")
-plt.ylabel("Yield (t/ha)")
-plt.show()
-
-xl, xu = problem.bounds()
-plt.figure(figsize=(7, 5))
-plt.scatter(x1vals, x2vals, s=30, facecolors='r', edgecolors='r')
-plt.xlim(xl[0], xu[0])
-plt.ylim(xl[1], xu[1])
-plt.title("All Individuals")
-plt.ylabel("Fertile Tiller Number")
-plt.xlabel("EndJuvtoFI Thermal Time (DD)")
-plt.show()
-
-plt.figure(figsize=(7, 5))
-plt.scatter(f1vals, f2vals, s=30, facecolors='b', edgecolors='b')
-plt.title("All Objectives")
-plt.xlabel("Total Crop Water Use (mm)")
-plt.ylabel("Yield (t/ha)")
-plt.show()
-"""
+fig = px.scatter(all_df, x= x1, y= f2, color= x2, title="Yield over Maturity", template = 'plotly_white',
+                 hover_data={f1: ':.2f', f2: False, x1: False, x2: ':.2f'},
+                 width=1400, height=700)
+fig.update_traces(mode="markers", marker=dict(size=12, line=dict(width=2, color='DarkSlateGrey')))
+fig.update_layout(font_family='Courier New', font_size = 16, title_font_color = 'black', title_x=0.5)
+fig.update_xaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
+fig.update_yaxes(gridcolor='lightgray', mirror= True, ticks='outside', showline=True,linecolor= 'lightgray')
+fig.show()
 
 print("--- %s seconds ---" % (time.time() - start_time))
