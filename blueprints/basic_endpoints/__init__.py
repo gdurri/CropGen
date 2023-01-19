@@ -1,7 +1,11 @@
-from flask import Blueprint
+import random
+from flask import Blueprint, request, jsonify
 
 blueprint = Blueprint('api', __name__, url_prefix='/cropgen')
 
-@blueprint.route('/run', methods = ['PUT'])
+@blueprint.route('/run', methods = ['PUT', 'POST'])
 def cropgen():
-        return {'message': 'Running CropGen...'}
+    randomNumber = random.randint(0, 10000)
+    return jsonify(
+        result=randomNumber
+    )

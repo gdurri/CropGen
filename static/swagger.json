@@ -4,5 +4,67 @@
       "description": "Optimise crop design",
       "version": "1.0.0",
       "title": "CropGen"
+    },
+    "servers": [
+      {
+        "url": "/"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Run CropGen Request",
+        "description": ""
+      }
+    ],
+    "paths": {
+      "/cropgen/run": {        
+        "post": {
+          "tags": [
+            "Run CropGen Request"
+          ],
+          "summary": "Create a new run request",
+          "requestBody": {
+            "description": "Run CropGen Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/runCropGenRequestPostBody"
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/id"
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "id": {
+          "properties": {
+            "uuid": {
+              "type": "string"
+            }
+          }
+        },
+        "runCropGenRequestPostBody": {
+          "type": "object",
+          "properties": {
+          }
+        }
+      }
     }
   }
