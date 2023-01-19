@@ -2,11 +2,9 @@ import logging
 import os
 import random
 
-from config import Config
-
 class Jobs:
-  def __init__(self):
-    self.config = Config()
+  def __init__(self, config):
+    self.config = config
 
   def _run(self):
     simGenUrl = os.path.join(self.config.jobsBaseUrl, self.config.simGenUrl)
