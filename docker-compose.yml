@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  crop-gen-app:
+    build: .
+    image: crop-gen
+    ports: 
+      - "5000:5000"
