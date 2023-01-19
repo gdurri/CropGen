@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Swagger Code
 swaggerUrl = '/swagger'
-apiUrl = '/static/swagger.json'
+apiUrl = '/config/swagger.json'
 swaggerBlueprint = get_swaggerui_blueprint(
     swaggerUrl,
     apiUrl,

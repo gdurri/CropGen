@@ -38,12 +38,6 @@
             "application/json"
           ],
           "responses": {
-            "201": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
             "400": {
               "description": "Failed. Bad post data."
             }
@@ -53,13 +47,6 @@
     },
     "components": {
       "schemas": {
-        "id": {
-          "properties": {
-            "uuid": {
-              "type": "string"
-            }
-          }
-        },
         "runCropGenRequestPostBody": {
           "type": "object",
           "properties": {
