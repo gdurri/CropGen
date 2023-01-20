@@ -17,7 +17,7 @@
       }
     ],
     "paths": {
-      "/cropgen/run": {        
+      "/cropgen/run/singleyearproblem": {        
         "post": {
           "tags": [
             "Run CropGen Request"

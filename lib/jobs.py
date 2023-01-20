@@ -1,11 +1,18 @@
-import os
-import random
+from threading import Thread
+from flask import jsonify
 
 class Jobs:
-  def __init__(self, config):
+  def __init__(self, logger, config, single_year_problem_visualisation):
+    self.logger = logger
     self.config = config
+    self.single_year_problem_visualisation = single_year_problem_visualisation    
 
-  def _run(self, run_job_request):
-    sim_gen_url = os.path.join(self.config.jobs_base_url, self.config.sim_gen_url)
-    job_id = run_job_request.job_id
-    return random.randint(0, 10000)
+  def _run_single_year_problem(self, run_job_request):
+
+    thread = Thread(target=self.single_year_problem_visualisation._run, args=(run_job_request,))
+    thread.daemon = True
+    thread.start()
+
+    return jsonify({
+        "msg": "Success"
+    })

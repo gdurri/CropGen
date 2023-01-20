@@ -3,11 +3,16 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from lib.jobs import Jobs
 from lib.config import Config
 from lib.run_job_request import RunJobRequest
+from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
+from lib.logger import Logger
 
 app = Flask(__name__)
 
 # Create a jobs instance and pass it the config.
-jobs = Jobs(Config())
+config = Config()
+logger = Logger()
+single_year_problem_visualisation = SingleYearProblemVisualisation(logger, config)
+jobs = Jobs(logger, config, single_year_problem_visualisation)
 
 # Swagger Code
 swagger_url = '/swagger'
@@ -22,7 +27,7 @@ swaggerBlueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerBlueprint, url_prefix=swagger_url)
 
 # Endpoints
-@app.route('/cropgen/run/', methods = ['POST'])
+@app.route('/cropgen/run/singleyearproblem', methods = ['POST'])
 def cropgen():
     run_job_request = RunJobRequest(request)
     if not run_job_request.valid:
@@ -31,10 +36,7 @@ def cropgen():
             "errors": run_job_request.errors
         }), 400
 
-    result = jobs._run(run_job_request)
-    return jsonify(
-        result=result
-    )
+    return jobs._run_single_year_problem(run_job_request)
 
 # Main
 if __name__ == "__main__":
