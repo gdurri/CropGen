@@ -4,5 +4,5 @@ class JobsServerClient:
     self.config = config
     self.sim_gen_url = config._get_sim_gen_url()
 
-  def _run(self, run_job_request, params, outputNames, table):
-    job_id = run_job_request.job_id
+  def _run(self, job_id, params, outputNames, table):
+    fred = job_id
