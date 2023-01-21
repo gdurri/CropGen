@@ -64,7 +64,9 @@ class SingleYearProblemVisualisation(Problem):
 
       job_run_result = self.job_server_client._run(self.job_id, params, outputNames, self.HARVEST_REPORT_TABLE_NAME)
 
+      r1 = job_run_result[self.WATER_USE][0]
       water_use_job_result_calc = 1 * (job_run_result[self.WATER_USE][0]) 
+      r2 = job_run_result[self.YIELD][0]
       yield_job_result_calc = -1 * (job_run_result[self.YIELD][0]) 
 
       results.append([water_use_job_result_calc, yield_job_result_calc])

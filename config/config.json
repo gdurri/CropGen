@@ -1,4 +1,5 @@
 {
     "jobsBaseUrl": "https://jobs.cgmwgp.com/",
-    "simGenUrl": "api/jobs/simgen"
+    "simGenUrl": "api/jobs/simgen",
+    "useMockJobServerClient" : true
 }

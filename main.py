@@ -5,14 +5,14 @@ from lib.config import Config
 from lib.run_job_request import RunJobRequest
 from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.logger import Logger
-from lib.jobs_server_client import JobsServerClient
+from lib.jobs_server_client_factory import JobsServerClientFactory
 
 app = Flask(__name__)
 
 # Create a jobs instance and pass it the config.
 config = Config()
 logger = Logger()
-jobs_server_client = JobsServerClient(logger, config)
+jobs_server_client = JobsServerClientFactory()._create(config, logger)
 single_year_problem_visualisation = SingleYearProblemVisualisation(logger, jobs_server_client)
 jobs = Jobs(logger, config, single_year_problem_visualisation)
 

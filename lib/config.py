@@ -6,13 +6,14 @@ class Config:
 
     relative_path = '../config/config.json'
     current_script_dir = os.path.dirname(os.path.realpath(__file__))
-    config_file_full_path = os.path.join(current_script_dir, relative_path)
+    config_file_full_path = os.path.join(current_script_dir, relative_path)    
 
     with open(config_file_full_path) as json_config_file:
         data = json.load(json_config_file)    
     
     self.jobs_base_url = data['jobsBaseUrl']
     self.sim_gen_url = data['simGenUrl']
+    self.use_mock_job_server_client = data['useMockJobServerClient']
 
   def _get_sim_gen_url(self):
     return os.path.join(self.jobs_base_url, self.sim_gen_url)
