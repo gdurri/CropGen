@@ -29,7 +29,7 @@ class SingleYearProblemVisualisation(Problem):
     self.logger = logger
     self.job_server_client = job_server_client
     self.job_id = 0
-    self.indivs = []
+    self.individual_results = []
 
     super().__init__(
       n_var = 2, 
@@ -42,14 +42,14 @@ class SingleYearProblemVisualisation(Problem):
   def _evaluate(self, variable_values_for_population, out, *args, **kwargs):    
     results = []
     for population_value in variable_values_for_population:      
-      self._handle_evaluate_value_for_population(population_value, results)
+      self._handle_evaluate_value_for_population(population_value, out, results)
 
   # Evaluate fitness of the individuals in the population
   # Parameters:
   # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
   # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives 
   # and 'G' key for constraints
-  def _handle_evaluate_value_for_population(self, population_value, results):
+  def _handle_evaluate_value_for_population(self, population_value, out, results):
 
       params = {}
       params[self.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
@@ -57,28 +57,39 @@ class SingleYearProblemVisualisation(Problem):
 
       self._print_params(params)
 
+      # Initialise our out names array.
       outputNames = [
         self.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, 
         self.OUTPUT_NAME_YIELD_HA
       ]
 
+      # Ask the jobs server to run APSIM and store the result.
       job_run_result = self.job_server_client._run(self.job_id, params, outputNames, self.HARVEST_REPORT_TABLE_NAME)
 
-      r1 = job_run_result[self.WATER_USE][0]
-      water_use_job_result_calc = 1 * (job_run_result[self.WATER_USE][0]) 
-      r2 = job_run_result[self.YIELD][0]
-      yield_job_result_calc = -1 * (job_run_result[self.YIELD][0]) 
+      # Perform some calculations on the returned results.
+      water_use_job_result_calc = 1 * (job_run_result[self.WATER_USE][0])
+      yield_job_result_calc = -1 * (job_run_result[self.YIELD][0])
 
       results.append([water_use_job_result_calc, yield_job_result_calc])
 
-      self.indivs.append(
-        population_value[0], 
-        population_value[1], 
-        water_use_job_result_calc, 
-        (yield_job_result_calc * -0.01)
+      # TODO this doesn't compile anymore??
+      # self.indivivs.append(
+      #   population_value[0], 
+      #   population_value[1], 
+      #   water_use_job_result_calc, 
+      #   (yield_job_result_calc * -0.01)
+      # )
+
+      self.individual_results.extend(
+        [
+          population_value[0],
+          population_value[1],
+          water_use_job_result_calc,
+          (yield_job_result_calc * -0.01)
+        ]
       )
 
-      self.out[self.OUT_INDEX_F] = NumPy.array(results)
+      out[self.OUT_INDEX_F] = NumPy.array(results)
       
 
   def _print_params(self, params):
@@ -105,8 +116,6 @@ class SingleYearProblemVisualisation(Problem):
     X = minimize_result.X 
     # Objective values for non-dominated individuals in the last generation
     F = minimize_result.F
-    # History of data from all generations
-    minimize_history = minimize_result.history
 
     total = list(zip(X[:,0], X[:,1], F[:,0], (-0.01 * F[:,1])))
     
@@ -120,15 +129,16 @@ class SingleYearProblemVisualisation(Problem):
       ]
     )
 
-    all_data_frame = Pandas.DataFrame(
-      self.indivs, 
-      columns = [
-        self.END_JUV_TO_FI_THERMAL_TIME, 
-        self.FERTILE_TILLER_NUMBER, 
-        self.TOTAL_CROP_WATER_USE_MM, 
-        self.YIELD_HA
-      ]
-    )
+    # TODO - Fix
+    # all_data_frame = Pandas.DataFrame(
+    #   self.individual_results, 
+    #   columns = [
+    #     self.END_JUV_TO_FI_THERMAL_TIME, 
+    #     self.FERTILE_TILLER_NUMBER, 
+    #     self.TOTAL_CROP_WATER_USE_MM, 
+    #     self.YIELD_HA
+    #   ]
+    # )
 
     self._print_params(
       opt_data_frame.sort_values(self.YIELD_HA, ascending=False)
