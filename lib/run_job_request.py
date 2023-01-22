@@ -1,13 +1,19 @@
 class RunJobRequest:
-  def __init__(self, request_data):
+  # Constants
+  JOB_ID_JSON_ATTRIBUTE = 'jobId'
+
+  def __init__(self, logger, request_data):
+    self.logger = logger
     self.errors = []
     self._parse(request_data)
 
   def _parse(self, request_data):
 
     self.valid = True
-    self.job_id = request_data.json.get('jobId', None)
+    self.job_id = request_data.json.get(self.JOB_ID_JSON_ATTRIBUTE, None)
 
     if self.job_id == None:
         self.valid = False
-        self.errors.append("No jobId specified")
+        job_id_missing_error = "No {} specified".format(self.JOB_ID_JSON_ATTRIBUTE)
+        self.errors.append(job_id_missing_error)
+        self.logger._log_warn(job_id_missing_error)

@@ -4,6 +4,7 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 # from pymoo.factory import get_sampling, get_crossover, get_mutation
 import numpy as NumPy
 import pandas as Pandas
+from lib.results_logger import ResultsLogger
 
 class SingleYearProblemVisualisation(Problem):
 
@@ -30,6 +31,7 @@ class SingleYearProblemVisualisation(Problem):
     self.job_server_client = job_server_client
     self.job_id = 0
     self.individual_results = []
+    self.results_logger = ResultsLogger()
 
     super().__init__(
       n_var = 2, 
@@ -55,7 +57,7 @@ class SingleYearProblemVisualisation(Problem):
       params[self.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
       params[self.SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL]= population_value[1]
 
-      self._print_params(params)
+      self.results_logger._log_single_year_problem_entry(params)
 
       # Initialise our out names array.
       outputNames = [
@@ -91,10 +93,6 @@ class SingleYearProblemVisualisation(Problem):
 
       out[self.OUT_INDEX_F] = NumPy.array(results)
       
-
-  def _print_params(self, params):
-    # This might do something different soon, hence adding the method at this stage.
-    print(params)
 
   # Invokes the running of the problem.
   def _run(self, run_job_request):
@@ -140,7 +138,7 @@ class SingleYearProblemVisualisation(Problem):
     #   ]
     # )
 
-    self._print_params(
+    self.results_logger._log_single_year_problem_entry(
       opt_data_frame.sort_values(self.YIELD_HA, ascending=False)
     )
 

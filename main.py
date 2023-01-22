@@ -31,7 +31,7 @@ app.register_blueprint(swaggerBlueprint, url_prefix=swagger_url)
 # Endpoints
 @app.route('/cropgen/run/singleyearproblem', methods = ['POST'])
 def cropgen():
-    run_job_request = RunJobRequest(request)
+    run_job_request = RunJobRequest(logger, request)
     if not run_job_request.valid:
         return jsonify({
             "msg": "Invalid RunJobRequest",
