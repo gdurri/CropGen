@@ -59,17 +59,28 @@ class ResultsLogger:
     self.objective_space_graph_html = os.path.join(
       results_folder_for_now, "objective_space_graph.html"
     )
+
+    self.all_objectives_graph_json = os.path.join(
+      results_folder_for_now, "all_objectives_graph.json"
+    )
+    self.all_objectives_graph_html = os.path.join(
+      results_folder_for_now, "all_objectives_graph.html"
+    )
     
   def _log_problem_entry(self, data):
     self._log_entry(self.log_filename, str(data))
 
-  def _log_design_space_graph(self, json, html):
-    self._log_entry(self.design_space_graph_json, json)
-    self._log_entry(self.design_space_graph_html, html)
+  def _log_design_space_graph(self, graph):
+    self._log_entry(self.design_space_graph_json, graph.to_json(pretty=True))
+    self._log_entry(self.design_space_graph_html, graph.to_html())
 
-  def _log_objective_space_graph(self, json, html):
-    self._log_entry(self.objective_space_graph_json, json)
-    self._log_entry(self.objective_space_graph_html, html)
+  def _log_objective_space_graph(self, graph):
+    self._log_entry(self.objective_space_graph_json, graph.to_json(pretty=True))
+    self._log_entry(self.objective_space_graph_html, graph.to_html())
+    
+  def _log_all_objectives_graph(self, graph):
+    self._log_entry(self.all_objectives_graph_json, graph.to_json(pretty=True))
+    self._log_entry(self.all_objectives_graph_html, graph.to_html())
 
   def _log_entry(self, filename, data):
     with open(filename, "a") as file:

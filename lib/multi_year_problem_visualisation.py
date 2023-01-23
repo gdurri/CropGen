@@ -8,7 +8,7 @@ from lib.constants import Constants
 from lib.algorithm_generator import AlgorithmGenerator
 from lib.graph_generator import GraphGenerator
 
-class SingleYearProblemVisualisation(Problem):
+class MultiYearProblemVisualisation(Problem):
 
   # Construct problem with the given dimensions and variable ranges
   def __init__(self, config, logger, job_server_client):
@@ -50,7 +50,7 @@ class SingleYearProblemVisualisation(Problem):
 
       # Initialise our out names array.
       outputNames = [
-        Constants.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, 
+        Constants.FAILURE_RISK_YIELD_HA, 
         Constants.OUTPUT_NAME_YIELD_HA
       ]
 
@@ -77,7 +77,7 @@ class SingleYearProblemVisualisation(Problem):
   def _run(self, run_job_request):
     self.job_id = run_job_request.job_id
     self.results_logger._run_started()
-    algorithm = self.algorithm_generator._create_nsga2_algorithm(Constants.ALGORITHM_SINGLE_YEAR_POP_SIZE)
+    algorithm = self.algorithm_generator._create_nsga2_algorithm(Constants.ALGORITHM_MULTI_YEAR_POP_SIZE)
 
     # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
     # so problems must be framed such that each objective is minimised
@@ -85,7 +85,7 @@ class SingleYearProblemVisualisation(Problem):
     minimize_result = minimize(
       self, 
       algorithm,
-      (Constants.N_GEN, Constants.SINGLE_YEAR_GEN_NUMBER), 
+      (Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER), 
       save_history = True, 
       verbose = False
     )
@@ -102,7 +102,17 @@ class SingleYearProblemVisualisation(Problem):
       columns = [
         Constants.END_JUV_TO_FI_THERMAL_TIME, 
         Constants.FERTILE_TILLER_NUMBER, 
-        Constants.TOTAL_CROP_WATER_USE_MM, 
+        Constants.FAILURE_RISK_YIELD_HA, 
+        Constants.YIELD_HA
+      ]
+    )
+
+    all_data_frame = Pandas.DataFrame(
+      self.individual_results, 
+      columns = [
+        Constants.END_JUV_TO_FI_THERMAL_TIME, 
+        Constants.FERTILE_TILLER_NUMBER, 
+        Constants.FAILURE_RISK_YIELD_HA, 
         Constants.YIELD_HA
       ]
     )
@@ -110,20 +120,24 @@ class SingleYearProblemVisualisation(Problem):
     self.results_logger._log_problem_entry(
       opt_data_frame.sort_values(Constants.YIELD_HA, ascending=False)
     )
-    
-    self._do_graphs(opt_data_frame)
+
+    self._do_graphs(opt_data_frame, all_data_frame)
 
     # Now that we are done, report back.
     self.job_server_client._run_complete(self.job_id)
 
 
-  def _do_graphs(self, opt_data_frame):
-    design_space_graph = self.graph_generator._generate_design_space_graph_single_year(opt_data_frame, self.bounds())
+  def _do_graphs(self, opt_data_frame, all_data_frame):
+    design_space_graph = self.graph_generator._generate_design_space_graph_multi_year(opt_data_frame, self.bounds())
     self.results_logger._log_design_space_graph(design_space_graph)
 
-    objective_space_graph = self.graph_generator._generate_objective_space_graph_single_year(opt_data_frame)
+    objective_space_graph = self.graph_generator._generate_objective_space_graph_multi_year(opt_data_frame)
     self.results_logger._log_objective_space_graph(objective_space_graph)
+
+    all_objectives_graph = self.graph_generator._generate_all_objectives_graph(all_data_frame)
+    self.results_logger._log_all_objectives_graph(all_objectives_graph)
 
     if self.config.show_graphs_when_generated:
       design_space_graph.show()
       objective_space_graph.show()
+      all_objectives_graph.show()
