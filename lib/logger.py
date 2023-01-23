@@ -1,5 +1,5 @@
 from enum import Enum
-from datetime import date
+import datetime
 
 # class syntax
 class LogLevel(Enum):
@@ -52,4 +52,5 @@ class Logger:
     self._print_log(self.FATAL_LOG_PREFIX, log_entry)
 
   def _print_log(self, log_prefix, log_entry):
-    print("{}: {} - {}".format, (date.today(), log_prefix, log_entry))
+    date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"{date_str}: {log_prefix} - {log_entry}")

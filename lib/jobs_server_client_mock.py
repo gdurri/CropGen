@@ -17,11 +17,7 @@ class JobsServerClientMock:
     }
 
     self.logger._log_debug(
-      "{} run called with job_id: {}. Returning mock result: {}".format(
-        self.__class__.__name__,
-        job_id,
-        results
-        )
-      )
+      f"{self.__class__.__name__} run called with job_id:{job_id}. Returning mock result: {results}"
+    )
 
     return results

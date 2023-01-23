@@ -31,7 +31,7 @@ class SingleYearProblemVisualisation(Problem):
     self.job_server_client = job_server_client
     self.job_id = 0
     self.individual_results = []
-    self.results_logger = ResultsLogger()
+    self.results_logger = ResultsLogger(self.__class__.__name__)
 
     super().__init__(
       n_var = 2, 
@@ -57,7 +57,7 @@ class SingleYearProblemVisualisation(Problem):
       params[self.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
       params[self.SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL]= population_value[1]
 
-      self.results_logger._log_single_year_problem_entry(params)
+      self.results_logger._log_problem_entry(params)
 
       # Initialise our out names array.
       outputNames = [
@@ -75,7 +75,7 @@ class SingleYearProblemVisualisation(Problem):
       results.append([water_use_job_result_calc, yield_job_result_calc])
 
       # TODO this doesn't compile anymore??
-      # self.indivivs.append(
+      # self.individual_results.append(
       #   population_value[0], 
       #   population_value[1], 
       #   water_use_job_result_calc, 
@@ -138,7 +138,7 @@ class SingleYearProblemVisualisation(Problem):
     #   ]
     # )
 
-    self.results_logger._log_single_year_problem_entry(
+    self.results_logger._log_problem_entry(
       opt_data_frame.sort_values(self.YIELD_HA, ascending=False)
     )
 

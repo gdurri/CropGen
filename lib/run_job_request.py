@@ -14,6 +14,6 @@ class RunJobRequest:
 
     if self.job_id == None:
         self.valid = False
-        job_id_missing_error = "No {} specified".format(self.JOB_ID_JSON_ATTRIBUTE)
+        job_id_missing_error = f"No {self.JOB_ID_JSON_ATTRIBUTE} specified"
         self.errors.append(job_id_missing_error)
         self.logger._log_warn(job_id_missing_error)
