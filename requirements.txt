@@ -1,5 +1,6 @@
 flask
 flask-restplus
 flask_swagger_ui
-pymoo
 pandas
+plotly
+pymoo

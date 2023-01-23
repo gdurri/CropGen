@@ -1,9 +1,10 @@
 from pymoo.core.problem import Problem
 from pymoo.optimize import minimize
 from pymoo.algorithms.moo.nsga2 import NSGA2
-# from pymoo.factory import get_sampling, get_crossover, get_mutation
 import numpy as NumPy
 import pandas as Pandas
+import plotly.express as px
+
 from lib.results_logger import ResultsLogger
 
 class SingleYearProblemVisualisation(Problem):
@@ -23,6 +24,18 @@ class SingleYearProblemVisualisation(Problem):
   GEN_NUMBER = 2
   N_GEN = 'n_gen'
   OUT_INDEX_F = 'F'
+  # Graphs
+  GRAPH_WIDTH = 1400
+  GRAPH_HEIGHT = 700
+  GRAPH_GRID_COLOUR_LIGHT_GRAY = 'lightgray'
+  GRAPH_GRID_COLOUR_SLATE_GRAY = 'DarkSlateGrey'
+  GRAPH_FONT = 'Courier New'
+  GRAPH_FONT_SIZE = 16
+  GRAPH_FONT_COLOUR = 'black'
+  GRAPH_TITLE_X = 0.5
+  GRAPH_TICKS = 'outside'
+  GRAPH_PLOT_TYPE = 'plotly_white'
+  GRAPH_MODE_MARKERS = 'markers'
 
   # Construct problem with the given dimensions and variable ranges
   def __init__(self, logger, job_server_client):
@@ -141,6 +154,65 @@ class SingleYearProblemVisualisation(Problem):
     self.results_logger._log_problem_entry(
       opt_data_frame.sort_values(self.YIELD_HA, ascending=False)
     )
+
+    self._generate_graphs(opt_data_frame)
+
+    self.job_server_client._run_complete(self.job_id)
+
+  def _generate_graphs(self, opt_data_frame):
+    design_space_graph = self._generate_design_space_graph(opt_data_frame)
+    design_space_graph.show()
+
+    objective_space_graph = self._generate_objective_space_graph(opt_data_frame)
+    objective_space_graph.show()
+
+  def _generate_design_space_graph(self, opt_data_frame):
+    design_space_graph = px.scatter(
+      opt_data_frame, 
+      x = self.END_JUV_TO_FI_THERMAL_TIME, 
+      y = self.FERTILE_TILLER_NUMBER, 
+      title="Design Space", 
+      template = self.GRAPH_PLOT_TYPE,
+      hover_data = {
+        self.TOTAL_CROP_WATER_USE_MM: ':.2f', 
+        self.YIELD_HA: ':.2f', 
+        self.END_JUV_TO_FI_THERMAL_TIME: False, 
+        self.FERTILE_TILLER_NUMBER: False
+      },
+      width = self.GRAPH_WIDTH,
+      height = self.GRAPH_HEIGHT
+    )
+
+    xl, xu = self.bounds()
+    
+    design_space_graph.update_traces(mode=self.GRAPH_MODE_MARKERS, marker=dict(size=12, line=dict(width=2, color=self.GRAPH_GRID_COLOUR_SLATE_GRAY)))
+    design_space_graph.update_layout(font_family=self.GRAPH_FONT, font_size = self.GRAPH_FONT_SIZE, title_font_color = self.GRAPH_FONT_COLOUR, title_x=self.GRAPH_TITLE_X)
+    design_space_graph.update_xaxes(range=[xl[0], xu[0]], gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
+    design_space_graph.update_yaxes(range=[xl[1], xu[1]], gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
+    return design_space_graph
+
+  def _generate_objective_space_graph(self, opt_data_frame):
+    objective_space_graph = px.scatter(
+      opt_data_frame, 
+      x = self.TOTAL_CROP_WATER_USE_MM, 
+      y = self.YIELD_HA, 
+      title = "Objective Space", 
+      template = self.GRAPH_PLOT_TYPE,
+      hover_data = {
+        self.TOTAL_CROP_WATER_USE_MM: False, 
+        self.YIELD_HA: False, 
+        self.END_JUV_TO_FI_THERMAL_TIME: ':.2f', 
+        self.FERTILE_TILLER_NUMBER: ':.2f'
+      },
+      width = self.GRAPH_WIDTH,
+      height = self.GRAPH_HEIGHT
+    )
+    
+    objective_space_graph.update_traces(mode=self.GRAPH_MODE_MARKERS, marker=dict(size=12,line=dict(width=2, color=self.GRAPH_GRID_COLOUR_SLATE_GRAY)))
+    objective_space_graph.update_layout(font_family=self.GRAPH_FONT, font_size = self.GRAPH_FONT_SIZE, title_font_color = self.GRAPH_FONT_COLOUR, title_x=self.GRAPH_TITLE_X)
+    objective_space_graph.update_xaxes(gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
+    objective_space_graph.update_yaxes(gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
+    return objective_space_graph
 
 
   def _create_algorithm(self):

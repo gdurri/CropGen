@@ -22,7 +22,7 @@ class ResultsLogger:
     if not os.path.exists(results_folder_for_today):
       os.makedirs(results_folder_for_today)
 
-    current_time = now.strftime("%H-%M-%S")
+    current_time = now.strftime("%H.%M.%S")
     results_file_name = f"{problem}_{current_time}.txt"
     return os.path.join(results_folder_for_today, results_file_name)
     
