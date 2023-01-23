@@ -14,6 +14,7 @@ class Config:
     self.jobs_base_url = data['jobsBaseUrl']
     self.sim_gen_url = data['simGenUrl']
     self.use_mock_job_server_client = data['useMockJobServerClient']
+    self.show_graphs_when_generated = data['showGraphsWhenGenerated']
 
   def _get_sim_gen_url(self):
     return os.path.join(self.jobs_base_url, self.sim_gen_url)

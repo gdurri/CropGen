@@ -13,7 +13,7 @@ app = Flask(__name__)
 config = Config()
 logger = Logger()
 jobs_server_client = JobsServerClientFactory()._create(config, logger)
-single_year_problem_visualisation = SingleYearProblemVisualisation(logger, jobs_server_client)
+single_year_problem_visualisation = SingleYearProblemVisualisation(config, logger, jobs_server_client)
 jobs = Jobs(logger, config, single_year_problem_visualisation)
 
 # Swagger Code

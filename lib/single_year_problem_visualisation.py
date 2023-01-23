@@ -6,45 +6,23 @@ import pandas as Pandas
 import plotly.express as px
 
 from lib.results_logger import ResultsLogger
+from lib.constants import Constants
+from lib.algorithm_generator import AlgorithmGenerator
+from lib.graph_generator import GraphGenerator
 
 class SingleYearProblemVisualisation(Problem):
 
-  # Constants
-  HARVEST_REPORT_TABLE_NAME = 'HarvestReport'
-  END_JUV_TO_FI_THERMAL_TIME = 'EndJuvtoFI Thermal Time (DD)'
-  FERTILE_TILLER_NUMBER = 'Fertile Tiller Number'
-  TOTAL_CROP_WATER_USE_MM = 'Total Crop Water Use (mm)'
-  YIELD_HA = 'Yield (t/ha)'
-  WATER_USE = 'WaterUse'
-  YIELD = 'Yield'
-  SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL = '[Sorghum].Phenology.TTEndJuvToInit.FixedValue'
-  SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL  = '[Sow on a fixed date].Script.Tillering'
-  OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM = 'Total Crop Water Use (mm)'
-  OUTPUT_NAME_YIELD_HA = 'Yield (t/ha)'
-  GEN_NUMBER = 2
-  N_GEN = 'n_gen'
-  OUT_INDEX_F = 'F'
-  # Graphs
-  GRAPH_WIDTH = 1400
-  GRAPH_HEIGHT = 700
-  GRAPH_GRID_COLOUR_LIGHT_GRAY = 'lightgray'
-  GRAPH_GRID_COLOUR_SLATE_GRAY = 'DarkSlateGrey'
-  GRAPH_FONT = 'Courier New'
-  GRAPH_FONT_SIZE = 16
-  GRAPH_FONT_COLOUR = 'black'
-  GRAPH_TITLE_X = 0.5
-  GRAPH_TICKS = 'outside'
-  GRAPH_PLOT_TYPE = 'plotly_white'
-  GRAPH_MODE_MARKERS = 'markers'
-
   # Construct problem with the given dimensions and variable ranges
-  def __init__(self, logger, job_server_client):
+  def __init__(self, config, logger, job_server_client):
     # Member variables
+    self.config = config
     self.logger = logger
     self.job_server_client = job_server_client
     self.job_id = 0
     self.individual_results = []
     self.results_logger = ResultsLogger(self.__class__.__name__)
+    self.algorithm_generator = AlgorithmGenerator()
+    self.graph_generator = GraphGenerator()
 
     super().__init__(
       n_var = 2, 
@@ -67,23 +45,23 @@ class SingleYearProblemVisualisation(Problem):
   def _handle_evaluate_value_for_population(self, population_value, out, results):
 
       params = {}
-      params[self.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
-      params[self.SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL]= population_value[1]
+      params[Constants.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
+      params[Constants.SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL]= population_value[1]
 
       self.results_logger._log_problem_entry(params)
 
       # Initialise our out names array.
       outputNames = [
-        self.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, 
-        self.OUTPUT_NAME_YIELD_HA
+        Constants.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, 
+        Constants.OUTPUT_NAME_YIELD_HA
       ]
 
       # Ask the jobs server to run APSIM and store the result.
-      job_run_result = self.job_server_client._run(self.job_id, params, outputNames, self.HARVEST_REPORT_TABLE_NAME)
+      job_run_result = self.job_server_client._run(self.job_id, params, outputNames, Constants.GRAPH_MODE_MARKERS)
 
       # Perform some calculations on the returned results.
-      water_use_job_result_calc = 1 * (job_run_result[self.WATER_USE][0])
-      yield_job_result_calc = -1 * (job_run_result[self.YIELD][0])
+      water_use_job_result_calc = 1 * (job_run_result[Constants.WATER_USE][0])
+      yield_job_result_calc = -1 * (job_run_result[Constants.YIELD][0])
 
       results.append([water_use_job_result_calc, yield_job_result_calc])
 
@@ -104,13 +82,15 @@ class SingleYearProblemVisualisation(Problem):
         ]
       )
 
-      out[self.OUT_INDEX_F] = NumPy.array(results)
+      out[Constants.OUT_INDEX_F] = NumPy.array(results)
       
 
   # Invokes the running of the problem.
   def _run(self, run_job_request):
     self.job_id = run_job_request.job_id
-    algorithm = self._create_algorithm()
+    self.results_logger._run_started()
+    pop_size = 5
+    algorithm = self.algorithm_generator._create_nsga2_algorithm(pop_size)
 
     # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
     # so problems must be framed such that each objective is minimised
@@ -118,7 +98,7 @@ class SingleYearProblemVisualisation(Problem):
     minimize_result = minimize(
       self, 
       algorithm,
-      (self.N_GEN, self.GEN_NUMBER), 
+      (Constants.N_GEN, Constants.GEN_NUMBER), 
       save_history = True, 
       verbose = False
     )
@@ -133,10 +113,10 @@ class SingleYearProblemVisualisation(Problem):
     opt_data_frame = Pandas.DataFrame(
       total, 
       columns = [
-        self.END_JUV_TO_FI_THERMAL_TIME, 
-        self.FERTILE_TILLER_NUMBER, 
-        self.TOTAL_CROP_WATER_USE_MM, 
-        self.YIELD_HA
+        Constants.END_JUV_TO_FI_THERMAL_TIME, 
+        Constants.FERTILE_TILLER_NUMBER, 
+        Constants.TOTAL_CROP_WATER_USE_MM, 
+        Constants.YIELD_HA
       ]
     )
 
@@ -144,85 +124,26 @@ class SingleYearProblemVisualisation(Problem):
     # all_data_frame = Pandas.DataFrame(
     #   self.individual_results, 
     #   columns = [
-    #     self.END_JUV_TO_FI_THERMAL_TIME, 
-    #     self.FERTILE_TILLER_NUMBER, 
-    #     self.TOTAL_CROP_WATER_USE_MM, 
-    #     self.YIELD_HA
+    #     Constants.END_JUV_TO_FI_THERMAL_TIME, 
+    #     Constants.FERTILE_TILLER_NUMBER, 
+    #     Constants.TOTAL_CROP_WATER_USE_MM, 
+    #     Constants.YIELD_HA
     #   ]
     # )
 
     self.results_logger._log_problem_entry(
-      opt_data_frame.sort_values(self.YIELD_HA, ascending=False)
+      opt_data_frame.sort_values(Constants.YIELD_HA, ascending=False)
     )
 
-    self._generate_graphs(opt_data_frame)
+    design_space_graph = self.graph_generator._generate_design_space_graph(opt_data_frame, self.bounds())
+    self.results_logger._log_design_space_graph(design_space_graph.to_json(pretty=True))
 
-    self.job_server_client._run_complete(self.job_id)
+    objective_space_graph = self.graph_generator._generate_objective_space_graph(opt_data_frame)
+    self.results_logger._log_objective_space_graph(objective_space_graph.to_json(pretty=True))
 
-  def _generate_graphs(self, opt_data_frame):
-    design_space_graph = self._generate_design_space_graph(opt_data_frame)
-    design_space_graph.show()
+    if self.config.show_graphs_when_generated:
+      design_space_graph.show()
+      objective_space_graph.show()
 
-    objective_space_graph = self._generate_objective_space_graph(opt_data_frame)
-    objective_space_graph.show()
-
-  def _generate_design_space_graph(self, opt_data_frame):
-    design_space_graph = px.scatter(
-      opt_data_frame, 
-      x = self.END_JUV_TO_FI_THERMAL_TIME, 
-      y = self.FERTILE_TILLER_NUMBER, 
-      title="Design Space", 
-      template = self.GRAPH_PLOT_TYPE,
-      hover_data = {
-        self.TOTAL_CROP_WATER_USE_MM: ':.2f', 
-        self.YIELD_HA: ':.2f', 
-        self.END_JUV_TO_FI_THERMAL_TIME: False, 
-        self.FERTILE_TILLER_NUMBER: False
-      },
-      width = self.GRAPH_WIDTH,
-      height = self.GRAPH_HEIGHT
-    )
-
-    xl, xu = self.bounds()
-    
-    design_space_graph.update_traces(mode=self.GRAPH_MODE_MARKERS, marker=dict(size=12, line=dict(width=2, color=self.GRAPH_GRID_COLOUR_SLATE_GRAY)))
-    design_space_graph.update_layout(font_family=self.GRAPH_FONT, font_size = self.GRAPH_FONT_SIZE, title_font_color = self.GRAPH_FONT_COLOUR, title_x=self.GRAPH_TITLE_X)
-    design_space_graph.update_xaxes(range=[xl[0], xu[0]], gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
-    design_space_graph.update_yaxes(range=[xl[1], xu[1]], gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
-    return design_space_graph
-
-  def _generate_objective_space_graph(self, opt_data_frame):
-    objective_space_graph = px.scatter(
-      opt_data_frame, 
-      x = self.TOTAL_CROP_WATER_USE_MM, 
-      y = self.YIELD_HA, 
-      title = "Objective Space", 
-      template = self.GRAPH_PLOT_TYPE,
-      hover_data = {
-        self.TOTAL_CROP_WATER_USE_MM: False, 
-        self.YIELD_HA: False, 
-        self.END_JUV_TO_FI_THERMAL_TIME: ':.2f', 
-        self.FERTILE_TILLER_NUMBER: ':.2f'
-      },
-      width = self.GRAPH_WIDTH,
-      height = self.GRAPH_HEIGHT
-    )
-    
-    objective_space_graph.update_traces(mode=self.GRAPH_MODE_MARKERS, marker=dict(size=12,line=dict(width=2, color=self.GRAPH_GRID_COLOUR_SLATE_GRAY)))
-    objective_space_graph.update_layout(font_family=self.GRAPH_FONT, font_size = self.GRAPH_FONT_SIZE, title_font_color = self.GRAPH_FONT_COLOUR, title_x=self.GRAPH_TITLE_X)
-    objective_space_graph.update_xaxes(gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
-    objective_space_graph.update_yaxes(gridcolor=self.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=self.GRAPH_TICKS, showline=True,linecolor= self.GRAPH_GRID_COLOUR_LIGHT_GRAY)
-    return objective_space_graph
-
-
-  def _create_algorithm(self):
-    # TODO - get_sampling ETC have been deprecated.
-    # return NSGA2(
-    #   pop_size = 5,
-    #   sampling = get_sampling("real_random"),
-    #   crossover = get_crossover("real_sbx", prob=0.9, eta=15),
-    #   mutation = get_mutation("real_pm", eta=20),
-    #   eliminate_duplicates = True
-    # )
-    return NSGA2(pop_size = 5)
-
+    # Now that we are done, report back.
+    self.job_server_client._run_complete(self.job_id)  
