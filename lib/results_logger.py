@@ -46,22 +46,30 @@ class ResultsLogger:
       results_folder_for_now, "logs.txt"
     )
 
-    self.design_space_graph = os.path.join(
+    self.design_space_graph_json = os.path.join(
       results_folder_for_now, "design_space_graph.json"
     )
+    self.design_space_graph_html = os.path.join(
+      results_folder_for_now, "design_space_graph.html"
+    )
 
-    self.objective_space_graph = os.path.join(
+    self.objective_space_graph_json = os.path.join(
       results_folder_for_now, "objective_space_graph.json"
+    )
+    self.objective_space_graph_html = os.path.join(
+      results_folder_for_now, "objective_space_graph.html"
     )
     
   def _log_problem_entry(self, data):
     self._log_entry(self.log_filename, str(data))
 
-  def _log_design_space_graph(self, data):
-    self._log_entry(self.design_space_graph, data)
+  def _log_design_space_graph(self, json, html):
+    self._log_entry(self.design_space_graph_json, json)
+    self._log_entry(self.design_space_graph_html, html)
 
-  def _log_objective_space_graph(self, data):
-    self._log_entry(self.objective_space_graph, data)
+  def _log_objective_space_graph(self, json, html):
+    self._log_entry(self.objective_space_graph_json, json)
+    self._log_entry(self.objective_space_graph_html, html)
 
   def _log_entry(self, filename, data):
     with open(filename, "a") as file:

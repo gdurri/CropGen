@@ -136,10 +136,16 @@ class SingleYearProblemVisualisation(Problem):
     )
 
     design_space_graph = self.graph_generator._generate_design_space_graph(opt_data_frame, self.bounds())
-    self.results_logger._log_design_space_graph(design_space_graph.to_json(pretty=True))
+    self.results_logger._log_design_space_graph(
+      design_space_graph.to_json(pretty=True),
+      design_space_graph.to_html()
+    )
 
     objective_space_graph = self.graph_generator._generate_objective_space_graph(opt_data_frame)
-    self.results_logger._log_objective_space_graph(objective_space_graph.to_json(pretty=True))
+    self.results_logger._log_objective_space_graph(
+      objective_space_graph.to_json(pretty=True),
+      objective_space_graph.to_html()
+    )
 
     if self.config.show_graphs_when_generated:
       design_space_graph.show()
