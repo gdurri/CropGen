@@ -5,8 +5,10 @@ from lib.config import Config
 from lib.run_job_request import RunJobRequest
 from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.multi_year_problem_visualisation import MultiYearProblemVisualisation
+from lib.performance import Performance
 from lib.logger import Logger
 from lib.jobs_server_client_factory import JobsServerClientFactory
+from lib.results_logger import ResultsLogger
 
 app = Flask(__name__)
 
@@ -14,9 +16,19 @@ app = Flask(__name__)
 config = Config()
 logger = Logger()
 jobs_server_client = JobsServerClientFactory()._create(config, logger)
+# Before starting, delete and recreate the results folder.
+ResultsLogger._remove_and_create_results_folder()
 single_year_problem_visualisation = SingleYearProblemVisualisation(config, logger, jobs_server_client)
 multi_year_problem_visualisation = MultiYearProblemVisualisation(config, logger, jobs_server_client)
-jobs = Jobs(logger, config, single_year_problem_visualisation, multi_year_problem_visualisation)
+performance = Performance(config, logger, jobs_server_client)
+
+jobs = Jobs(
+    logger, 
+    config, 
+    single_year_problem_visualisation, 
+    multi_year_problem_visualisation,
+    performance
+)
 
 # Swagger Code
 swagger_url = '/swagger'
@@ -54,6 +66,18 @@ def cropgen_multi_year_problem():
         }), 400
 
     return jobs._run_multi_year_problem(run_job_request)
+
+# Performance
+@app.route('/cropgen/run/performance', methods = ['POST'])
+def cropgen_performance():
+    run_job_request = RunJobRequest(logger, request)
+    if not run_job_request.valid:
+        return jsonify({
+            "msg": "Invalid RunJobRequest",
+            "errors": run_job_request.errors
+        }), 400
+
+    return jobs._run_performance(run_job_request)
 
 # Main
 if __name__ == "__main__":

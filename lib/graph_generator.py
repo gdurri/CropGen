@@ -177,7 +177,7 @@ class GraphGenerator():
     graph.update_traces(mode=Constants.GRAPH_MODE_MARKERS, marker=dict(size=12,line=dict(width=2, color=Constants.GRAPH_GRID_COLOUR_SLATE_GRAY)))
     graph.update_layout(font_family=Constants.GRAPH_FONT, font_size = Constants.GRAPH_FONT_SIZE, title_font_color = Constants.GRAPH_FONT_COLOUR, title_x=Constants.GRAPH_TITLE_X)
 
-    if bounds == None:
+    if bounds is None:
       graph.update_xaxes(gridcolor=Constants.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=Constants.GRAPH_TICKS, showline=True,linecolor= Constants.GRAPH_GRID_COLOUR_LIGHT_GRAY)
       graph.update_yaxes(gridcolor=Constants.GRAPH_GRID_COLOUR_LIGHT_GRAY, mirror= True, ticks=Constants.GRAPH_TICKS, showline=True,linecolor= Constants.GRAPH_GRID_COLOUR_LIGHT_GRAY)
     else: 

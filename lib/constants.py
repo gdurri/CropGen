@@ -37,3 +37,6 @@ class Constants():
   GRAPH_TITLE_ALL_INDIVIDUALS = 'All Individuals'
   GRAPH_TITLE_ALL_OBJECTIVES = "All Objectives"
   GRAPH_TITLE_YIELD_OVER_MATURITY = "Yield over Maturity"
+  CONSTRAINT_VIOLATIONS_KEY = 'CV'
+  FEASIBLE_KEY = 'feasible'
+  HISTORY_FEASIBLE_KEY = 'F'

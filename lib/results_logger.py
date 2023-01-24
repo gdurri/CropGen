@@ -27,27 +27,34 @@ class ResultsLogger:
     self.problem = problem
     self.results_folder = ''
     self.results_folder_for_now = ''
-    self._create_results_folder()
     self.run_started_time = 0.0
+    self.results_folder = ResultsLogger._get_results_folder_path()
+
+  @staticmethod
+  def _get_results_folder_path():
+    return os.path.join(
+      os.path.dirname(os.path.realpath(__file__)), 
+      f'../{ResultsLogger.RESULTS_FOLDER}/'
+    )
+
+  @staticmethod
+  def _remove_and_create_results_folder():
+    results_folder = ResultsLogger._get_results_folder_path()
+
+    # Remove and recreate the results directory.
+    if os.path.exists(results_folder):
+      shutil.rmtree(results_folder)
+    os.makedirs(results_folder)
 
   def _run_started(self):
     self._construct_results_file_path()
     self.run_started_time = time.time()
     self._log_problem_entry(f'Run started')
 
-  def _run_finished(self):
+
+  def _run_ended(self):
     self._log_problem_entry(f'Run finished. Total run time: {time.time() - self.run_started_time} seconds')
 
-  def _create_results_folder(self):
-    self.results_folder = os.path.join(
-      os.path.dirname(os.path.realpath(__file__)), 
-      f'../{self.RESULTS_FOLDER}/'
-    )
-
-    # Remove and recreate the results directory.
-    if os.path.exists(self.results_folder):
-      shutil.rmtree(self.results_folder)
-    os.makedirs(self.results_folder)
 
   def _construct_results_file_path(self):
     now = datetime.datetime.now()
