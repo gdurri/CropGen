@@ -10,5 +10,5 @@ class AlgorithmGenerator():
     #   mutation = get_mutation("real_pm", eta=20),
     #   eliminate_duplicates = True
     # )
-    return NSGA2(pop_size = 5)
+    return NSGA2(pop_size = pop_size)
 

@@ -77,6 +77,7 @@ class SingleYearProblemVisualisation(Problem):
   def _run(self, run_job_request):
     self.job_id = run_job_request.job_id
     self.results_logger._run_started()
+
     algorithm = self.algorithm_generator._create_nsga2_algorithm(Constants.ALGORITHM_SINGLE_YEAR_POP_SIZE)
 
     # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
@@ -107,23 +108,75 @@ class SingleYearProblemVisualisation(Problem):
       ]
     )
 
+    all_data_frame = Pandas.DataFrame(
+      self.individual_results, 
+      columns = [
+        Constants.END_JUV_TO_FI_THERMAL_TIME, 
+        Constants.FERTILE_TILLER_NUMBER, 
+        Constants.TOTAL_CROP_WATER_USE_MM, 
+        Constants.YIELD_HA
+      ]
+    )
+
     self.results_logger._log_problem_entry(
       opt_data_frame.sort_values(Constants.YIELD_HA, ascending=False)
     )
     
-    self._do_graphs(opt_data_frame)
+    self._do_graphs(opt_data_frame, all_data_frame)
 
     # Now that we are done, report back.
     self.job_server_client._run_complete(self.job_id)
+    self.results_logger._run_finished()
 
 
-  def _do_graphs(self, opt_data_frame):
+  def _do_graphs(self, opt_data_frame, all_data_frame):
+    # Design Space
     design_space_graph = self.graph_generator._generate_design_space_graph_single_year(opt_data_frame, self.bounds())
-    self.results_logger._log_design_space_graph(design_space_graph)
+    self.results_logger._log_graph(
+      design_space_graph, 
+      ResultsLogger.DESIGN_SPACE_GRAPH_JSON,
+      ResultsLogger.DESIGN_SPACE_GRAPH_HTML
+    )
 
+    # Objective Space
     objective_space_graph = self.graph_generator._generate_objective_space_graph_single_year(opt_data_frame)
-    self.results_logger._log_objective_space_graph(objective_space_graph)
+    self.results_logger._log_graph(
+      objective_space_graph, 
+      ResultsLogger.OBJECTIVE_SPACE_GRAPH_JSON,
+      ResultsLogger.OBJECTIVE_SPACE_GRAPH_HTML
+    )
+
+    # All Individuals
+    all_individuals_graph = self.graph_generator._generate_all_individuals_graph_single_year(all_data_frame, self.bounds())
+    self.results_logger._log_graph(
+      all_individuals_graph, 
+      ResultsLogger.ALL_INDIVIDUALS_GRAPH_JSON,
+      ResultsLogger.ALL_INDIVIDUALS_GRAPH_HTML
+    )
+
+    # All Objectives
+    all_objectives_graph = self.graph_generator._generate_all_objectives_graph_single_year(all_data_frame)
+    self.results_logger._log_graph(
+      all_objectives_graph,
+      ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_JSON,
+      ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_HTML
+    )
+
+    # Yield Over Maturity
+    yield_over_maturity_graph = self.graph_generator._generate_yield_over_maturity_graph_single_year(all_data_frame)
+    self.results_logger._log_graph(
+      yield_over_maturity_graph,
+      ResultsLogger.YIELD_OVER_MATURITY_GRAPH_JSON,
+      ResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML
+    )
+
+    # Log the raw data frames.
+    self.results_logger._log_raw_results(opt_data_frame, ResultsLogger.OPT_DATA_FRAME_JSON)
+    self.results_logger._log_raw_results(all_data_frame, ResultsLogger.ALL_DATA_FRAME_JSON)
 
     if self.config.show_graphs_when_generated:
       design_space_graph.show()
       objective_space_graph.show()
+      all_individuals_graph.show()
+      all_objectives_graph.show()
+      yield_over_maturity_graph.show()

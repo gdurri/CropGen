@@ -1,19 +1,47 @@
 import datetime
+import time
 import shutil
 import os
 
 class ResultsLogger:
+
+  RESULTS_FOLDER = 'results'
+  LOG_FILE = 'logs.txt'
+  DESIGN_SPACE_GRAPH_JSON = 'design_space_graph.json'
+  DESIGN_SPACE_GRAPH_HTML = 'design_space_graph.html'
+  OBJECTIVE_SPACE_GRAPH_JSON = 'objective_space_graph.json'
+  OBJECTIVE_SPACE_GRAPH_HTML = 'objective_space_graph.html'
+  ALL_INDIVIDUALS_GRAPH_JSON = 'all_individuals_graph.json'
+  ALL_INDIVIDUALS_GRAPH_HTML = 'all_individuals_graph.html'
+  ALL_OBJECTIVES_SPACE_GRAPH_JSON = 'all_objectives_graph.json'
+  ALL_OBJECTIVES_SPACE_GRAPH_HTML = 'all_objectives_graph.html'
+  YIELD_OVER_MATURITY_GRAPH_JSON = 'yield_over_maturity_graph.json'
+  YIELD_OVER_MATURITY_GRAPH_HTML = 'yield_over_maturity_graph.html'
+  OPT_DATA_FRAME_JSON = 'opt_data.json'
+  ALL_DATA_FRAME_JSON = 'all_data.json'
+
+  DATE_FORMAT = '%Y-%m-%d'
+  TIME_FORMAT = '%H.%M.%S'
+
   def __init__(self, problem):
     self.problem = problem
+    self.results_folder = ''
+    self.results_folder_for_now = ''
     self._create_results_folder()
+    self.run_started_time = 0.0
 
   def _run_started(self):
     self._construct_results_file_path()
+    self.run_started_time = time.time()
+    self._log_problem_entry(f'Run started')
+
+  def _run_finished(self):
+    self._log_problem_entry(f'Run finished. Total run time: {time.time() - self.run_started_time} seconds')
 
   def _create_results_folder(self):
     self.results_folder = os.path.join(
       os.path.dirname(os.path.realpath(__file__)), 
-      '../results/'
+      f'../{self.RESULTS_FOLDER}/'
     )
 
     # Remove and recreate the results directory.
@@ -26,61 +54,39 @@ class ResultsLogger:
 
     results_folder_for_today = os.path.join(
       self.results_folder,
-      now.strftime("%Y-%m-%d")
+      now.strftime(self.DATE_FORMAT)
     )
     # Remove and recreate the results directory.
     if not os.path.exists(results_folder_for_today):
       os.makedirs(results_folder_for_today)
 
-    time_str = now.strftime("%H.%M.%S")
+    time_str = now.strftime(self.TIME_FORMAT)
 
     results_folder_for_now = os.path.join(
       results_folder_for_today,
       f"{self.problem}_{time_str}"
     )
+
     # Create a folder within today, for the current time.
     if not os.path.exists(results_folder_for_now):
       os.makedirs(results_folder_for_now)
 
-    self.log_filename = os.path.join(
-      results_folder_for_now, "logs.txt"
-    )
+    self.results_folder_for_now = results_folder_for_now
+  
+  def _create_filepath_in_for_now_folder(self, filename):
+    return os.path.join(self.results_folder_for_now, filename)
 
-    self.design_space_graph_json = os.path.join(
-      results_folder_for_now, "design_space_graph.json"
-    )
-    self.design_space_graph_html = os.path.join(
-      results_folder_for_now, "design_space_graph.html"
-    )
-
-    self.objective_space_graph_json = os.path.join(
-      results_folder_for_now, "objective_space_graph.json"
-    )
-    self.objective_space_graph_html = os.path.join(
-      results_folder_for_now, "objective_space_graph.html"
-    )
-
-    self.all_objectives_graph_json = os.path.join(
-      results_folder_for_now, "all_objectives_graph.json"
-    )
-    self.all_objectives_graph_html = os.path.join(
-      results_folder_for_now, "all_objectives_graph.html"
-    )
-    
   def _log_problem_entry(self, data):
-    self._log_entry(self.log_filename, str(data))
-
-  def _log_design_space_graph(self, graph):
-    self._log_entry(self.design_space_graph_json, graph.to_json(pretty=True))
-    self._log_entry(self.design_space_graph_html, graph.to_html())
-
-  def _log_objective_space_graph(self, graph):
-    self._log_entry(self.objective_space_graph_json, graph.to_json(pretty=True))
-    self._log_entry(self.objective_space_graph_html, graph.to_html())
+    date_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H.%M.%S')
+    data_str = f"{date_time_str}: {str(data)}"
+    self._log_entry(self._create_filepath_in_for_now_folder(ResultsLogger.LOG_FILE), data_str)
     
-  def _log_all_objectives_graph(self, graph):
-    self._log_entry(self.all_objectives_graph_json, graph.to_json(pretty=True))
-    self._log_entry(self.all_objectives_graph_html, graph.to_html())
+  def _log_graph(self, graph, graph_file_name_json, graph_file_name_html):
+    self._log_entry(self._create_filepath_in_for_now_folder(graph_file_name_json), graph.to_json(pretty=True))
+    self._log_entry(self._create_filepath_in_for_now_folder(graph_file_name_html), graph.to_html())
+
+  def _log_raw_results(self, data_frame, filename):
+    self._log_entry(self._create_filepath_in_for_now_folder(filename), data_frame.to_json(indent=2))
 
   def _log_entry(self, filename, data):
     with open(filename, "a") as file:

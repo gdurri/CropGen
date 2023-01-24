@@ -32,6 +32,8 @@ class Constants():
   GRAPH_TICKS = 'outside'
   GRAPH_PLOT_TYPE = 'plotly_white'
   GRAPH_MODE_MARKERS = 'markers'
-  GRAPH_TITLE_DESIGN_SPACE = "Design Space"
-  GRAPH_TITLE_OBJECTIVE_SPACE = "Objective Space"
+  GRAPH_TITLE_DESIGN_SPACE = 'Design Space'
+  GRAPH_TITLE_OBJECTIVE_SPACE = 'Objective Space'
+  GRAPH_TITLE_ALL_INDIVIDUALS = 'All Individuals'
   GRAPH_TITLE_ALL_OBJECTIVES = "All Objectives"
+  GRAPH_TITLE_YIELD_OVER_MATURITY = "Yield over Maturity"
