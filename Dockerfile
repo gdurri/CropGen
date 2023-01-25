@@ -14,4 +14,5 @@ COPY . .
 ENV FLASK_APP=main.py
 ENV RUNNING_IN_DOCKER Yes
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD [ "python", "./main.py", "--host", "0.0.0.0", "--port", "8000"]
+# CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

@@ -62,10 +62,10 @@ class Performance():
       # Append list with objective values for non-dominated individuals in generation
       self.non_dominant_individuals_history.append(optimal_individuals.get(Constants.HISTORY_FEASIBLE_KEY)[feasibility])
 
-      self._analyse_results_and_do_graphs()
+      self._do_graphs()
 
 
-  def _analyse_results_and_do_graphs(self):
+  def _do_graphs(self):
   
     # Generation with the first feasible individual
     first_feasible_individual = NumPy.where(NumPy.array(self.history_minimum_constraint_violations) <= 0)[0].min()
@@ -86,6 +86,7 @@ class Performance():
     #if self.config.show_graphs_when_generated:
       #plt.show()
 
+    # TODO - Not Working
     # Plot number of non-dominated solutions against generation number
     #plt.figure(figsize=(7, 5))
     #plt.plot(NumPy.arange(1,(self.single_year_problem.generation_number + 1),1), self.non_dominant_individuals,  color='black', lw=0.7)

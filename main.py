@@ -1,84 +1,25 @@
-from flask import Flask, jsonify, request
-from flask_swagger_ui import get_swaggerui_blueprint
-from lib.jobs import Jobs
+import asyncio
+import websockets
 from lib.config import Config
-from lib.run_job_request import RunJobRequest
-from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
-from lib.multi_year_problem_visualisation import MultiYearProblemVisualisation
-from lib.performance import Performance
 from lib.logger import Logger
-from lib.jobs_server_client_factory import JobsServerClientFactory
-from lib.results_logger import ResultsLogger
+from lib.message_processor import MessageProcessor
 
-app = Flask(__name__)
+message_processor = MessageProcessor()
 
-# Create various class instances.
-config = Config()
-logger = Logger()
-jobs_server_client = JobsServerClientFactory()._create(config, logger)
-# Before starting, delete and recreate the results folder.
-ResultsLogger._remove_and_create_results_folder()
-single_year_problem_visualisation = SingleYearProblemVisualisation(config, logger, jobs_server_client)
-multi_year_problem_visualisation = MultiYearProblemVisualisation(config, logger, jobs_server_client)
-performance = Performance(config, logger, jobs_server_client)
 
-jobs = Jobs(
-    logger, 
-    config, 
-    single_year_problem_visualisation, 
-    multi_year_problem_visualisation,
-    performance
-)
+async def message_handler(websocket, path):
+    data = await websocket.recv()
+    response = message_processor._process_message(data)
+    await websocket.send(response)
 
-# Swagger Code
-swagger_url = '/swagger'
-api_url = '/static/swagger.json'
-swaggerBlueprint = get_swaggerui_blueprint(
-    swagger_url,
-    api_url,
-    config={
-        'app_name': "CropGen"
-    }
-)
-app.register_blueprint(swaggerBlueprint, url_prefix=swagger_url)
-
-# Endpoints
-# Single Year Problem
-@app.route('/cropgen/run/singleyearproblem', methods = ['POST'])
-def cropgen_single_year_problem():
-    run_job_request = RunJobRequest(logger, request)
-    if not run_job_request.valid:
-        return jsonify({
-            "msg": "Invalid RunJobRequest",
-            "errors": run_job_request.errors
-        }), 400
-
-    return jobs._run_single_year_problem(run_job_request)
-
-# Multi Year Problem
-@app.route('/cropgen/run/multiyearproblem', methods = ['POST'])
-def cropgen_multi_year_problem():
-    run_job_request = RunJobRequest(logger, request)
-    if not run_job_request.valid:
-        return jsonify({
-            "msg": "Invalid RunJobRequest",
-            "errors": run_job_request.errors
-        }), 400
-
-    return jobs._run_multi_year_problem(run_job_request)
-
-# Performance
-@app.route('/cropgen/run/performance', methods = ['POST'])
-def cropgen_performance():
-    run_job_request = RunJobRequest(logger, request)
-    if not run_job_request.valid:
-        return jsonify({
-            "msg": "Invalid RunJobRequest",
-            "errors": run_job_request.errors
-        }), 400
-
-    return jobs._run_performance(run_job_request)
 
 # Main
 if __name__ == "__main__":
-    app.run()
+    config = Config()
+    logger = Logger()
+
+    start_server = websockets.serve(message_handler, config.socket_server_ip,
+                                    config.socket_server_port)
+
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()

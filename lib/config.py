@@ -1,25 +1,49 @@
 import json
 import os
 
+
 class Config:
-  def __init__(self):
+    RUNNING_IN_DOCKER_ENV = 'RUNNING_IN_DOCKER'
 
-    relative_path = '../config/config.json'
-    current_script_dir = os.path.dirname(os.path.realpath(__file__))
-    config_file_full_path = os.path.join(current_script_dir, relative_path)
+    def __init__(self):
 
-    with open(config_file_full_path) as json_config_file:
-        data = json.load(json_config_file)    
-    
-    self.jobs_base_url = data['jobsBaseUrl']
-    self.sim_gen_url = data['simGenUrl']
-    self.use_mock_job_server_client = data['useMockJobServerClient']
-    self.show_graphs_when_generated = data['showGraphsWhenGenerated']
-    # Override this config setting if we are running inside of a docker 
-    # container.
-    if os.environ.get('RUNNING_IN_DOCKER', False):
-      self.show_graphs_when_generated = False
+        self.data = self._parse()
+        self._populate_from_data()
 
+    def _parse(self):
+        relative_path = '../config/config.json'
+        current_script_dir = os.path.dirname(os.path.realpath(__file__))
+        config_file_full_path = os.path.join(current_script_dir, relative_path)
 
-  def _get_sim_gen_url(self):
-    return os.path.join(self.jobs_base_url, self.sim_gen_url)
+        with open(config_file_full_path) as json_config_file:
+            data = json.load(json_config_file)
+
+        return data
+
+    def _populate_from_data(self):
+        self.jobs_base_url = self._get_config_setting('jobsBaseUrl')
+        self.sim_gen_url = self._get_config_setting('simGenUrl')
+        self.use_mock_job_server_client = self._get_config_setting(
+            'useMockJobServerClient')
+        self.show_graphs_when_generated = self._get_config_setting(
+            'showGraphsWhenGenerated', True, False)
+        self.socket_server_ip = self._get_config_setting('socketServerIP')
+        self.socket_server_port = self._get_config_setting('socketServerPort')
+
+    def _get_config_setting(self,
+                            config_key,
+                            check_for_docker=False,
+                            value_if_docker=None):
+        if not check_for_docker:
+            return self.data[config_key]
+
+        if self._is_running_in_docker():
+            return value_if_docker
+
+        return self.data[config_key]
+
+    def _is_running_in_docker(self):
+        return os.environ.get(Config.RUNNING_IN_DOCKER_ENV, False)
+
+    def _get_sim_gen_url(self):
+        return os.path.join(self.jobs_base_url, self.sim_gen_url)

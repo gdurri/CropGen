@@ -1,6 +1,8 @@
 {
     "jobsBaseUrl": "https://jobs.cgmwgp.com/",
     "simGenUrl": "api/jobs/simgen",
-    "useMockJobServerClient" : true,
-    "showGraphsWhenGenerated": false
+    "useMockJobServerClient": true,
+    "showGraphsWhenGenerated": false,
+    "socketServerIP": "",
+    "socketServerPort": 8000
 }
