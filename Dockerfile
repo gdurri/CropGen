@@ -11,8 +11,6 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Setup environment variables
-ENV FLASK_APP=main.py
 ENV RUNNING_IN_DOCKER Yes
 
-CMD [ "python", "./main.py", "--host", "0.0.0.0", "--port", "8000"]
-# CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]

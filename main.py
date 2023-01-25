@@ -1,25 +1,21 @@
-import asyncio
-import websockets
-from lib.config import Config
-from lib.logger import Logger
+import uvicorn
+from fastapi import FastAPI, WebSocket
 from lib.message_processor import MessageProcessor
+from lib.results_logger import ResultsLogger
 
+app = FastAPI()
 message_processor = MessageProcessor()
+ResultsLogger._remove_and_create_results_folder()
 
 
-async def message_handler(websocket, path):
-    data = await websocket.recv()
-    response = message_processor._process_message(data)
-    await websocket.send(response)
+# Endpoints
+@app.websocket("/cropgen/run")
+async def test(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        request = await websocket.receive_text()
+        await message_processor._process_run_message(request, websocket)
 
 
-# Main
 if __name__ == "__main__":
-    config = Config()
-    logger = Logger()
-
-    start_server = websockets.serve(message_handler, config.socket_server_ip,
-                                    config.socket_server_port)
-
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
+    uvicorn.run("main:app")

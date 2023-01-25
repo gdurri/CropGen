@@ -76,13 +76,13 @@ class Performance():
     self.results_logger._log_problem_entry(f"Whole population feasible in generation {all_feasible_individuals} after {self.number_of_evaluations[all_feasible_individuals]} evaluations")
 
     # Plot constraint violation against number of fucntion evaluations
-    plt.figure(figsize=(7, 5))
-    plt.plot(self.number_of_evaluations, self.history_average_constraint_violations, color='black', lw=0.7, label="Avg. CV of Pop")
-    plt.scatter(self.number_of_evaluations, self.history_average_constraint_violations, facecolor="none", edgecolor='black', marker="p")
-    plt.axvline(self.number_of_evaluations[all_feasible_individuals], color="red", label="All Feasible", linestyle="--")
-    plt.xlabel("Function Evaluations")
-    plt.ylabel("Constraint Violation")
-    plt.legend()
+    #plt.figure(figsize=(7, 5))
+    #plt.plot(self.number_of_evaluations, self.history_average_constraint_violations, color='black', lw=0.7, label="Avg. CV of Pop")
+    #plt.scatter(self.number_of_evaluations, self.history_average_constraint_violations, facecolor="none", edgecolor='black', marker="p")
+    #plt.axvline(self.number_of_evaluations[all_feasible_individuals], color="red", label="All Feasible", linestyle="--")
+    #plt.xlabel("Function Evaluations")
+    #plt.ylabel("Constraint Violation")
+    #plt.legend()
     #if self.config.show_graphs_when_generated:
       #plt.show()
 
