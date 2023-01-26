@@ -5,7 +5,6 @@ from lib.results_logger import ResultsLogger
 
 app = FastAPI()
 message_processor = MessageProcessor()
-ResultsLogger._remove_and_create_results_folder()
 
 
 # Endpoints
@@ -18,4 +17,5 @@ async def test(websocket: WebSocket):
 
 
 if __name__ == "__main__":
+    ResultsLogger._remove_and_create_results_folder()
     uvicorn.run("main:app")

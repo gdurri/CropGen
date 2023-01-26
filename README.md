@@ -44,3 +44,23 @@ a remote (Linux) VM.
 
 test
 test2
+
+To test the Websocket API you can use off the shelve tools such as PostMan or Chrome
+extensions. The following address can be used:
+
+ws://127.0.0.1:8000/cropgen/run
+
+Using the following Payload:
+
+Payload:
+{
+    "jobType": "singleYear",
+    "payload": {
+        "jobId": 423423
+    }
+}
+
+Where jobType can be any of the following (Case insensitive):
+singleyear
+multiyear
+performance
