@@ -7,7 +7,6 @@ from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.multi_year_problem_visualisation import MultiYearProblemVisualisation
 from lib.performance import Performance
 from lib.run_job_request import RunJobRequest
-from lib.results_logger import ResultsLogger
 
 
 class RunMessageProcessor():
@@ -16,39 +15,35 @@ class RunMessageProcessor():
     JOB_TYPE_MULTI_YEAR = 'MULTIYEAR'
     JOB_TYPE_PERFORMANCE = 'PERFORMANCE'
 
-    def __init__(self):
+    def __init__(self, websocket):
         self.logger = Logger()
         self.config = Config()
         self.logger = Logger()
+        self.websocket = websocket
 
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
-        self.jobs_server_client = JobsServerClientFactory()._create(
-            self.config, self.logger)
+        self.jobs_server_client = JobsServerClientFactory()._create(self.config, self.logger)
         # Construct our runners (Single/Multi Year and Performance)
-        self.single_year_problem = SingleYearProblemVisualisation(
-            self.config, self.logger, self.jobs_server_client)
-        self.multi_year_problem = MultiYearProblemVisualisation(
-            self.config, self.logger, self.jobs_server_client)
-        self.performance = Performance(self.config, self.logger,
-                                       self.jobs_server_client)
+        self.single_year_problem = SingleYearProblemVisualisation(self.config, self.logger, self.jobs_server_client)
+        self.multi_year_problem = MultiYearProblemVisualisation(self.config, self.logger, self.jobs_server_client)
+        self.performance = Performance(self.config, self.logger, self.jobs_server_client)
 
-    async def _process_run_message(self, job_type, payload, websocket):
-        runner_dictionary = {
+        self.runner_dictionary = {
             RunMessageProcessor.JOB_TYPE_SINGLE_YEAR: self.single_year_problem,
             RunMessageProcessor.JOB_TYPE_MULTI_YEAR: self.multi_year_problem,
             RunMessageProcessor.JOB_TYPE_PERFORMANCE: self.performance
         }
 
-        if job_type.upper() in runner_dictionary.keys():
+    async def _process_run_message(self, job_type, payload):
+        if job_type.upper() in self.runner_dictionary.keys():
             await self._process_run_message_for_runner(
-                payload, runner_dictionary[job_type.upper()], websocket)
+                payload, self.runner_dictionary[job_type.upper()])
         else:
-            await websocket.send_text(
+            await self.websocket.send_text(
                 json.dumps({"Message": f"Unknown run job type: {job_type}"}))
 
-    async def _process_run_message_for_runner(self, payload, runner,
-                                              websocket):
+    async def _process_run_message_for_runner(self, payload, runner):
         run_job_request = RunJobRequest(payload)
         if not run_job_request.valid:
             return json.dumps({
@@ -58,4 +53,4 @@ class RunMessageProcessor():
 
         runner._run(run_job_request)
 
-        await websocket.send_text(json.dumps({"Message": "Success"}))
+        await self.websocket.send_text(json.dumps({"Message": "Success"}))
