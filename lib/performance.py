@@ -5,6 +5,7 @@ from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.results_logger import ResultsLogger
 from lib.graph_generator import GraphGenerator
 from lib.constants import Constants
+import json
 
 
 class Performance():
@@ -26,22 +27,27 @@ class Performance():
             config, logger, jobs_server_client, self.results_logger)
 
     # Invokes the running of the problem.
-    def _run(self, run_job_request):
+    async def _run(self, run_job_request, websocket):
         self.job_id = run_job_request.job_id
         self.results_logger._run_started()
 
         # Run the single year problem as we need to use its history
         # to perform our analysis.
-        self.single_year_problem._run(run_job_request)
+        await self.single_year_problem._run(run_job_request, websocket)
 
         for generation in self.single_year_problem.results_history:
-            self._process_generation(generation)
+            self._process_generation(generation, websocket)
 
         # Now that we are done, report back.
         self.jobs_server_client._run_complete(self.job_id)
         self.results_logger._run_ended()
+        await websocket.send_text(
+            json.dumps({
+                "Message":
+                f"Successfully ran: {self.__class__.__name__} for job id: {self.job_id}"
+            }))
 
-    def _process_generation(self, generation):
+    def _process_generation(self, generation, websocket):
         # Append list with number of evaluations in the generation
         self.number_of_evaluations.append(generation.evaluator.n_eval)
 
@@ -66,9 +72,9 @@ class Performance():
             optimal_individuals.get(
                 Constants.HISTORY_FEASIBLE_KEY)[feasibility])
 
-        self._do_graphs()
+        self._do_graphs(websocket)
 
-    def _do_graphs(self):
+    def _do_graphs(self, websocket):
 
         # Generation with the first feasible individual
         first_feasible_individual = NumPy.where(

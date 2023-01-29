@@ -52,6 +52,4 @@ class RunMessageProcessor():
             }))
             return
 
-        runner._run(run_job_request)
-
-        await self.websocket.send_text(json.dumps({"Message": "Success"}))
+        await runner._run(run_job_request, self.websocket)

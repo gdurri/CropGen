@@ -2,6 +2,7 @@ from pymoo.core.problem import Problem
 from pymoo.optimize import minimize
 import numpy as NumPy
 import pandas as Pandas
+import json
 
 from lib.results_logger import ResultsLogger
 from lib.constants import Constants
@@ -35,7 +36,7 @@ class MultiYearProblemVisualisation(Problem):
                          ]))
 
     # Invokes the running of the problem.
-    def _run(self, run_job_request):
+    async def _run(self, run_job_request, websocket):
         self.job_id = run_job_request.job_id
         self.results_logger._run_started()
         algorithm = self.algorithm_generator._create_nsga2_algorithm(
@@ -76,11 +77,16 @@ class MultiYearProblemVisualisation(Problem):
         self.results_logger._log_problem_entry(
             opt_data_frame.sort_values(Constants.YIELD_HA, ascending=False))
 
-        self._do_graphs(opt_data_frame, all_data_frame)
+        await self._output_data(opt_data_frame, all_data_frame, websocket)
 
         # Now that we are done, report back.
         self.jobs_server_client._run_complete(self.job_id)
         self.results_logger._run_ended()
+        await websocket.send_text(
+            json.dumps({
+                "Message":
+                f"Successfully ran: {self.__class__.__name__} for job id: {self.job_id}"
+            }))
 
     # Iterate over each population and perform calcs.
     def _evaluate(self, variable_values_for_population, out, *args, **kwargs):
@@ -129,49 +135,55 @@ class MultiYearProblemVisualisation(Problem):
 
         out[Constants.OUT_INDEX_F] = NumPy.array(results)
 
-    def _do_graphs(self, opt_data_frame, all_data_frame):
-        # Design Space
-        design_space_graph = self.graph_generator._generate_design_space_graph_multi_year(
-            opt_data_frame, self.bounds())
-        self.results_logger._log_graph(design_space_graph,
-                                       ResultsLogger.DESIGN_SPACE_GRAPH_JSON,
-                                       ResultsLogger.DESIGN_SPACE_GRAPH_HTML)
+    async def _output_data(self, opt_data_frame, all_data_frame, websocket):
+        if self.config.output_graphs_to_file:
+            # Design Space
+            design_space_graph = self.graph_generator._generate_design_space_graph_multi_year(
+                opt_data_frame, self.bounds())
+            self.results_logger._log_graph(design_space_graph,
+                                        ResultsLogger.DESIGN_SPACE_GRAPH_JSON,
+                                        ResultsLogger.DESIGN_SPACE_GRAPH_HTML)
 
-        # Objective Space
-        objective_space_graph = self.graph_generator._generate_objective_space_graph_multi_year(
-            opt_data_frame)
-        self.results_logger._log_graph(
-            objective_space_graph, ResultsLogger.OBJECTIVE_SPACE_GRAPH_JSON,
-            ResultsLogger.OBJECTIVE_SPACE_GRAPH_HTML)
+            # Objective Space
+            objective_space_graph = self.graph_generator._generate_objective_space_graph_multi_year(
+                opt_data_frame)
+            self.results_logger._log_graph(
+                objective_space_graph, ResultsLogger.OBJECTIVE_SPACE_GRAPH_JSON,
+                ResultsLogger.OBJECTIVE_SPACE_GRAPH_HTML)
 
-        # All Individuals
-        all_individuals_graph = self.graph_generator._generate_all_individuals_graph_multi_year(
-            all_data_frame, self.bounds())
-        self.results_logger._log_graph(
-            all_individuals_graph, ResultsLogger.ALL_INDIVIDUALS_GRAPH_JSON,
-            ResultsLogger.ALL_INDIVIDUALS_GRAPH_HTML)
+            # All Individuals
+            all_individuals_graph = self.graph_generator._generate_all_individuals_graph_multi_year(
+                all_data_frame, self.bounds())
+        
+            self.results_logger._log_graph(
+                all_individuals_graph, ResultsLogger.ALL_INDIVIDUALS_GRAPH_JSON,
+                ResultsLogger.ALL_INDIVIDUALS_GRAPH_HTML)
 
-        # All Objectives
-        all_objectives_graph = self.graph_generator._generate_all_objectives_graph_multi_year(
-            all_data_frame)
-        self.results_logger._log_graph(
-            all_objectives_graph,
-            ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_JSON,
-            ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_HTML)
+            # All Objectives
+            all_objectives_graph = self.graph_generator._generate_all_objectives_graph_multi_year(
+                all_data_frame)
+        
+            self.results_logger._log_graph(
+                all_objectives_graph,
+                ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_JSON,
+                ResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_HTML)
 
-        # Yield Over Maturity
-        yield_over_maturity_graph = self.graph_generator._generate_yield_over_maturity_graph_multi_year(
-            all_data_frame)
-        self.results_logger._log_graph(
-            yield_over_maturity_graph,
-            ResultsLogger.YIELD_OVER_MATURITY_GRAPH_JSON,
-            ResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML)
+            # Yield Over Maturity
+            yield_over_maturity_graph = self.graph_generator._generate_yield_over_maturity_graph_multi_year(
+                all_data_frame)
+
+            self.results_logger._log_graph(
+                yield_over_maturity_graph,
+                ResultsLogger.YIELD_OVER_MATURITY_GRAPH_JSON,
+                ResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML)
 
         # Log the raw data frames.
-        self.results_logger._log_raw_results(opt_data_frame,
-                                             ResultsLogger.OPT_DATA_FRAME_JSON)
-        self.results_logger._log_raw_results(all_data_frame,
-                                             ResultsLogger.ALL_DATA_FRAME_JSON)
+        await self.results_logger._log_raw_results(opt_data_frame,
+                                             ResultsLogger.OPT_DATA_FRAME_JSON,
+                                             websocket)
+        await self.results_logger._log_raw_results(all_data_frame,
+                                             ResultsLogger.ALL_DATA_FRAME_JSON,
+                                             websocket)
 
         if self.config.show_graphs_when_generated:
             design_space_graph.show()

@@ -27,7 +27,7 @@ class Config:
             'useMockJobServerClient')
         self.show_graphs_when_generated = self._get_config_setting(
             'showGraphsWhenGenerated', True, False)
-        self.socket_server_ip = self._get_config_setting('socketServerIP')
+        self.output_graphs_to_file = self._get_config_setting('outputGraphsToFile')
         self.socket_server_port = self._get_config_setting('socketServerPort')
 
     def _get_config_setting(self,

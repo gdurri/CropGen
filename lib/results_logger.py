@@ -2,6 +2,7 @@ import datetime
 import time
 import shutil
 import os
+import json
 
 
 class ResultsLogger:
@@ -93,9 +94,15 @@ class ResultsLogger:
             self._create_filepath_in_for_now_folder(graph_file_name_html),
             graph.to_html())
 
-    def _log_raw_results(self, data_frame, filename):
-        self._log_entry(self._create_filepath_in_for_now_folder(filename),
-                        data_frame.to_json(indent=2))
+    async def _log_raw_results(self, data_frame, filename, websocket):
+        # self._log_entry(self._create_filepath_in_for_now_folder(filename),
+        #                 data_frame.to_json(indent=2))
+
+        await websocket.send_text(
+            json.dumps({
+                "Data":
+                data_frame.to_json(indent=2)
+            }))
 
     def _log_entry(self, filename, data):
         with open(filename, "a") as file:

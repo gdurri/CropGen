@@ -3,6 +3,6 @@
     "simGenUrl": "api/jobs/simgen",
     "useMockJobServerClient": true,
     "showGraphsWhenGenerated": false,
-    "socketServerIP": "",
+    "outputGraphsToFile": false,
     "socketServerPort": 8000
 }
