@@ -19,13 +19,9 @@ class JobsServerClientMock:
             [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)]
         }
 
-        self.logger._log_debug(
-            f"{self.__class__.__name__} run called with job_id:{job_id}. Returning mock result: {results}"
-        )
+        #self.logger._log_debug(f"{self.__class__.__name__} - run started with job_id:{job_id}.")
 
         return results
 
     def _run_complete(self, job_id):
-        self.logger._log_debug(
-            f"{self.__class__.__name__} run complete called with job_id:{job_id}."
-        )
+        self.logger._log_debug(f"{self.__class__.__name__} - run complete called with job_id:{job_id}.")

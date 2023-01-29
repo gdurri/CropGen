@@ -46,10 +46,11 @@ class RunMessageProcessor():
     async def _process_run_message_for_runner(self, payload, runner):
         run_job_request = RunJobRequest(payload)
         if not run_job_request.valid:
-            return json.dumps({
+            await self.websocket.send_text(json.dumps({
                 "msg": "Invalid RunJobRequest",
                 "errors": run_job_request.errors
-            })
+            }))
+            return
 
         runner._run(run_job_request)
 
