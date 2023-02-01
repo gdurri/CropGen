@@ -47,7 +47,8 @@ class MultiYearProblemVisualisation(Problem):
         # seed = 1
         minimize_result = minimize(
             self,
-            algorithm, (Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER),
+            algorithm, 
+            (Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER),
             save_history=True,
             verbose=False)
 
@@ -178,12 +179,8 @@ class MultiYearProblemVisualisation(Problem):
                 ResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML)
 
         # Log the raw data frames.
-        await self.results_logger._log_raw_results(opt_data_frame,
-                                             ResultsLogger.OPT_DATA_FRAME_JSON,
-                                             websocket)
-        await self.results_logger._log_raw_results(all_data_frame,
-                                             ResultsLogger.ALL_DATA_FRAME_JSON,
-                                             websocket)
+        await self.results_logger._log_raw_results(opt_data_frame, self.job_id, websocket)
+        await self.results_logger._log_raw_results(all_data_frame, self.job_id, websocket)
 
         if self.config.show_graphs_when_generated:
             design_space_graph.show()

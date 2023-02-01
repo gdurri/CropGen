@@ -4,6 +4,7 @@ import shutil
 import os
 import json
 
+from lib.results import Results
 
 class ResultsLogger:
 
@@ -94,15 +95,13 @@ class ResultsLogger:
             self._create_filepath_in_for_now_folder(graph_file_name_html),
             graph.to_html())
 
-    async def _log_raw_results(self, data_frame, filename, websocket):
-        # self._log_entry(self._create_filepath_in_for_now_folder(filename),
-        #                 data_frame.to_json(indent=2))
+    def _log_raw_results_to_file(self, data_frame, filename):
+        self._log_entry(self._create_filepath_in_for_now_folder(filename),
+                        data_frame.to_json(indent=2))
 
-        await websocket.send_text(
-            json.dumps({
-                "Data":
-                data_frame.to_json(indent=2)
-            }))
+    async def _log_raw_results(self, data_frame, job_id, websocket):
+        results = Results(job_id, data_frame)
+        await websocket.send_text(results.to_json())
 
     def _log_entry(self, filename, data):
         with open(filename, "a") as file:
