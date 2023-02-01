@@ -39,7 +39,7 @@ class RunMessageProcessor():
             await self._process_run_message_for_runner(
                 payload, self.runner_dictionary[cleansed_job_type])
         else:
-            message = ErrorMessage([f"Unknown run job type: {job_type}",])
+            message = ErrorMessage([f"Unknown run job type: {job_type}. Supported job types are: {list(self.runner_dictionary.keys())}",])
             await self.websocket.send_text(message.to_json())
 
     async def _process_run_message_for_runner(self, payload, runner):
