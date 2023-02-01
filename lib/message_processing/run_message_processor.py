@@ -1,13 +1,13 @@
 import json
 
-from lib.Logging.logger import Logger
-from lib.Utils.config import Config
-from lib.Utils.constants import Constants
-from lib.JobsServer.jobs_server_client_factory import JobsServerClientFactory
-from lib.Problems.single_year_problem_visualisation import SingleYearProblemVisualisation
-from lib.Problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
-from lib.Problems.performance import Performance
-from lib.Requests.run_job_request import RunJobRequest
+from lib.logging.logger import Logger
+from lib.utils.config import Config
+from lib.utils.constants import Constants
+from lib.jobs_server.jobs_server_client_factory import JobsServerClientFactory
+from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
+from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
+from lib.problems.performance import Performance
+from lib.requests.run_job_request import RunJobRequest
 
 
 class RunMessageProcessor():

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from lib.Utils.date_time_helper import DateTimeHelper
+from lib.utils.date_time_helper import DateTimeHelper
 
 # class syntax
 class LogLevel(Enum):

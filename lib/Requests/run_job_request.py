@@ -1,4 +1,4 @@
-from lib.Logging.logger import Logger
+from lib.logging.logger import Logger
 
 
 class RunJobRequest:

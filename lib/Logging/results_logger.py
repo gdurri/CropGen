@@ -1,10 +1,10 @@
 import shutil
 import os
 
-from lib.SocketMessages.results_message import ResultsMessage
-from lib.SocketMessages.start_of_run_message import StartOfRunMessage
-from lib.SocketMessages.end_of_run_message import EndOfRunMessage
-from lib.Utils.date_time_helper import DateTimeHelper
+from lib.socket_messages.results_message import ResultsMessage
+from lib.socket_messages.start_of_run_message import StartOfRunMessage
+from lib.socket_messages.end_of_run_message import EndOfRunMessage
+from lib.utils.date_time_helper import DateTimeHelper
 
 class ResultsLogger:
 

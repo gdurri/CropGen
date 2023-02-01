@@ -3,10 +3,10 @@ from pymoo.optimize import minimize
 import numpy as NumPy
 import pandas as Pandas
 
-from lib.Logging.results_logger import ResultsLogger
-from lib.Logging.graph_generator import GraphGenerator
-from lib.Utils.constants import Constants
-from lib.Utils.algorithm_generator import AlgorithmGenerator
+from lib.logging.results_logger import ResultsLogger
+from lib.logging.graph_generator import GraphGenerator
+from lib.utils.constants import Constants
+from lib.utils.algorithm_generator import AlgorithmGenerator
 
 
 class SingleYearProblemVisualisation(Problem):

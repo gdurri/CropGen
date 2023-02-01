@@ -1,5 +1,5 @@
-from lib.JobsServer.jobs_server_client import JobsServerClient
-from lib.JobsServer.jobs_server_client_mock import JobsServerClientMock
+from lib.jobs_server.jobs_server_client import JobsServerClient
+from lib.jobs_server.jobs_server_client_mock import JobsServerClientMock
 
 
 class JobsServerClientFactory():

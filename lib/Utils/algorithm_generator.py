@@ -11,16 +11,8 @@ class AlgorithmGenerator():
                                 cross_over_eta=15,
                                 cross_over_prob=0.9,
                                 mutation_eta=20):
-        # TODO - get_sampling etc have all been deprecated.
-        # return NSGA2(
-        #   pop_size = 5,
-        #   sampling = get_sampling("real_random"),
-        #   crossover = get_crossover("real_sbx", prob=0.9, eta=15),
-        #   mutation = get_mutation("real_pm", eta=20),
-        #   eliminate_duplicates = True
-        # )
-
         return NSGA2(pop_size=pop_size,
+                     # TODO - This used to be set to get_sampling("real_random"),
                      sampling=FloatRandomSampling(),
                      crossover=SBX(eta=cross_over_eta, prob=cross_over_prob),
                      mutation=PM(eta=mutation_eta),

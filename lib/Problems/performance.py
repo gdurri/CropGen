@@ -1,10 +1,10 @@
 import numpy as NumPy
 import matplotlib.pyplot as plt
 
-from lib.Problems.single_year_problem_visualisation import SingleYearProblemVisualisation
-from lib.Logging.results_logger import ResultsLogger
-from lib.Logging.graph_generator import GraphGenerator
-from lib.Utils.constants import Constants
+from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
+from lib.logging.results_logger import ResultsLogger
+from lib.logging.graph_generator import GraphGenerator
+from lib.utils.constants import Constants
 
 
 class Performance():

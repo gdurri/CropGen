@@ -1,18 +1,17 @@
 import json
 
-from lib.Utils.date_time_helper import DateTimeHelper
+from lib.utils.date_time_helper import DateTimeHelper
 
 class Data:
-    def __init__(self, job_id, data_frame):
+    def __init__(self, job_id):
         self.job_id = job_id
-        self.data = data_frame.to_json(indent=2)
 
-class ResultsMessage:
-    def __init__(self, job_type, job_id, data_frame):
+class StartOfRunMessage:
+    def __init__(self, job_type, job_id):
         self.message_type = __class__.__name__
         self.job_type = job_type
         self.date_time = DateTimeHelper._get_date_time_now_str()
-        self.data = Data(job_id, data_frame)
+        self.data = Data(job_id)
 
     def to_json(self):
         return json.dumps(

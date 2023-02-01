@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from lib.Utils.constants import Constants
+from lib.utils.constants import Constants
 
 
 class GraphGenerator():
