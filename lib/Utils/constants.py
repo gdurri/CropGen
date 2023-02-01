@@ -41,3 +41,7 @@ class Constants():
     CONSTRAINT_VIOLATIONS_KEY = 'CV'
     FEASIBLE_KEY = 'feasible'
     HISTORY_FEASIBLE_KEY = 'F'
+
+    JOB_TYPE_SINGLE_YEAR = 'singleyear'
+    JOB_TYPE_MULTI_YEAR = 'multiyear'
+    JOB_TYPE_PERFORMANCE = 'performance'

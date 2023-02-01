@@ -1,6 +1,6 @@
 import json
 
-from lib.run_message_processor import RunMessageProcessor
+from lib.MessageProcessing.run_message_processor import RunMessageProcessor
 
 
 class MessageProcessor():

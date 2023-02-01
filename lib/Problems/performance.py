@@ -1,11 +1,10 @@
 import numpy as NumPy
 import matplotlib.pyplot as plt
 
-from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
-from lib.results_logger import ResultsLogger
-from lib.graph_generator import GraphGenerator
-from lib.constants import Constants
-import json
+from lib.Problems.single_year_problem_visualisation import SingleYearProblemVisualisation
+from lib.Logging.results_logger import ResultsLogger
+from lib.Logging.graph_generator import GraphGenerator
+from lib.Utils.constants import Constants
 
 
 class Performance():
@@ -24,12 +23,12 @@ class Performance():
         self.results_logger = ResultsLogger(self.__class__.__name__)
 
         self.single_year_problem = SingleYearProblemVisualisation(
-            config, logger, jobs_server_client, self.results_logger)
+            config, logger, jobs_server_client, self.results_logger, False)
 
     # Invokes the running of the problem.
     async def _run(self, run_job_request, websocket):
         self.job_id = run_job_request.job_id
-        self.results_logger._run_started()
+        await self.results_logger._run_started(Constants.JOB_TYPE_PERFORMANCE, run_job_request.job_id, websocket)
 
         # Run the single year problem as we need to use its history
         # to perform our analysis.
@@ -40,12 +39,8 @@ class Performance():
 
         # Now that we are done, report back.
         self.jobs_server_client._run_complete(self.job_id)
-        self.results_logger._run_ended()
-        await websocket.send_text(
-            json.dumps({
-                "Message":
-                f"Successfully ran: {self.__class__.__name__} for job id: {self.job_id}"
-            }))
+        await self.results_logger._run_ended(Constants.JOB_TYPE_PERFORMANCE, self.job_id, websocket)
+
 
     def _process_generation(self, generation, websocket):
         # Append list with number of evaluations in the generation

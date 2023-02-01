@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, WebSocket
-from lib.message_processor import MessageProcessor
-from lib.results_logger import ResultsLogger
+from lib.MessageProcessing.message_processor import MessageProcessor
+from lib.Logging.results_logger import ResultsLogger
 
 app = FastAPI()
 

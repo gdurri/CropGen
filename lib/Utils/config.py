@@ -11,7 +11,7 @@ class Config:
         self._populate_from_data()
 
     def _parse(self):
-        relative_path = '../config/config.json'
+        relative_path = '../../config/config.json'
         current_script_dir = os.path.dirname(os.path.realpath(__file__))
         config_file_full_path = os.path.join(current_script_dir, relative_path)
 

@@ -1,5 +1,4 @@
-import json
-from lib.logger import Logger
+from lib.Logging.logger import Logger
 
 
 class RunJobRequest:

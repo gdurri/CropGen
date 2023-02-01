@@ -1,6 +1,6 @@
 from enum import Enum
-import datetime
 
+from lib.Utils.date_time_helper import DateTimeHelper
 
 # class syntax
 class LogLevel(Enum):
@@ -54,5 +54,5 @@ class Logger:
         self._print_log(self.FATAL_LOG_PREFIX, log_entry)
 
     def _print_log(self, log_prefix, log_entry):
-        date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_str = DateTimeHelper._get_date_time_now_str()
         print(f"{date_str}: {log_prefix} - {log_entry}")

@@ -1,10 +1,10 @@
-import datetime
-import time
 import shutil
 import os
-import json
 
-from lib.results import Results
+from lib.SocketMessages.results_message import ResultsMessage
+from lib.SocketMessages.start_of_run_message import StartOfRunMessage
+from lib.SocketMessages.end_of_run_message import EndOfRunMessage
+from lib.Utils.date_time_helper import DateTimeHelper
 
 class ResultsLogger:
 
@@ -23,20 +23,17 @@ class ResultsLogger:
     OPT_DATA_FRAME_JSON = 'opt_data.json'
     ALL_DATA_FRAME_JSON = 'all_data.json'
 
-    DATE_FORMAT = '%Y-%m-%d'
-    TIME_FORMAT = '%H.%M.%S'
-
     def __init__(self, problem):
         self.problem = problem
         self.results_folder = ''
         self.results_folder_for_now = ''
-        self.run_started_time = 0.0
+        self.run_start_time = DateTimeHelper._get_date_time()
         self.results_folder = ResultsLogger._get_results_folder_path()
 
     @staticmethod
     def _get_results_folder_path():
         return os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                            f'../{ResultsLogger.RESULTS_FOLDER}/')
+                            f'../../{ResultsLogger.RESULTS_FOLDER}/')
 
     @staticmethod
     def _remove_and_create_results_folder():
@@ -47,29 +44,17 @@ class ResultsLogger:
             shutil.rmtree(results_folder)
         os.makedirs(results_folder)
 
-    def _run_started(self):
-        self._construct_results_file_path()
-        self.run_started_time = time.time()
-        self._log_problem_entry(f'Run started')
-
-    def _run_ended(self):
-        self._log_problem_entry(
-            f'Run finished. Total run time: {time.time() - self.run_started_time} seconds'
-        )
-
     def _construct_results_file_path(self):
-        now = datetime.datetime.now()
 
-        results_folder_for_today = os.path.join(self.results_folder,
-                                                now.strftime(self.DATE_FORMAT))
+        results_folder_for_today = os.path.join(self.results_folder, DateTimeHelper._get_date_now_str())
+
         # Remove and recreate the results directory.
         if not os.path.exists(results_folder_for_today):
             os.makedirs(results_folder_for_today)
 
-        time_str = now.strftime(self.TIME_FORMAT)
+        time_str = DateTimeHelper._get_time_now_str()
 
-        results_folder_for_now = os.path.join(results_folder_for_today,
-                                              f"{self.problem}_{time_str}")
+        results_folder_for_now = os.path.join(results_folder_for_today, f"{self.problem}_{time_str}")
 
         # Create a folder within today, for the current time.
         if not os.path.exists(results_folder_for_now):
@@ -81,28 +66,35 @@ class ResultsLogger:
         return os.path.join(self.results_folder_for_now, filename)
 
     def _log_problem_entry(self, data):
-        date_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H.%M.%S')
+        date_time_str = DateTimeHelper._get_date_time_now_str()
         data_str = f"{date_time_str}: {str(data)}"
-        self._log_entry(
-            self._create_filepath_in_for_now_folder(ResultsLogger.LOG_FILE),
-            data_str)
+        self._log_entry(self._create_filepath_in_for_now_folder(ResultsLogger.LOG_FILE), data_str)
 
     def _log_graph(self, graph, graph_file_name_json, graph_file_name_html):
-        self._log_entry(
-            self._create_filepath_in_for_now_folder(graph_file_name_json),
-            graph.to_json(pretty=True))
-        self._log_entry(
-            self._create_filepath_in_for_now_folder(graph_file_name_html),
-            graph.to_html())
+        self._log_entry(self._create_filepath_in_for_now_folder(graph_file_name_json), graph.to_json(pretty=True))
+        self._log_entry(self._create_filepath_in_for_now_folder(graph_file_name_html), graph.to_html())
 
     def _log_raw_results_to_file(self, data_frame, filename):
-        self._log_entry(self._create_filepath_in_for_now_folder(filename),
-                        data_frame.to_json(indent=2))
-
-    async def _log_raw_results(self, data_frame, job_id, websocket):
-        results = Results(job_id, data_frame)
-        await websocket.send_text(results.to_json())
+        self._log_entry(self._create_filepath_in_for_now_folder(filename), data_frame.to_json(indent=2))
 
     def _log_entry(self, filename, data):
         with open(filename, "a") as file:
             file.write(f"{data} \n")
+
+    # Web socket logging - Async methods.
+    async def _run_started(self, job_type, job_id, websocket):
+        self._log_problem_entry(f'Run started')
+        self._construct_results_file_path()
+        self.run_start_time = DateTimeHelper._get_date_time()
+        message = StartOfRunMessage(job_type, job_id)
+        await websocket.send_text(message.to_json())
+
+    async def _run_ended(self, job_type, job_id, websocket):
+        duration_seconds = DateTimeHelper._get_seconds_since_now(self.run_start_time)
+        self._log_problem_entry(f'Run finished. Total run time: {duration_seconds} seconds')
+        message = EndOfRunMessage(job_type, job_id, duration_seconds)
+        await websocket.send_text(message.to_json())
+
+    async def _log_raw_results(self, job_type, job_id, data_frame, websocket):
+        message = ResultsMessage(job_type, job_id, data_frame)
+        await websocket.send_text(message.to_json())

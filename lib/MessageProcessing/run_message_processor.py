@@ -1,19 +1,16 @@
 import json
 
-from lib.logger import Logger
-from lib.config import Config
-from lib.jobs_server_client_factory import JobsServerClientFactory
-from lib.single_year_problem_visualisation import SingleYearProblemVisualisation
-from lib.multi_year_problem_visualisation import MultiYearProblemVisualisation
-from lib.performance import Performance
-from lib.run_job_request import RunJobRequest
+from lib.Logging.logger import Logger
+from lib.Utils.config import Config
+from lib.Utils.constants import Constants
+from lib.JobsServer.jobs_server_client_factory import JobsServerClientFactory
+from lib.Problems.single_year_problem_visualisation import SingleYearProblemVisualisation
+from lib.Problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
+from lib.Problems.performance import Performance
+from lib.Requests.run_job_request import RunJobRequest
 
 
 class RunMessageProcessor():
-
-    JOB_TYPE_SINGLE_YEAR = 'SINGLEYEAR'
-    JOB_TYPE_MULTI_YEAR = 'MULTIYEAR'
-    JOB_TYPE_PERFORMANCE = 'PERFORMANCE'
 
     def __init__(self, websocket):
         self.logger = Logger()
@@ -30,15 +27,15 @@ class RunMessageProcessor():
         self.performance = Performance(self.config, self.logger, self.jobs_server_client)
 
         self.runner_dictionary = {
-            RunMessageProcessor.JOB_TYPE_SINGLE_YEAR: self.single_year_problem,
-            RunMessageProcessor.JOB_TYPE_MULTI_YEAR: self.multi_year_problem,
-            RunMessageProcessor.JOB_TYPE_PERFORMANCE: self.performance
+            Constants.JOB_TYPE_SINGLE_YEAR: self.single_year_problem,
+            Constants.JOB_TYPE_MULTI_YEAR: self.multi_year_problem,
+            Constants.JOB_TYPE_PERFORMANCE: self.performance
         }
 
     async def _process_run_message(self, job_type, payload):
-        if job_type.upper() in self.runner_dictionary.keys():
+        if job_type.lower() in self.runner_dictionary.keys():
             await self._process_run_message_for_runner(
-                payload, self.runner_dictionary[job_type.upper()])
+                payload, self.runner_dictionary[job_type.lower()])
         else:
             await self.websocket.send_text(
                 json.dumps({"Message": f"Unknown run job type: {job_type}"}))
