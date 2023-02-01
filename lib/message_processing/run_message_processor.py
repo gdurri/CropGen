@@ -8,6 +8,7 @@ from lib.problems.single_year_problem_visualisation import SingleYearProblemVisu
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
 from lib.problems.performance import Performance
 from lib.requests.run_job_request import RunJobRequest
+from lib.socket_messages.error_message import ErrorMessage
 
 
 class RunMessageProcessor():
@@ -33,20 +34,19 @@ class RunMessageProcessor():
         }
 
     async def _process_run_message(self, job_type, payload):
-        if job_type.lower() in self.runner_dictionary.keys():
+        cleansed_job_type = job_type.lower().strip()
+        if cleansed_job_type in self.runner_dictionary.keys():
             await self._process_run_message_for_runner(
-                payload, self.runner_dictionary[job_type.lower()])
+                payload, self.runner_dictionary[cleansed_job_type])
         else:
-            await self.websocket.send_text(
-                json.dumps({"Message": f"Unknown run job type: {job_type}"}))
+            message = ErrorMessage([f"Unknown run job type: {job_type}",])
+            await self.websocket.send_text(message.to_json())
 
     async def _process_run_message_for_runner(self, payload, runner):
         run_job_request = RunJobRequest(payload)
         if not run_job_request.valid:
-            await self.websocket.send_text(json.dumps({
-                "msg": "Invalid RunJobRequest",
-                "errors": run_job_request.errors
-            }))
+            message = ErrorMessage(run_job_request.errors)
+            await self.websocket.send_text(message.to_json())
             return
 
         await runner._run(run_job_request, self.websocket)

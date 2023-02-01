@@ -83,8 +83,8 @@ class ResultsLogger:
 
     # Web socket logging - Async methods.
     async def _run_started(self, job_type, job_id, websocket):
-        self._log_problem_entry(f'Run started')
         self._construct_results_file_path()
+        self._log_problem_entry(f'Run started')
         self.run_start_time = DateTimeHelper._get_date_time()
         message = StartOfRunMessage(job_type, job_id)
         await websocket.send_text(message.to_json())
