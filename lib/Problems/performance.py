@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.logging.results_logger import ResultsLogger
-from lib.logging.graph_generator import GraphGenerator
+from lib.utils.graph_generator import GraphGenerator
 from lib.utils.constants import Constants
 
 

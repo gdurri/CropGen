@@ -1,5 +1,6 @@
 import json
 
+from http import HTTPStatus
 from lib.utils.date_time_helper import DateTimeHelper
 
 class Data:
@@ -10,6 +11,7 @@ class Data:
 
 class EndOfRunMessage:        
     def __init__(self, job_type, job_id, duration_seconds):
+        self.http_status = HTTPStatus.OK
         self.message_type = __class__.__name__
         self.job_type = job_type
         self.data = Data(job_id, duration_seconds)

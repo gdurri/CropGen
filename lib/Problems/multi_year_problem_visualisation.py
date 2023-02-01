@@ -4,7 +4,7 @@ import numpy as NumPy
 import pandas as Pandas
 
 from lib.logging.results_logger import ResultsLogger
-from lib.logging.graph_generator import GraphGenerator
+from lib.utils.graph_generator import GraphGenerator
 from lib.utils.constants import Constants
 from lib.utils.algorithm_generator import AlgorithmGenerator
 
