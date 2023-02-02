@@ -48,19 +48,21 @@ test2
 To test the Websocket API you can use off the shelve tools such as PostMan or Chrome
 extensions. The following address can be used:
 
-ws://127.0.0.1:8000/cropgen/run
+Docker:
+  ws://127.0.0.1:8000/cropgen/run
+
+Visual Code (Debug):
+  ws://127.0.0.1:<port>/cropgen/run
+  Where Port is whatever is configured in the CropGen\config\config.json file for the socketServerPort.
 
 Using the following Payload:
-
-Payload:
 {
-    "jobType": "singleYear",
-    "payload": {
-        "jobId": 423423
+    "jobType": "singleyear",
+    "body": {
+        "jobId": 10
     }
 }
 
 Where jobType can be any of the following (Case insensitive):
 singleyear
 multiyear
-performance

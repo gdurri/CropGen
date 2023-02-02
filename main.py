@@ -25,5 +25,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app", 
         port=config.socket_server_port,
-        reload=True
+        reload=True,
+        log_level="info"
     )

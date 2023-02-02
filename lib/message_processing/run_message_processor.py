@@ -6,7 +6,6 @@ from lib.utils.constants import Constants
 from lib.jobs_server.jobs_server_client_factory import JobsServerClientFactory
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
-from lib.problems.performance import Performance
 from lib.requests.run_job_request import RunJobRequest
 from lib.socket_messages.error_message import ErrorMessage
 
@@ -25,12 +24,10 @@ class RunMessageProcessor():
         # Construct our runners (Single/Multi Year and Performance)
         self.single_year_problem = SingleYearProblemVisualisation(self.config, self.logger, self.jobs_server_client)
         self.multi_year_problem = MultiYearProblemVisualisation(self.config, self.logger, self.jobs_server_client)
-        self.performance = Performance(self.config, self.logger, self.jobs_server_client)
 
         self.runner_dictionary = {
             Constants.JOB_TYPE_SINGLE_YEAR: self.single_year_problem,
-            Constants.JOB_TYPE_MULTI_YEAR: self.multi_year_problem,
-            Constants.JOB_TYPE_PERFORMANCE: self.performance
+            Constants.JOB_TYPE_MULTI_YEAR: self.multi_year_problem
         }
 
     async def _process_run_message(self, job_type, payload):

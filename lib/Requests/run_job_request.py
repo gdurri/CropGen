@@ -11,12 +11,9 @@ class RunJobRequest:
         self._parse(request_data)
 
     def _parse(self, payload):
-
-        self.valid = True
+        self.valid = False
         if RunJobRequest.JOB_ID_JSON_ATTRIBUTE in payload:
             self.job_id = payload[RunJobRequest.JOB_ID_JSON_ATTRIBUTE]
+            self.valid = True
         else:
-            self.valid = False
-            job_id_missing_error = f"No {RunJobRequest.JOB_ID_JSON_ATTRIBUTE} specified"
-            self.errors.append(job_id_missing_error)
-            self.logger._log_warn(job_id_missing_error)
+            self.errors.append(f"No {RunJobRequest.JOB_ID_JSON_ATTRIBUTE} specified")
