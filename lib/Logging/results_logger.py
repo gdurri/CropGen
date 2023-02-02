@@ -1,9 +1,9 @@
 import shutil
 import os
 
-from lib.socket_messages.results_message import ResultsMessage
-from lib.socket_messages.start_of_run_message import StartOfRunMessage
-from lib.socket_messages.end_of_run_message import EndOfRunMessage
+from lib.models.results_message import ResultsMessage
+from lib.models.start_of_run_message import StartOfRunMessage
+from lib.models.end_of_run_message import EndOfRunMessage
 from lib.utils.date_time_helper import DateTimeHelper
 
 class ResultsLogger:

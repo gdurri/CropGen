@@ -16,7 +16,6 @@ class Constants():
     SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL = '[Sow on a fixed date].Script.Tillering'
     OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM = 'Total Crop Water Use (mm)'
     OUTPUT_NAME_YIELD_HA = 'Yield (t/ha)'
-    SINGLE_YEAR_GEN_NUMBER = 2
     MULTI_YEAR_GEN_NUMBER = 5
     N_GEN = 'n_gen'
     OUT_INDEX_F = 'F'

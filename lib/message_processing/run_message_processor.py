@@ -6,8 +6,8 @@ from lib.utils.constants import Constants
 from lib.jobs_server.jobs_server_client_factory import JobsServerClientFactory
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
-from lib.requests.run_job_request import RunJobRequest
-from lib.socket_messages.error_message import ErrorMessage
+from lib.models.run_job_request import RunJobRequest
+from lib.models.error_message import ErrorMessage
 
 
 class RunMessageProcessor():
@@ -30,18 +30,18 @@ class RunMessageProcessor():
             Constants.JOB_TYPE_MULTI_YEAR: self.multi_year_problem
         }
 
-    async def _process_run_message(self, job_type, payload):
+    async def _process_run_message(self, job_type, body):
         cleansed_job_type = job_type.lower().strip()
         if cleansed_job_type in self.runner_dictionary.keys():
             await self._process_run_message_for_runner(
-                payload, self.runner_dictionary[cleansed_job_type])
+                body, self.runner_dictionary[cleansed_job_type])
         else:
             message = ErrorMessage([f"Unknown run job type: {job_type}. Supported job types are: {list(self.runner_dictionary.keys())}",])
             await self.websocket.send_text(message.to_json())
 
-    async def _process_run_message_for_runner(self, payload, runner):
-        run_job_request = RunJobRequest(payload)
-        if not run_job_request.valid:
+    async def _process_run_message_for_runner(self, body, runner):
+        run_job_request = RunJobRequest(body)
+        if not run_job_request._is_valid():
             message = ErrorMessage(run_job_request.errors)
             await self.websocket.send_text(message.to_json())
             return

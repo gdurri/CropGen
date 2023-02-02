@@ -4,6 +4,7 @@ import numpy as NumPy
 import pandas as Pandas
 
 from lib.logging.results_logger import ResultsLogger
+from lib.models.wgp_server_request import WGPServerRequest
 from lib.utils.graph_generator import GraphGenerator
 from lib.utils.constants import Constants
 from lib.utils.algorithm_generator import AlgorithmGenerator
@@ -30,7 +31,6 @@ class SingleYearProblemVisualisation(Problem):
         self.report_start_and_end = report_start_and_end
 
         self.job_id = 0
-        self.generation_number = Constants.SINGLE_YEAR_GEN_NUMBER
         self.individual_results = []
         self.results_history = []
 
@@ -51,8 +51,7 @@ class SingleYearProblemVisualisation(Problem):
     # Invokes the running of the problem.
     async def _run(self, run_job_request, websocket):
         self.job_id = run_job_request.job_id
-        if self.report_start_and_end:
-            await self.results_logger._run_started(Constants.JOB_TYPE_SINGLE_YEAR, run_job_request.job_id, websocket)
+        await self._report_run_started(run_job_request, websocket)
 
         algorithm = self.algorithm_generator._create_nsga2_algorithm(Constants.ALGORITHM_SINGLE_YEAR_POP_SIZE)
 
@@ -61,7 +60,7 @@ class SingleYearProblemVisualisation(Problem):
         # seed = 1
         minimize_result = minimize(problem=self,
                                    algorithm=algorithm,
-                                   termination=(Constants.N_GEN, self.generation_number),
+                                   termination=(Constants.N_GEN, run_job_request.population),
                                    save_history=True,
                                    verbose=False)
 
@@ -97,10 +96,16 @@ class SingleYearProblemVisualisation(Problem):
         await self._output_data(opt_data_frame, all_data_frame, websocket)
 
         # Now that we are done, report back.
+        self._report_run_ended(websocket)
+
+    async def _report_run_started(self, run_job_request, websocket):
+        if self.report_start_and_end:
+            await self.results_logger._run_started(Constants.JOB_TYPE_SINGLE_YEAR, run_job_request.job_id, websocket)
+
+    async def _report_run_ended(self, websocket):
         self.jobs_server_client._run_complete(self.job_id)
         if self.report_start_and_end:
             await self.results_logger._run_ended(Constants.JOB_TYPE_SINGLE_YEAR, self.job_id, websocket)
-
 
     # Iterate over each population and perform calcs.
     def _evaluate(self, variable_values_for_population, out, *args, **kwargs):
@@ -115,15 +120,20 @@ class SingleYearProblemVisualisation(Problem):
     # and 'G' key for constraints
     def _handle_evaluate_value_for_population(self, population_value, out, results):
         params = {}
+        # TODO - This will be variable.
         params[Constants.SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[0]
         params[Constants.SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL] = population_value[1]
 
         self.results_logger._log_problem_entry(params)
 
         # Initialise our out names array.
-        outputNames = [Constants.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, Constants.OUTPUT_NAME_YIELD_HA]
+        outputNames = [
+            Constants.OUTPUT_NAME_TOTAL_CROP_WATER_USE_MM, 
+            Constants.OUTPUT_NAME_YIELD_HA
+        ]
 
         # Ask the jobs server to run APSIM and store the result.
+        #obj=client.run(params, outputNames, outputTypes, table, ip, port)
         job_run_result = self.jobs_server_client._run(self.job_id, params, outputNames, Constants.GRAPH_MODE_MARKERS)
 
         # Perform some calculations on the returned results.
@@ -139,6 +149,13 @@ class SingleYearProblemVisualisation(Problem):
         out[Constants.OUT_INDEX_F] = NumPy.array(results)
 
     async def _output_data(self, opt_data_frame, all_data_frame, websocket):
+        # Log the raw data frames.
+        await self.results_logger._log_raw_results(Constants.JOB_TYPE_SINGLE_YEAR, self.job_id, opt_data_frame, websocket)
+        await self.results_logger._log_raw_results(Constants.JOB_TYPE_SINGLE_YEAR, self.job_id, all_data_frame, websocket)
+
+        self._handle_graphs(opt_data_frame, all_data_frame)
+
+    def _handle_graphs(self, opt_data_frame, all_data_frame):
         if self.config.output_graphs_to_file:
             # Design Space        
             design_space_graph = self.graph_generator._generate_design_space_graph_single_year(opt_data_frame, self.bounds())
@@ -159,10 +176,6 @@ class SingleYearProblemVisualisation(Problem):
             # Yield Over Maturity
             yield_over_maturity_graph = self.graph_generator._generate_yield_over_maturity_graph_single_year(all_data_frame)
             self.results_logger._log_graph(yield_over_maturity_graph, ResultsLogger.YIELD_OVER_MATURITY_GRAPH_JSON, ResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML)
-
-        # Log the raw data frames.
-        await self.results_logger._log_raw_results(Constants.JOB_TYPE_SINGLE_YEAR, self.job_id, opt_data_frame, websocket)
-        await self.results_logger._log_raw_results(Constants.JOB_TYPE_SINGLE_YEAR, self.job_id, all_data_frame, websocket)
 
         if self.config.show_graphs_when_generated:
             design_space_graph.show()
