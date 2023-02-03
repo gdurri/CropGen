@@ -1,5 +1,6 @@
 from pymoo.core.problem import Problem
 import numpy as NumPy
+import pandas as Pandas
 
 from lib.logging.logger import Logger
 from lib.models.results_message import ResultsMessage
@@ -34,6 +35,16 @@ class ProblemBase(Problem):
                 Constants.NUMBER_OF_EQUALITY_CONSTRAINTS_1,
                 Constants.NUMBER_OF_EQUALITY_CONSTRAINTS_2
             ]))
+
+    #
+    # Constructs a data frame containing the input and output data
+    # using the input and output columns.
+    #
+    def _construct_data_frame(self, data, columns):
+        return Pandas.DataFrame(
+            data,
+            columns=columns
+        )
 
     #
     # Simply performs what's required when the problem run is started.

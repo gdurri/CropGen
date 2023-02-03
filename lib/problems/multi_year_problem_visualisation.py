@@ -1,192 +1,104 @@
-# from pymoo.core.problem import Problem
-# from pymoo.optimize import minimize
-# import numpy as NumPy
-# import pandas as Pandas
+from pymoo.optimize import minimize
+import numpy as NumPy
+import statistics as stats
 
-# from lib.logging.logger import Logger
-# from lib.logging.results_logger import WebSocketResultsLogger
-# from lib.utils.graph_generator import GraphGenerator
-# from lib.utils.constants import Constants
-# from lib.utils.algorithm_generator import AlgorithmGenerator
+from lib.models.wgp_server_request import WGPServerRequest
+from lib.problems.problem_base import ProblemBase
+from lib.utils.algorithm_generator import AlgorithmGenerator
+from lib.utils.constants import Constants
 
 
-# class MultiYearProblemVisualisation(Problem):
+class MultiYearProblemVisualisation(ProblemBase):
 
-#     # Construct problem with the given dimensions and variable ranges
-#     def __init__(self, config, jobs_server_client):
-#         # Member variables
-#         self.config = config
-#         self.jobs_server_client = jobs_server_client
-#         self.logger = Logger()
-#         self.job_id = 0
-#         self.individual_results = []
-#         self.results_logger = WebSocketResultsLogger(self.__class__.__name__)
-#         self.algorithm_generator = AlgorithmGenerator()
-#         self.graph_generator = GraphGenerator()
+    #
+    # Construct problem with the given dimensions and variable ranges
+    #
+    def __init__(self, config, run_job_request):
+        super().__init__(Constants.JOB_TYPE_MULTI_YEAR, config, run_job_request)
 
-#         super().__init__(n_var=2,
-#                          n_obj=2,
-#                          xl=NumPy.array([
-#                              Constants.NUMBER_OF_INEQUALITY_CONSTRAINTS_1,
-#                              Constants.NUMBER_OF_INEQUALITY_CONSTRAINTS_2
-#                          ]),
-#                          xu=NumPy.array([
-#                              Constants.NUMBER_OF_EQUALITY_CONSTRAINTS_1,
-#                              Constants.NUMBER_OF_EQUALITY_CONSTRAINTS_2
-#                          ]))
+    #
+    # Invokes the running of the problem.
+    #
+    async def _run(self, websocket):
+        await super()._run_started(websocket)
 
-#     # Invokes the running of the problem.
-#     async def _run(self, run_job_request, websocket):
-#         self.job_id = run_job_request.job_id
-#         await self.results_logger._run_started(Constants.JOB_TYPE_MULTI_YEAR,
-#                                                run_job_request.job_id,
-#                                                websocket)
-#         algorithm = self.algorithm_generator._create_nsga2_algorithm(
-#             Constants.ALGORITHM_MULTI_YEAR_POP_SIZE)
+        algorithm = AlgorithmGenerator._create_nsga2_algorithm(self.run_job_request.individuals)        
 
-#         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
-#         # so problems must be framed such that each objective is minimised
-#         # seed = 1
-#         minimize_result = minimize(
-#             problem=self,
-#             algorithm=algorithm,
-#             termination=(Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER),
-#             save_history=True,
-#             verbose=False)
+        # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
+        # so problems must be framed such that each objective is minimised
+        # seed = 1
+        minimize_result = minimize(
+            problem=self,
+            algorithm=algorithm,
+            termination=(Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER),
+            save_history=True,
+            verbose=False)
 
-#         # Variable values for non-dominated individuals in the last generation
-#         X = minimize_result.X
-#         # Objective values for non-dominated individuals in the last generation
-#         F = minimize_result.F
+        # Variable values for non-dominated individuals in the last generation
+        X = minimize_result.X
+        # Objective values for non-dominated individuals in the last generation
+        F = minimize_result.F
 
-#         total = list(zip(X[:, 0], X[:, 1], F[:, 0], (-0.01 * F[:, 1])))
+        total = list(
+            zip(X[:, 0], 
+                X[:, 1], 
+                F[:, 0], 
+                (-0.01 * F[:, 1])
+                )
+        )
 
-#         opt_data_frame = Pandas.DataFrame(
-#             total,
-#             columns=[
-#                 Constants.END_JUV_TO_FI_THERMAL_TIME,
-#                 Constants.FERTILE_TILLER_NUMBER,
-#                 Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA
-#             ])
+        columns = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA]
+        opt_data_frame = super()._construct_data_frame(total, columns)
+        all_data_frame = super()._construct_data_frame(self.individual_results, columns)
 
-#         all_data_frame = Pandas.DataFrame(
-#             self.individual_results,
-#             columns=[
-#                 Constants.END_JUV_TO_FI_THERMAL_TIME,
-#                 Constants.FERTILE_TILLER_NUMBER,
-#                 Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA
-#             ])
+        await super()._send_results(opt_data_frame, all_data_frame, websocket)
 
-#         self.results_logger._log_problem_entry(
-#             opt_data_frame.sort_values(Constants.YIELD_HA, ascending=False))
+        # Now that we are done, report back.
+        await super()._run_ended(websocket)
 
-#         await self._output_data(opt_data_frame, all_data_frame, websocket)
+    #
+    # Iterate over each population and perform calcs.
+    #
+    def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
+        wgp_server_request = WGPServerRequest(self.run_job_request, variable_values_for_population)
+        
+        self._handle_evaluate_value_for_population(
+            wgp_server_request,
+            variable_values_for_population,
+            out_objective_values
+        )
 
-#         # Now that we are done, report back.
-#         self.jobs_server_client._run_complete(self.job_id)
-#         await self.results_logger._run_ended(Constants.JOB_TYPE_MULTI_YEAR,
-#                                              self.job_id, websocket)
+    # Evaluate fitness of the individuals in the population
+    # Parameters:
+    # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
+    # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
+    # and 'G' key for constraints
+    def _handle_evaluate_value_for_population(
+        self,
+        wgp_server_request,
+        variable_values_for_population,
+        out_objective_values
+    ):
+        results=[]
+        response = self.jobs_server_client._run(wgp_server_request)
 
-#     # Iterate over each population and perform calcs.
-#     def _evaluate(self, variable_values_for_population, out, *args, **kwargs):
-#         results = []
-#         for population_value in variable_values_for_population:
-#             self._handle_evaluate_value_for_population(population_value, out,
-#                                                        results)
+        # Iterate over all of the results from the job run.
+        for output_values in response.outputs:
+            # Extract all of the response output values.
+            iteration = output_values[0]
+            output_value1 = 1 * (((output_values[2] < 150).sum())/ len(output_values))
+            # Force a negative version of this input.
+            output_value2 = -abs(stats.mean(output_values[2]))
+            # Get the values that the algorithm generated for this individual
+            individual_population_values = variable_values_for_population[iteration]
+            
+            results.append([output_value1, output_value2])
 
-#     # Evaluate fitness of the individuals in the population
-#     # Parameters:
-#     # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
-#     # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
-#     # and 'G' key for constraints
-#     def _handle_evaluate_value_for_population(self, population_value, out,
-#                                               results):
-
-#         params = {}
-#         params[
-#             Constants.
-#             SORGHUM_PHENOLOGY_TT_END_JV_TO_INIT_FIXED_VAL] = population_value[
-#                 0]
-#         params[Constants.
-#                SOW_ON_FIXD_DATE_SCRIPT_TILLERING_VAL] = population_value[1]
-
-#         self.results_logger._log_problem_entry(params)
-
-#         # Initialise our out names array.
-#         outputNames = [
-#             Constants.FAILURE_RISK_YIELD_HA, Constants.OUTPUT_NAME_YIELD_HA
-#         ]
-
-#         # Ask the jobs server to run APSIM and store the result.
-#         job_run_result = self.jobs_server_client._run(
-#             self.job_id, params, outputNames, Constants.GRAPH_MODE_MARKERS)
-
-#         # Perform some calculations on the returned results.
-#         water_use_job_result_calc = 1 * (
-#             job_run_result[Constants.WATER_USE][0])
-#         yield_job_result_calc = -1 * (job_run_result[Constants.YIELD][0])
-
-#         results.append([water_use_job_result_calc, yield_job_result_calc])
-
-#         self.individual_results.append(
-#             (population_value[0], population_value[1],
-#              water_use_job_result_calc, (yield_job_result_calc * -0.01)))
-
-#         out[Constants.OUT_INDEX_F] = NumPy.array(results)
-
-#     async def _output_data(self, opt_data_frame, all_data_frame, websocket):
-#         if self.config.output_graphs_to_file:
-#             # Design Space
-#             design_space_graph = self.graph_generator._generate_design_space_graph_multi_year(
-#                 opt_data_frame, self.bounds())
-#             self.results_logger._log_graph(
-#                 design_space_graph,
-#                 WebSocketResultsLogger.DESIGN_SPACE_GRAPH_JSON,
-#                 WebSocketResultsLogger.DESIGN_SPACE_GRAPH_HTML)
-
-#             # Objective Space
-#             objective_space_graph = self.graph_generator._generate_objective_space_graph_multi_year(
-#                 opt_data_frame)
-#             self.results_logger._log_graph(
-#                 objective_space_graph,
-#                 WebSocketResultsLogger.OBJECTIVE_SPACE_GRAPH_JSON,
-#                 WebSocketResultsLogger.OBJECTIVE_SPACE_GRAPH_HTML)
-
-#             # All Individuals
-#             all_individuals_graph = self.graph_generator._generate_all_individuals_graph_multi_year(
-#                 all_data_frame, self.bounds())
-#             self.results_logger._log_graph(
-#                 all_individuals_graph,
-#                 WebSocketResultsLogger.ALL_INDIVIDUALS_GRAPH_JSON,
-#                 WebSocketResultsLogger.ALL_INDIVIDUALS_GRAPH_HTML)
-
-#             # All Objectives
-#             all_objectives_graph = self.graph_generator._generate_all_objectives_graph_multi_year(
-#                 all_data_frame)
-#             self.results_logger._log_graph(
-#                 all_objectives_graph,
-#                 WebSocketResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_JSON,
-#                 WebSocketResultsLogger.ALL_OBJECTIVES_SPACE_GRAPH_HTML)
-
-#             # Yield Over Maturity
-#             yield_over_maturity_graph = self.graph_generator._generate_yield_over_maturity_graph_multi_year(
-#                 all_data_frame)
-#             self.results_logger._log_graph(
-#                 yield_over_maturity_graph,
-#                 WebSocketResultsLogger.YIELD_OVER_MATURITY_GRAPH_JSON,
-#                 WebSocketResultsLogger.YIELD_OVER_MATURITY_GRAPH_HTML)
-
-#         # Log the raw data frames.
-#         await self.results_logger._log_raw_results(
-#             Constants.JOB_TYPE_MULTI_YEAR, self.job_id, opt_data_frame,
-#             websocket)
-#         await self.results_logger._log_raw_results(
-#             Constants.JOB_TYPE_MULTI_YEAR, self.job_id, all_data_frame,
-#             websocket)
-
-#         if self.config.show_graphs_when_generated:
-#             design_space_graph.show()
-#             objective_space_graph.show()
-#             all_individuals_graph.show()
-#             all_objectives_graph.show()
-#             yield_over_maturity_graph.show()
+            self.individual_results.append((
+                individual_population_values[0],
+                individual_population_values[1],
+                output_value1,
+                (output_value2 * -0.01)
+            ))
+        
+        out_objective_values[Constants.OUT_INDEX_F] = NumPy.array(results)

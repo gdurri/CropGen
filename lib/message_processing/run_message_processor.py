@@ -1,7 +1,7 @@
 from lib.utils.config import Config
 from lib.utils.constants import Constants
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
-#from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
+from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
 from lib.models.run_job_request import RunJobRequest
 from lib.models.error_message import ErrorMessage
 
@@ -46,6 +46,5 @@ class RunMessageProcessor():
         if cleansed_job_type == Constants.JOB_TYPE_SINGLE_YEAR:
             return SingleYearProblemVisualisation(self.config, run_job_request)
         elif cleansed_job_type == Constants.JOB_TYPE_MULTI_YEAR:
-            #return MultiYearProblemVisualisation(self.config, run_job_request)
-            return None
+            return MultiYearProblemVisualisation(self.config, run_job_request)
         return None

@@ -1,6 +1,5 @@
 from pymoo.optimize import minimize
 import numpy as NumPy
-import pandas as Pandas
 
 from lib.models.wgp_server_request import WGPServerRequest
 from lib.problems.problem_base import ProblemBase
@@ -15,6 +14,49 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     def __init__(self, config, run_job_request):
         super().__init__(Constants.JOB_TYPE_SINGLE_YEAR, config, run_job_request)
+    
+    #
+    # Invokes the running of the problem.
+    #
+    async def _run(self, websocket):
+        await super()._run_started(websocket)
+
+        algorithm = AlgorithmGenerator._create_nsga2_algorithm(self.run_job_request.individuals)
+
+        # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
+        # so problems must be framed such that each objective is minimised
+        # seed = 1
+        minimize_result = minimize(
+            problem=self,
+            algorithm=algorithm,
+            termination=(Constants.N_GEN, Constants.SINGLE_YEAR_GEN_NUMBER),
+            save_history=True,
+            verbose=False
+        )
+
+        # Variable values for non-dominated individuals in the last generation
+        X = minimize_result.X
+        # Objective values for non-dominated individuals in the last generation
+        F = minimize_result.F
+        # History of data from all generations
+        self.results_history = minimize_result.history
+
+        total = list(
+            zip(X[:, 0], 
+                X[:, 1], 
+                F[:, 0], 
+                (-0.01 * F[:, 1])
+                )
+        )
+        
+        columns = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.TOTAL_CROP_WATER_USE_MM, Constants.YIELD_HA]
+        opt_data_frame = super()._construct_data_frame(total, columns)
+        all_data_frame = super()._construct_data_frame(self.individual_results, columns)
+
+        await super()._send_results(opt_data_frame, all_data_frame, websocket)
+
+        # Now that we are done, report back.
+        await super()._run_ended(websocket)
     
     #
     # Iterate over each population and perform calcs.
@@ -65,54 +107,3 @@ class SingleYearProblemVisualisation(ProblemBase):
             ))
         
         out_objective_values[Constants.OUT_INDEX_F] = NumPy.array(results)
-
-    #
-    # Invokes the running of the problem.
-    #
-    async def _run(self, websocket):
-        await super()._run_started(websocket)
-
-        algorithm = AlgorithmGenerator._create_nsga2_algorithm(self.run_job_request.individuals)
-
-        # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
-        # so problems must be framed such that each objective is minimised
-        # seed = 1
-        minimize_result = minimize(
-            problem=self,
-            algorithm=algorithm,
-            termination=(Constants.N_GEN, Constants.SINGLE_YEAR_GEN_NUMBER),
-            save_history=True,
-            verbose=False
-        )
-
-        # Variable values for non-dominated individuals in the last generation
-        X = minimize_result.X
-        # Objective values for non-dominated individuals in the last generation
-        F = minimize_result.F
-        # History of data from all generations
-        self.results_history = minimize_result.history
-
-        total = list(zip(X[:, 0], X[:, 1], F[:, 0], (-0.01 * F[:, 1])))
-
-        opt_data_frame = Pandas.DataFrame(
-            total,
-            columns=[
-                Constants.END_JUV_TO_FI_THERMAL_TIME,
-                Constants.FERTILE_TILLER_NUMBER,
-                Constants.TOTAL_CROP_WATER_USE_MM, 
-                Constants.YIELD_HA
-            ])
-
-        all_data_frame = Pandas.DataFrame(
-            self.individual_results,
-            columns=[
-                Constants.END_JUV_TO_FI_THERMAL_TIME,
-                Constants.FERTILE_TILLER_NUMBER,
-                Constants.TOTAL_CROP_WATER_USE_MM, 
-                Constants.YIELD_HA
-            ])
-
-        await super()._send_results(opt_data_frame, all_data_frame, websocket)
-
-        # Now that we are done, report back.
-        await super()._run_ended(websocket)
