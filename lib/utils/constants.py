@@ -1,3 +1,6 @@
+#
+# System wide constants.
+#
 class Constants():
     APPLICATION_NAME = 'CropGen'
     NUMBER_OF_INEQUALITY_CONSTRAINTS_1 = 130.0

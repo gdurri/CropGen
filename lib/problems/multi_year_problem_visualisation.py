@@ -7,7 +7,9 @@ from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
-
+#
+# Represents a Multi Year Problem
+#
 class MultiYearProblemVisualisation(ProblemBase):
 
     #

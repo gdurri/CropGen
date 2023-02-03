@@ -10,8 +10,13 @@ from lib.utils.constants import Constants
 from lib.utils.date_time_helper import DateTimeHelper
 from lib.wgp_server.wgp_server_client_factory import WGPServerClientFactory
 
-
+#
+# The base class for Problems, provides some useful problem specific functionality.
+#
 class ProblemBase(Problem):
+    #
+    # Constructor
+    #
     def __init__(self, job_type, config, run_job_request):
         # Member variables
         self.job_type = job_type

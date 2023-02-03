@@ -4,5 +4,6 @@
     "useMockWgpServerClient": true,
     "showGraphsWhenGenerated": false,
     "outputGraphsToFile": false,
-    "socketServerPort": 8000
+    "socketServerPort": 8000,
+    "webServerLogLevel" : "info"
 }

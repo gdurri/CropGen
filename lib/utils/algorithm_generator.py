@@ -3,9 +3,14 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 
-
+#
+# Simple wrapper for generating algorithms.
+#
 class AlgorithmGenerator():
 
+    #
+    # Creates a NSGA2 algorithm.
+    #
     @staticmethod
     def _create_nsga2_algorithm(pop_size,
                                 cross_over_eta=15,

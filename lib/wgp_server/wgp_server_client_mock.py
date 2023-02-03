@@ -42,7 +42,7 @@ class WGPServerClientMock:
         return wgp_server_response
 
     #
-    # Mock notification that the job is complete.
+    # TODO REMOVE Tells the job server that the run is complete.
     #
     def _run_complete(self, job_id):
         self.logger._log_debug(f"{self.__class__.__name__} - run complete called with job_id:{job_id}.")
