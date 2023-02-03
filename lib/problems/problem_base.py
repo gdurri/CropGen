@@ -7,16 +7,18 @@ from lib.models.start_of_run_message import StartOfRunMessage
 from lib.models.end_of_run_message import EndOfRunMessage
 from lib.utils.constants import Constants
 from lib.utils.date_time_helper import DateTimeHelper
+from lib.wgp_server.wgp_server_client_factory import WGPServerClientFactory
 
 
 class ProblemBase(Problem):
-    def __init__(self, job_type, config, jobs_server_client):
+    def __init__(self, job_type, config, run_job_request):
         # Member variables
         self.job_type = job_type
         self.config = config
-        self.jobs_server_client = jobs_server_client
-
-        self.run_job_request = None
+        self.run_job_request = run_job_request
+        # Use our factory to provide us with a job server client. This is responsible
+        # for returning a mock one depending on the configuration.
+        self.jobs_server_client = WGPServerClientFactory()._create(self.config)
         self.logger = Logger()
         self.individual_results = []
         self.run_start_time = DateTimeHelper._get_date_time()
@@ -36,8 +38,7 @@ class ProblemBase(Problem):
     #
     # Simply performs what's required when the problem run is started.
     #
-    async def _run_started(self, run_job_request, websocket):
-        self.run_job_request = run_job_request
+    async def _run_started(self, websocket):
         self.run_start_time = DateTimeHelper._get_date_time()
         message = StartOfRunMessage(self.job_type, self.run_job_request.job_id)
         await websocket.send_text(message.to_json())

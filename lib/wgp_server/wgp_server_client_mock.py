@@ -3,8 +3,10 @@ import random
 from lib.logging.logger import Logger
 from lib.models.wgp_server_response  import WGPServerResponse
 
-
-class JobsServerClientMock:
+#
+# This class can be used to mock the WGP Job Server Client.
+#
+class WGPServerClientMock:
     RANDOM_FLOAT_MIN = 0.0
     RANDOM_FLOAT_MAX = 1000.0
 
@@ -31,20 +33,13 @@ class JobsServerClientMock:
             
             wgp_server_response._add_output(random_outputs)
 
-        self.logger._log_trace(f"{self.__class__.__name__} _run -------------------------------------------------------------")
-        self.logger._log_trace(f"{self.__class__.__name__} wgp_server_request: {wgp_server_request.to_json()}")
-        self.logger._log_trace(f"{self.__class__.__name__} wgp_server_response: {wgp_server_response.to_json()}")
-        self.logger._log_trace(f"{self.__class__.__name__} -------------------------------------------------------------")
+        self.logger._log_trace(f"-------------------------------------------------------------")
+        self.logger._log_trace(f"{self.__class__.__name__} _run")
+        self.logger._log_trace(f"wgp_server_request: {wgp_server_request.to_json()}")
+        self.logger._log_trace(f"wgp_server_response: {wgp_server_response.to_json()}")
+        self.logger._log_trace(f"-------------------------------------------------------------")
 
         return wgp_server_response
-
-        # results = {
-        #     self.WATER_USE:
-        #     [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)],
-        #     self.YIELD:
-        #     [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)]
-        # }
-        #return results
 
     #
     # Mock notification that the job is complete.

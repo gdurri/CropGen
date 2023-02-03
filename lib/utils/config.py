@@ -23,7 +23,7 @@ class Config:
     def _populate_from_data(self):
         self.jobs_base_url = self._get_config_setting('jobsBaseUrl')
         self.sim_gen_url = self._get_config_setting('simGenUrl')
-        self.use_mock_job_server_client = self._get_config_setting('useMockJobServerClient')
+        self.use_mock_wgp_server_client = self._get_config_setting('useMockWgpServerClient')
         self.show_graphs_when_generated = self._get_config_setting('showGraphsWhenGenerated', True, False)
         self.output_graphs_to_file = self._get_config_setting('outputGraphsToFile')
         self.socket_server_port = self._get_config_setting('socketServerPort')

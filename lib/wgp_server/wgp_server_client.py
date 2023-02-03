@@ -1,6 +1,6 @@
 from lib.logging.logger import Logger
 
-class JobsServerClient:
+class WGPServerClient:
 
     def __init__(self, config):
         self.config = config

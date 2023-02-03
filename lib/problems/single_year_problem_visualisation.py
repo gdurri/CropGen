@@ -13,8 +13,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, config, jobs_server_client):
-        super().__init__(Constants.JOB_TYPE_SINGLE_YEAR, config, jobs_server_client)
+    def __init__(self, config, run_job_request):
+        super().__init__(Constants.JOB_TYPE_SINGLE_YEAR, config, run_job_request)
     
     #
     # Iterate over each population and perform calcs.
@@ -43,7 +43,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     ):        
         results=[]
         response = self.jobs_server_client._run(wgp_server_request)
-        
+
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:
             # Extract all of the response output values.
@@ -69,8 +69,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Invokes the running of the problem.
     #
-    async def _run(self, run_job_request, websocket):
-        await super()._run_started(run_job_request, websocket)
+    async def _run(self, websocket):
+        await super()._run_started(websocket)
 
         algorithm = AlgorithmGenerator._create_nsga2_algorithm(self.run_job_request.individuals)
 
