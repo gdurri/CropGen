@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, WebSocket
 from lib.message_processing.message_processor import MessageProcessor
-from lib.logging.results_logger import ResultsLogger
 from lib.utils.config import Config
 
 
@@ -20,7 +19,6 @@ async def test(websocket: WebSocket):
 
 
 if __name__ == "__main__":
-    ResultsLogger._remove_and_create_results_folder()
     config = Config()
     uvicorn.run(
         "main:app", 

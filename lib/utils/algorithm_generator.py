@@ -6,13 +6,13 @@ from pymoo.operators.mutation.pm import PM
 
 class AlgorithmGenerator():
 
-    def _create_nsga2_algorithm(self,
-                                pop_size,
+    @staticmethod
+    def _create_nsga2_algorithm(pop_size,
                                 cross_over_eta=15,
                                 cross_over_prob=0.9,
-                                mutation_eta=20):
+                                mutation_eta=20
+    ):
         return NSGA2(pop_size=pop_size,
-                     # TODO - This used to be set to get_sampling("real_random"),
                      sampling=FloatRandomSampling(),
                      crossover=SBX(eta=cross_over_eta, prob=cross_over_prob),
                      mutation=PM(eta=mutation_eta),

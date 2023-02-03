@@ -1,27 +1,53 @@
 import random
 
+from lib.logging.logger import Logger
+from lib.models.wgp_server_response  import WGPServerResponse
+
 
 class JobsServerClientMock:
-    WATER_USE = 'WaterUse'
-    YIELD = 'Yield'
-    RANDOM_INT_MIN = 0
-    RANDOM_INT_MAX = 1000
+    RANDOM_FLOAT_MIN = 0.0
+    RANDOM_FLOAT_MAX = 1000.0
 
-    def __init__(self, logger, config):
-        self.logger = logger
+    #
+    # Constructor
+    #
+    def __init__(self, config):
         self.config = config
+        self.logger = Logger()
 
-    def _run(self, job_id, individuals, traits, inputs):
-        results = {
-            self.WATER_USE:
-            [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)],
-            self.YIELD:
-            [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)]
-        }
+    #
+    # Mock the run by returning a mocked response objects.
+    #
+    def _run(self, wgp_server_request):
+        # Construct a mocked response.
+        wgp_server_response = WGPServerResponse()
+        
+        # Loop through each of the individuals and for each output
+        # add a random output values.
+        for individual in range(0, wgp_server_request.body.individuals):
+            random_outputs = [individual]
+            for output in wgp_server_request.body.outputs:
+                random_outputs.append(random.uniform(self.RANDOM_FLOAT_MIN, self.RANDOM_FLOAT_MAX))
+            
+            wgp_server_response._add_output(random_outputs)
 
-        #self.logger._log_debug(f"{self.__class__.__name__} - run started with job_id:{job_id}.")
+        self.logger._log_trace(f"{self.__class__.__name__} _run -------------------------------------------------------------")
+        self.logger._log_trace(f"{self.__class__.__name__} wgp_server_request: {wgp_server_request.to_json()}")
+        self.logger._log_trace(f"{self.__class__.__name__} wgp_server_response: {wgp_server_response.to_json()}")
+        self.logger._log_trace(f"{self.__class__.__name__} -------------------------------------------------------------")
 
-        return results
+        return wgp_server_response
 
+        # results = {
+        #     self.WATER_USE:
+        #     [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)],
+        #     self.YIELD:
+        #     [random.randint(self.RANDOM_INT_MIN, self.RANDOM_INT_MAX)]
+        # }
+        #return results
+
+    #
+    # Mock notification that the job is complete.
+    #
     def _run_complete(self, job_id):
         self.logger._log_debug(f"{self.__class__.__name__} - run complete called with job_id:{job_id}.")

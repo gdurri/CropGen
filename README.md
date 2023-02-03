@@ -57,9 +57,18 @@ Visual Code (Debug):
 
 Using the following Payload:
 {
-    "jobType": "singleyear",
+    "jobType": "multiyear",
     "body": {
-        "jobId": 10
+        "jobId": 2222,
+        "individuals": 10,
+        "inputs": [
+            "[Sorghum].Phenology.TTEndJuvToInit.FixedValue", 
+            "[Sow on a fixed date].Script.Tillering"
+        ],
+        "outputs": [
+            "Total Crop Water Use (mm)", 
+            "Yield (t/ha)"
+        ]
     }
 }
 
