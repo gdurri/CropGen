@@ -1,5 +1,3 @@
-import json
-
 from lib.logging.logger import Logger
 from lib.utils.config import Config
 from lib.utils.constants import Constants
@@ -15,7 +13,6 @@ class RunMessageProcessor():
     def __init__(self, websocket):
         self.logger = Logger()
         self.config = Config()
-        self.logger = Logger()
         self.websocket = websocket
 
         # Use our factory to provide us with a job server client. This is responsible

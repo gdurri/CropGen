@@ -60,7 +60,7 @@ class SingleYearProblemVisualisation(Problem):
         # seed = 1
         minimize_result = minimize(problem=self,
                                    algorithm=algorithm,
-                                   termination=(Constants.N_GEN, run_job_request.population),
+                                   termination=(Constants.N_GEN, run_job_request.individuals),
                                    save_history=True,
                                    verbose=False)
 
@@ -96,7 +96,7 @@ class SingleYearProblemVisualisation(Problem):
         await self._output_data(opt_data_frame, all_data_frame, websocket)
 
         # Now that we are done, report back.
-        self._report_run_ended(websocket)
+        await self._report_run_ended(websocket)
 
     async def _report_run_started(self, run_job_request, websocket):
         if self.report_start_and_end:

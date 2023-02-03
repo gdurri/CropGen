@@ -3,7 +3,7 @@ from lib.models.model import Model
 class RunJobRequest(Model):
     # Constants
     JOB_ID_JSON_ATTRIBUTE = 'jobId'
-    POPULATION_JSON_ATTRIBUTE = 'population'
+    INDIVIDUALS_JSON_ATTRIBUTE = 'individuals'
     INPUTS_JSON_ATTRIBUTE = 'inputs'
     OUTPUTS_JSON_ATTRIBUTE = 'outputs'
 
@@ -17,7 +17,7 @@ class RunJobRequest(Model):
     def _parse(self, body):
         self.errors.clear()
         self.job_id = self._get_attribute(body, RunJobRequest.JOB_ID_JSON_ATTRIBUTE)
-        self.population = self._get_attribute(body, RunJobRequest.POPULATION_JSON_ATTRIBUTE)
+        self.individuals = self._get_attribute(body, RunJobRequest.INDIVIDUALS_JSON_ATTRIBUTE)
         self.inputs = self._get_attribute(body, RunJobRequest.INPUTS_JSON_ATTRIBUTE)
         self.outputs = self._get_attribute(body, RunJobRequest.OUTPUTS_JSON_ATTRIBUTE)
 
