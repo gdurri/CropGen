@@ -10,7 +10,7 @@ class Data:
     #
     def __init__(self, job_id, duration_seconds):
         self.job_id = job_id        
-        self.date_time = DateTimeHelper._get_date_time_now_str()
+        self.date_time = DateTimeHelper.get_date_time_now_str()
         self.duration_seconds = duration_seconds
 
 #

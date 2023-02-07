@@ -7,7 +7,7 @@ from lib.utils.date_time_helper import DateTimeHelper
 class Data:
     def __init__(self, job_id):
         self.job_id = job_id
-        self.date_time = DateTimeHelper._get_date_time_now_str()
+        self.date_time = DateTimeHelper.get_date_time_now_str()
 
 #
 # The Start of Run Message. Used to signal that the job run is starting.

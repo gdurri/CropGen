@@ -14,7 +14,7 @@ class RunJobRequest(Model):
     #
     # Returns true if there are no errors.
     #
-    def _is_valid(self):
+    def is_valid(self):
         return not self.errors
 
     #

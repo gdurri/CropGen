@@ -14,7 +14,7 @@ class WGPServerRequestBody:
         self.job_id = run_job_request.job_id
         self.individuals = run_job_request.individuals
         self.inputs = run_job_request.inputs
-        self.input_values = WgpHelper._create_input_values(generated_input_values)
+        self.input_values = WgpHelper.create_input_values(generated_input_values)
         self.outputs = run_job_request.outputs
 
 #

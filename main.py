@@ -25,7 +25,7 @@ async def test(websocket: WebSocket):
 
     while True:
         request = await websocket.receive_text()
-        await message_processor._process_run_message(request)
+        await message_processor.process_run_message(request)
 
 
 # Main entry point

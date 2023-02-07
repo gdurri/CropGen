@@ -11,6 +11,7 @@ from lib.utils.constants import Constants
 # Represents a Multi Year Problem
 #
 class MultiYearProblemVisualisation(ProblemBase):
+    MULTI_YEAR_GEN_NUMBER = 5
 
     #
     # Construct problem with the given dimensions and variable ranges
@@ -21,10 +22,10 @@ class MultiYearProblemVisualisation(ProblemBase):
     #
     # Invokes the running of the problem.
     #
-    async def _run(self, websocket):
-        await super()._run_started(websocket)
+    async def run(self, websocket):
+        await super().run_started(websocket)
 
-        algorithm = AlgorithmGenerator._create_nsga2_algorithm(self.run_job_request.individuals)        
+        algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.individuals)        
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
@@ -32,7 +33,7 @@ class MultiYearProblemVisualisation(ProblemBase):
         minimize_result = minimize(
             problem=self,
             algorithm=algorithm,
-            termination=(Constants.N_GEN, Constants.MULTI_YEAR_GEN_NUMBER),
+            termination=(Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS, MultiYearProblemVisualisation.MULTI_YEAR_GEN_NUMBER),
             save_history=True,
             verbose=False)
 
@@ -50,13 +51,13 @@ class MultiYearProblemVisualisation(ProblemBase):
         )
 
         columns = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA]
-        opt_data_frame = super()._construct_data_frame(total, columns)
-        all_data_frame = super()._construct_data_frame(self.individual_results, columns)
+        opt_data_frame = super().construct_data_frame(total, columns)
+        all_data_frame = super().construct_data_frame(self.individual_results, columns)
 
-        await super()._send_results(opt_data_frame, all_data_frame, websocket)
+        await super().send_results(opt_data_frame, all_data_frame, websocket)
 
         # Now that we are done, report back.
-        await super()._run_ended(websocket)
+        await super().run_ended(websocket)
 
     #
     # Iterate over each population and perform calcs.
@@ -82,7 +83,7 @@ class MultiYearProblemVisualisation(ProblemBase):
         out_objective_values
     ):
         results=[]
-        response = self.jobs_server_client._run(wgp_server_request)
+        response = self.jobs_server_client.run(wgp_server_request)
 
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:
@@ -103,4 +104,4 @@ class MultiYearProblemVisualisation(ProblemBase):
                 (output_value2 * -0.01)
             ))
         
-        out_objective_values[Constants.OUT_INDEX_F] = NumPy.array(results)
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)

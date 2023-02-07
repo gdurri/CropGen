@@ -1,12 +1,11 @@
-from lib.utils.constants import Constants
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
 from lib.models.run_job_request import RunJobRequest
 from lib.models.error_message import ErrorMessage
+from lib.utils.constants import Constants
 
 
 class RunMessageProcessor():
-
     #
     # Constructor
     #
@@ -17,11 +16,11 @@ class RunMessageProcessor():
     #
     # Processes the run message passed in from the websocket.
     #
-    async def _process_run_message(self, job_type, body):
+    async def process_run_message(self, job_type, body):
         # Construct a Run Job Request, using the JSON body.
         run_job_request = RunJobRequest(body)
         # If it's invalid, send a socket message and return.
-        if not run_job_request._is_valid():
+        if not run_job_request.is_valid():
             await self.websocket.send_text(ErrorMessage(run_job_request.errors).to_json())
             return
 
@@ -30,7 +29,7 @@ class RunMessageProcessor():
 
         # If a valid "Problem" was created, call the run function.
         if problem:
-            await problem._run(self.websocket)
+            await problem.run(self.websocket)
         # Otherwise send an error message.
         else:
             await self.websocket.send_text(ErrorMessage(f"Unknown run job type: {job_type}.").to_json())

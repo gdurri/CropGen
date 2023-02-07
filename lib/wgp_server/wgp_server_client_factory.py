@@ -9,7 +9,7 @@ class WGPServerClientFactory():
     #
     # Creates an instance of a WGP Server Client.
     #
-    def _create(self, config):
+    def create(self, config):
         if config.use_mock_wgp_server_client:
             return WGPServerClientMock(config)
         else:

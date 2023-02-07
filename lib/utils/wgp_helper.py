@@ -11,7 +11,7 @@ class WgpHelper():
     # Gets the values for a specific iteration.
     #
     @staticmethod
-    def _get_values_for_individual(data, individual):
+    def get_values_for_individual(data, individual):
         for value in data:
             if value[WgpHelper.INDIVIDUAL_INDEX] == individual:
                 return value[1:]
@@ -21,7 +21,7 @@ class WgpHelper():
     # Creates input values, using the generated input values.
     #
     @staticmethod
-    def _create_input_values(generated_input_values):
+    def create_input_values(generated_input_values):
         input_values = []
         for individual in range(0, len(generated_input_values)):
             inputs = generated_input_values[individual]
@@ -44,7 +44,7 @@ class WgpHelper():
     # Creates output values
     #
     @staticmethod
-    def _create_output_values(
+    def create_output_values(
         total_individuals, 
         total_outputs,
         reverse_mocked_results,

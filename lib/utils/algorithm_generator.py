@@ -12,7 +12,7 @@ class AlgorithmGenerator():
     # Creates a NSGA2 algorithm.
     #
     @staticmethod
-    def _create_nsga2_algorithm(pop_size,
+    def create_nsga2_algorithm(pop_size,
                                 cross_over_eta=15,
                                 cross_over_prob=0.9,
                                 mutation_eta=20

@@ -12,9 +12,9 @@ class MessageProcessor():
         self.websocket = websocket
         self.run_message_processor = RunMessageProcessor(config, websocket)
 
-    async def _process_run_message(self, message):
+    async def process_run_message(self, message):
         json_object = json.loads(message)
         job_type = json_object[MessageProcessor.JSON_ATTRIBUTE_JOB_TYPE]
         body = json_object[MessageProcessor.JSON_ATTRIBUTE_BODY]
 
-        await self.run_message_processor._process_run_message(job_type, body)
+        await self.run_message_processor.process_run_message(job_type, body)
