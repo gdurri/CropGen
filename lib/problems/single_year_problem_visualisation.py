@@ -53,9 +53,9 @@ class SingleYearProblemVisualisation(ProblemBase):
         )
         
         # OLD
-        columns = super()._get_combined_inputs_outputs()
         columns_hardcoded = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.TOTAL_CROP_WATER_USE_MM, Constants.YIELD_HA]
-
+        # NEW
+        columns = super()._get_combined_inputs_outputs()
         opt_data_frame = super()._construct_data_frame(total, columns)
         all_data_frame = super()._construct_data_frame(self.individual_results, columns)
 

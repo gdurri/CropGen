@@ -35,8 +35,7 @@ class Config:
         self.jobs_base_url = self._get_config_setting('jobsBaseUrl')
         self.sim_gen_url = self._get_config_setting('simGenUrl')
         self.use_mock_wgp_server_client = self._get_config_setting('useMockWgpServerClient')
-        self.show_graphs_when_generated = self._get_config_setting('showGraphsWhenGenerated', True, False)
-        self.output_graphs_to_file = self._get_config_setting('outputGraphsToFile')
+        self.reverse_mocked_results = self._get_config_setting('reverseMockedResults')
         self.socket_server_port = self._get_config_setting('socketServerPort')
         self.web_server_log_level = self._get_config_setting('webServerLogLevel')
 

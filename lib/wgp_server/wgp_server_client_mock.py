@@ -20,7 +20,8 @@ class WGPServerClientMock:
     def _run(self, wgp_server_request):
         output_values = WgpHelper._create_output_values(
             wgp_server_request.body.individuals,
-            wgp_server_request.body.outputs
+            wgp_server_request.body.outputs, 
+            self.config.reverse_mocked_results
         )
 
         # Construct a mocked response.

@@ -47,6 +47,7 @@ class WgpHelper():
     def _create_output_values(
         total_individuals, 
         total_outputs,
+        reverse_mocked_results,
         random_min = 0.0,
         random_max = 100.0
     ):
@@ -54,7 +55,8 @@ class WgpHelper():
         individual_in_reverse = total_individuals - 1
 
         for individual in range(0, total_individuals):
-            random_outputs = [individual_in_reverse]
+            individual_to_use = individual_in_reverse if reverse_mocked_results else individual
+            random_outputs = [individual_to_use]
             for output in total_outputs:
                 random_outputs.append(random.uniform(random_min, random_max))
             

@@ -2,8 +2,7 @@
     "jobsBaseUrl": "https://jobs.cgmwgp.com/",
     "simGenUrl": "api/jobs/simgen",
     "useMockWgpServerClient": true,
-    "showGraphsWhenGenerated": false,
-    "outputGraphsToFile": false,
+    "reverseMockedResults": true,
     "socketServerPort": 8000,
     "webServerLogLevel" : "info"
 }
