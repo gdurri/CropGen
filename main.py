@@ -10,6 +10,9 @@ from lib.utils.config import Config
 
 # Constructs the app using the Fast API
 app = FastAPI()
+# Construct and parse the config. This gets passed around to minimise the
+# amount of file reading we do.
+config = Config()
 
 
 # Web socket endpoints - All Comms expects JSON.
@@ -18,7 +21,7 @@ app = FastAPI()
 @app.websocket("/cropgen/run")
 async def test(websocket: WebSocket):
     await websocket.accept()
-    message_processor = MessageProcessor(websocket)
+    message_processor = MessageProcessor(config, websocket)
 
     while True:
         request = await websocket.receive_text()
@@ -27,13 +30,10 @@ async def test(websocket: WebSocket):
 
 # Main entry point
 if __name__ == "__main__":
-    # Construct the config as this is used to obtain the server port.
-    config = Config()
-
     # Run the web server.
     uvicorn.run(
         "main:app", 
         port=config.socket_server_port,
         reload=True,
-        log_level="info"
+        log_level=config.web_server_log_level
     )

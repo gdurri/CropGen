@@ -1,4 +1,3 @@
-from lib.utils.config import Config
 from lib.utils.constants import Constants
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
@@ -11,8 +10,8 @@ class RunMessageProcessor():
     #
     # Constructor
     #
-    def __init__(self, websocket):
-        self.config = Config()
+    def __init__(self, config, websocket):
+        self.config = config
         self.websocket = websocket
 
     #

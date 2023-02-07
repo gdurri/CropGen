@@ -9,9 +9,3 @@ class WGPServerResponse(Model):
     #
     def __init__(self):
         self.outputs = []
-
-    #
-    # Allows outputs to be added.
-    #
-    def _add_output(self, outputs):
-        self.outputs.append(outputs)

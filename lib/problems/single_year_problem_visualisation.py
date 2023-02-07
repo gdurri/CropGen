@@ -5,6 +5,7 @@ from lib.models.wgp_server_request import WGPServerRequest
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
+from lib.utils.wgp_helper import WgpHelper
 
 #
 # Represents a Single Year Problem
@@ -51,7 +52,10 @@ class SingleYearProblemVisualisation(ProblemBase):
             )
         )
         
-        columns = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.TOTAL_CROP_WATER_USE_MM, Constants.YIELD_HA]
+        # OLD
+        columns = super()._get_combined_inputs_outputs()
+        columns_hardcoded = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.TOTAL_CROP_WATER_USE_MM, Constants.YIELD_HA]
+
         opt_data_frame = super()._construct_data_frame(total, columns)
         all_data_frame = super()._construct_data_frame(self.individual_results, columns)
 
@@ -68,7 +72,6 @@ class SingleYearProblemVisualisation(ProblemBase):
         
         self._handle_evaluate_value_for_population(
             wgp_server_request,
-            variable_values_for_population,
             out_objective_values
         )
 
@@ -82,7 +85,6 @@ class SingleYearProblemVisualisation(ProblemBase):
     def _handle_evaluate_value_for_population(
         self,
         wgp_server_request,
-        variable_values_for_population,
         out_objective_values
     ):        
         results=[]
@@ -97,7 +99,7 @@ class SingleYearProblemVisualisation(ProblemBase):
             # Force a negative version of this input.
             output_value2 = -abs(output_values[2])
             # Get the values that the algorithm generated for this individual
-            individual_population_values = variable_values_for_population[iteration]
+            individual_population_values = WgpHelper._get_values_for_individual(wgp_server_request.body.input_values, iteration)
             
             results.append([output_value1, output_value2])
 

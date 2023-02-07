@@ -45,6 +45,18 @@ class ProblemBase(Problem):
     # Constructs a data frame containing the input and output data
     # using the input and output columns.
     #
+    def _get_combined_inputs_outputs(self):
+        columns = []
+        for input in self.run_job_request.inputs:
+            columns.append(input)
+        for output in self.run_job_request.outputs:
+            columns.append(output)
+        return columns
+
+    #
+    # Constructs a data frame containing the input and output data
+    # using the input and output columns.
+    #
     def _construct_data_frame(self, data, columns):
         return Pandas.DataFrame(
             data,
