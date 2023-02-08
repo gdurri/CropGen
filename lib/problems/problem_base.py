@@ -79,7 +79,6 @@ class ProblemBase(Problem):
     # Simply performs what's required when the problem run is ended.
     #
     async def run_ended(self, websocket):
-        self.wgp_server_client.run_complete(self.run_job_request.job_id)
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
         message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
         await websocket.send_text(message.to_json())

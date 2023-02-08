@@ -35,9 +35,3 @@ class WGPClientMock:
         self.logger.log_trace(f"-------------------------------------------------------------")
 
         return wgp_server_response
-
-    #
-    # TODO REMOVE Tells the job server that the run is complete.
-    #
-    def run_complete(self, job_id):
-        self.logger.log_debug(f"{self.__class__.__name__} - run complete called with job_id:{job_id}.")
