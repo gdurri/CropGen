@@ -16,8 +16,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, config, run_job_request):
-        super().__init__(Constants.JOB_TYPE_SINGLE_YEAR, config, run_job_request)
+    def __init__(self, job_type, config, run_job_request):
+        super().__init__(job_type, config, run_job_request)
     
     #
     # Invokes the running of the problem.
@@ -54,6 +54,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         )
         
         # OLD
+        # x1 = 'EndJuvtoFI Thermal Time (DD)'
+        # x2 = 'Fertile Tiller Number'
+        # f1 = 'Total Crop Water Use (mm)'
+        # f2 = 'Yield (t/ha)'
         columns_hardcoded = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.TOTAL_CROP_WATER_USE_MM, Constants.YIELD_HA]
         # NEW
         columns = super().get_combined_inputs_outputs()
@@ -82,25 +86,33 @@ class SingleYearProblemVisualisation(ProblemBase):
     # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
     # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
     # and 'G' key for constraints
-    #
+    # Keys for original variable names.
+    # xs = variable_values_for_population
+    # x = wgp_server_request.body.input_values[individual]
+    # out = out_objective_values
+    # f1_apsim = WaterUse
+    # f2_apsim = Yield
+    # f1val = output_value1
+    # f2val = output_value2
     def _handle_evaluate_value_for_population(
         self,
         wgp_server_request,
         out_objective_values
     ):        
-        results=[]
-        response = self.jobs_server_client.run(wgp_server_request)
+        results = []
+        response = self.wgp_server_client.run(wgp_server_request)
 
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:
-            # Extract all of the response output values.
-            iteration = output_values[0]
-            # Get the first input (index 1 because index 0 contains the iteration).
+            # Extract all of the response output values - Individual, Output Values.
+            individual = output_values[0]
+            # Get the first input
             output_value1 = output_values[1]
             # Force a negative version of this input.
             output_value2 = -abs(output_values[2])
+
             # Get the values that the algorithm generated for this individual
-            individual_population_values = WgpHelper.get_values_for_individual(wgp_server_request.body.input_values, iteration)
+            individual_population_values = WgpHelper.get_values_for_individual(wgp_server_request.body.input_values, individual)
             
             results.append([output_value1, output_value2])
 

@@ -44,7 +44,7 @@ class WgpHelper():
     # Creates output values
     #
     @staticmethod
-    def create_output_values(
+    def create_random_output_values(
         total_individuals, 
         total_outputs,
         reverse_mocked_results,

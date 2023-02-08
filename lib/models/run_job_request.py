@@ -1,3 +1,6 @@
+from json.decoder import JSONDecodeError
+import json
+
 from lib.models.model import Model
 
 #
@@ -5,11 +8,11 @@ from lib.models.model import Model
 #
 class RunJobRequest(Model):
     #
-    # Constructor. Simply pass the request data for parsing.
+    # Constructor. Simply pass the message for parsing.
     #
-    def __init__(self, request_data):
+    def __init__(self, message):
         self.errors = []
-        self._parse(request_data)
+        self._parse(message)
 
     #
     # Returns true if there are no errors.
@@ -20,12 +23,22 @@ class RunJobRequest(Model):
     #
     # Parses the JSON data into this class.
     #
-    def _parse(self, body):
+    def _parse(self, message):
         self.errors.clear()
-        self.job_id = self._get_attribute(body, 'jobId')
-        self.individuals = self._get_attribute(body, 'individuals')
-        self.inputs = self._get_attribute(body, 'inputs')
-        self.outputs = self._get_attribute(body, 'outputs')
+
+        try:
+            json_object = json.loads(message)
+            self.job_type = self._get_attribute(json_object, 'jobType')
+            body = self._get_attribute(json_object, 'body')
+
+            if body != None:
+                self.job_id = self._get_attribute(body, 'jobId')
+                self.individuals = self._get_attribute(body, 'individuals')
+                self.inputs = self._get_attribute(body, 'inputs')
+                self.outputs = self._get_attribute(body, 'outputs')
+            
+        except JSONDecodeError as error:
+            self.errors.append(f"Failed to parse run JSON: {message}. Error: {error}")
 
     #
     # Safely extracts the attribute, or appends an error if it isn't present

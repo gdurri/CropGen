@@ -8,8 +8,7 @@ class Constants():
     TOTAL_CROP_WATER_USE_MM = 'Total Crop Water Use (mm)'
     YIELD_HA = 'Yield (t/ha)'
 
-    JOB_TYPE_SINGLE_YEAR = 'singleyear'
-    JOB_TYPE_MULTI_YEAR = 'multiyear'
-
+    # This represents the key for specifying the number of generations to run 
+    # when performing a minimize function using Pymoo.
     MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS = 'n_gen'
     OBJECTIVE_VALUES_ARRAY_INDEX = 'F'

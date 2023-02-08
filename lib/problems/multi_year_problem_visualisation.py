@@ -16,8 +16,8 @@ class MultiYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, config, run_job_request):
-        super().__init__(Constants.JOB_TYPE_MULTI_YEAR, config, run_job_request)
+    def __init__(self, job_type, config, run_job_request):
+        super().__init__(job_type, config, run_job_request)
 
     #
     # Invokes the running of the problem.
@@ -83,7 +83,7 @@ class MultiYearProblemVisualisation(ProblemBase):
         out_objective_values
     ):
         results=[]
-        response = self.jobs_server_client.run(wgp_server_request)
+        response = self.wgp_server_client.run(wgp_server_request)
 
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:

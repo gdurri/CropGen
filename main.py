@@ -15,11 +15,11 @@ app = FastAPI()
 config = Config()
 
 
-# Web socket endpoints - All Comms expects JSON.
+# Web socket endpoints - All Comms expect JSON.
 
 # Run endpoint
 @app.websocket("/cropgen/run")
-async def test(websocket: WebSocket):
+async def run(websocket: WebSocket):
     await websocket.accept()
     message_processor = MessageProcessor(config, websocket)
 

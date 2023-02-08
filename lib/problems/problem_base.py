@@ -28,7 +28,7 @@ class ProblemBase(Problem):
         self.run_job_request = run_job_request
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
-        self.jobs_server_client = WGPServerClientFactory().create(self.config)
+        self.wgp_server_client = WGPServerClientFactory().create(self.config)
         self.logger = Logger()
         self.individual_results = []
         self.run_start_time = DateTimeHelper.get_date_time()
@@ -79,7 +79,7 @@ class ProblemBase(Problem):
     # Simply performs what's required when the problem run is ended.
     #
     async def run_ended(self, websocket):
-        self.jobs_server_client.run_complete(self.run_job_request.job_id)
+        self.wgp_server_client.run_complete(self.run_job_request.job_id)
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
         message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
         await websocket.send_text(message.to_json())
