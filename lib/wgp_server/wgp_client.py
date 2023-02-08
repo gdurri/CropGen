@@ -1,9 +1,12 @@
+from websocket import create_connection
+
 from lib.logging.logger import Logger
+from lib.models.wgp_server_response import WGPServerResponse
 
 #
-# The real WGP Server Client
+# The real WGP Client
 #
-class WGPServerClient:
+class WGPClient:
 
     #
     # Constructor
@@ -11,14 +14,16 @@ class WGPServerClient:
     def __init__(self, config):
         self.config = config
         self.logger = Logger()
-        self.sim_gen_url = config._get_sim_gen_url()
+        self.websocket = create_connection(config.wgp_end_point)
 
     #
     # Run method which will run APSIM and retrieve the run results.
     #
     def run(self, wgp_server_request):
-        self.logger.log_debug(
-            f"{self.__class__.__name__} run called with job_id:{wgp_server_request.job_id}.")
+        self.websocket.send(wgp_server_request.to_json())
+        response = self.websocket.recv()
+        wgp_server_response = WGPServerResponse(response)
+        return wgp_server_response
 
     #
     # TODO REMOVE Tells the job server that the run is complete.

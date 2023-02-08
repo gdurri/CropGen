@@ -1,11 +1,11 @@
 from lib.logging.logger import Logger
-from lib.models.wgp_server_response  import WGPServerResponse
+from lib.models.wgp_server_response_mock  import WGPServerResponseMock
 from lib.utils.wgp_helper import WgpHelper
 
 #
 # This class can be used to mock the WGP Job Server Client.
 #
-class WGPServerClientMock:
+class WGPClientMock:
 
     #
     # Constructor
@@ -25,7 +25,7 @@ class WGPServerClientMock:
         )
 
         # Construct a mocked response.
-        wgp_server_response = WGPServerResponse()
+        wgp_server_response = WGPServerResponseMock()
         wgp_server_response.outputs = output_values
 
         self.logger.log_trace(f"-------------------------------------------------------------")

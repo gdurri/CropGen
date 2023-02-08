@@ -32,9 +32,8 @@ class Config:
     # Populates itself using the config JSON data.
     #
     def _populate_from_data(self):
-        self.jobs_base_url = self._get_config_setting('jobsBaseUrl')
-        self.sim_gen_url = self._get_config_setting('simGenUrl')
-        self.use_mock_wgp_server_client = self._get_config_setting('useMockWgpServerClient')
+        self.wgp_end_point = self._get_config_setting('wgpEndPoint')
+        self.use_mock_wgp_client = self._get_config_setting('useMockWgpClient')
         self.reverse_mocked_results = self._get_config_setting('reverseMockedResults')
         self.socket_server_port = self._get_config_setting('socketServerPort')
         self.web_server_log_level = self._get_config_setting('webServerLogLevel')
@@ -60,9 +59,3 @@ class Config:
     #
     def _is_running_in_docker(self):
         return os.environ.get(Config.RUNNING_IN_DOCKER_ENV, False)
-
-    #
-    # Concatonates the various URLs to get the full sim gen URL.
-    #
-    def _get_sim_gen_url(self):
-        return os.path.join(self.jobs_base_url, self.sim_gen_url)

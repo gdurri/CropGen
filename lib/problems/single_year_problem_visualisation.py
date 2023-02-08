@@ -106,13 +106,13 @@ class SingleYearProblemVisualisation(ProblemBase):
         for output_values in response.outputs:
             # Extract all of the response output values - Individual, Output Values.
             individual = output_values[0]
-            # Get the first input
+            # Get the first output
             output_value1 = output_values[1]
-            # Force a negative version of this input.
+            # Force a negative version of this output.
             output_value2 = -abs(output_values[2])
 
             # Get the values that the algorithm generated for this individual
-            individual_population_values = WgpHelper.get_values_for_individual(wgp_server_request.body.input_values, individual)
+            individual_population_values = WgpHelper.get_values_for_individual(wgp_server_request.body.inputValues, individual)
             
             results.append([output_value1, output_value2])
 
