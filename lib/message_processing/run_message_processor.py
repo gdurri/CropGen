@@ -29,7 +29,7 @@ class RunMessageProcessor():
             await problem.run(self.websocket)
         # Otherwise send an error message.
         else:
-            await self.websocket.send_text(ErrorMessage(f"Unknown run job type: {job_type}.").to_json())
+            await self.websocket.send_text(ErrorMessage(f"Unknown run job type: {run_job_request.job_type}.").to_json())
 
     #
     # Constructs a problem using the job type, or None if we don't know 
