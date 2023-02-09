@@ -19,8 +19,12 @@ class WGPClient:
     # Run method which will run APSIM and retrieve the run results.
     #
     def run(self, wgp_server_request):
-        websocket = create_connection(self.config.wgp_end_point)
-        websocket.send(wgp_server_request.to_json())
-        response = websocket.recv()
-        wgp_server_response = WGPServerResponse(response)
+        wgp_server_response = None
+        try:
+            websocket = create_connection(self.config.wgp_end_point, self.config.wgp_socket_timeout_seconds)
+            websocket.send(wgp_server_request.to_json())
+            response = websocket.recv()
+            wgp_server_response = WGPServerResponse(response)
+        except Exception as ex:
+            self.logger.log_error(f"Failed to contact WGP Server. Exception: {ex}")
         return wgp_server_response

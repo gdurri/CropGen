@@ -15,6 +15,18 @@ class RunJobRequest(Model):
         self._parse(message)
 
     #
+    # Simple helper for getting the total number of inputs defined
+    #
+    def total_inputs(self):
+        return len(self.inputs)
+
+    #
+    # Simple helper for getting the total number of outputs defined
+    #
+    def total_outputs(self):
+        return len(self.outputs)
+
+    #
     # Returns true if there are no errors.
     #
     def is_valid(self):

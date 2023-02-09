@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 websockets
+websocket-client
 pandas
 plotly
 pymoo

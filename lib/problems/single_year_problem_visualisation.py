@@ -38,6 +38,12 @@ class SingleYearProblemVisualisation(ProblemBase):
             verbose=False
         )
 
+        # Now that everything has been evaluated, check for any run errors and only
+        # continue if there aren't any.
+        if self.run_errors:
+            await super().report_run_errors(websocket)
+            return
+
         # Variable values for non-dominated individuals in the last generation
         X = minimize_result.X
         # Objective values for non-dominated individuals in the last generation
@@ -45,6 +51,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         # History of data from all generations
         self.results_history = minimize_result.history
 
+        # Everything ran successfully so continue processing and reporting.
         total = list(
             zip(X[:, 0], 
                 X[:, 1], 
@@ -73,6 +80,13 @@ class SingleYearProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
+        if self.run_errors: 
+            # Initialise the out array to satisfy the algorithm.
+            out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+                [len(variable_values_for_population), len(self.run_job_request.inputs)]
+            )
+            return
+
         wgp_server_request = WGPServerRequest(self.run_job_request, variable_values_for_population)
         
         self._handle_evaluate_value_for_population(
@@ -99,8 +113,19 @@ class SingleYearProblemVisualisation(ProblemBase):
         wgp_server_request,
         out_objective_values
     ):        
-        results = []
+        # Initialise the out array to satisfy the algorithm.
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+            [self.run_job_request.individuals, self.run_job_request.total_inputs()]
+        )
+
         response = self.wgp_server_client.run(wgp_server_request)
+
+        if not response:
+            self.run_errors.append("No response from wgp server. Cannot handle evaluate.")
+            return
+
+        # We got a valid response so we can start iterating over the results.
+        results = []
 
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:
@@ -113,14 +138,16 @@ class SingleYearProblemVisualisation(ProblemBase):
 
             # Get the values that the algorithm generated for this individual
             individual_population_values = WgpHelper.get_values_for_individual(wgp_server_request.body.inputValues, individual)
-            
-            results.append([output_value1, output_value2])
 
-            self.individual_results.append((
-                individual_population_values[0],
-                individual_population_values[1],
-                output_value1,
-                (output_value2 * -0.01)
-            ))
+            # Sanity check that a value was returned for this individual.
+            if individual_population_values:
+                results.append([output_value1, output_value2])
+
+                self.individual_results.append((
+                    individual_population_values[0],
+                    individual_population_values[1],
+                    output_value1,
+                    (output_value2 * -0.01)
+                ))
         
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)

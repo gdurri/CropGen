@@ -5,6 +5,7 @@ import pandas as Pandas
 from lib.logging.logger import Logger
 from lib.models.results_message import ResultsMessage
 from lib.models.start_of_run_message import StartOfRunMessage
+from lib.models.error_message import ErrorMessage
 from lib.models.end_of_run_message import EndOfRunMessage
 from lib.utils.date_time_helper import DateTimeHelper
 from lib.wgp_server.wgp_client_factory import WGPClientFactory
@@ -32,6 +33,7 @@ class ProblemBase(Problem):
         self.logger = Logger()
         self.individual_results = []
         self.run_start_time = DateTimeHelper.get_date_time()
+        self.run_errors = []
 
         super().__init__(
             n_var = 2,
@@ -71,6 +73,7 @@ class ProblemBase(Problem):
     # Simply performs what's required when the problem run is started.
     #
     async def run_started(self, websocket):
+        self.run_errors = []
         self.run_start_time = DateTimeHelper.get_date_time()
         message = StartOfRunMessage(self.job_type, self.run_job_request.job_id)
         await websocket.send_text(message.to_json())
@@ -82,6 +85,13 @@ class ProblemBase(Problem):
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
         message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
         await websocket.send_text(message.to_json())
+
+    #
+    # Report the errors.
+    #
+    async def report_run_errors(self, websocket):
+        if self.run_errors:
+            await websocket.send_text(ErrorMessage(self.run_errors).to_json())
 
     #
     # Outputs all of the run data.

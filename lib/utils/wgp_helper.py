@@ -14,6 +14,8 @@ class WgpHelper():
     def get_values_for_individual(data, individual):
         for value in data:
             if value[WgpHelper.INDIVIDUAL_INDEX] == individual:
+                # Return an array containing all of the items apart from 
+                # the individual that was stored in it.
                 return value[1:]
         return None
     

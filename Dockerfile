@@ -13,4 +13,4 @@ COPY . .
 # Setup environment variables
 ENV RUNNING_IN_DOCKER Yes
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

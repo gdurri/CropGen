@@ -12,6 +12,7 @@ class MessageProcessor():
     async def process_run_message(self, message):
         # Construct a Run Job Request, using the JSON body.
         run_job_request = RunJobRequest(message)
+        
         # If it's invalid, report the error and exit out of this.
         if not run_job_request.is_valid():
             await self.websocket.send_text(ErrorMessage(run_job_request.errors).to_json())
