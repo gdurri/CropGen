@@ -5,9 +5,9 @@ from lib.models.run_job_request import RunJobRequest
 
 class MessageProcessor():
 
-    def __init__(self, config, websocket):
-        self.websocket = websocket
-        self.run_message_processor = RunMessageProcessor(config, websocket)
+    def __init__(self, config, websocket_client):
+        self.websocket_client = websocket_client
+        self.run_message_processor = RunMessageProcessor(config, websocket_client)
 
     async def process_run_message(self, message):
         # Construct a Run Job Request, using the JSON body.
@@ -15,7 +15,7 @@ class MessageProcessor():
         
         # If it's invalid, report the error and exit out of this.
         if not run_job_request.is_valid():
-            await self.websocket.send_text(ErrorMessage(run_job_request.errors).to_json())
+            await self.websocket_client.send_error(run_job_request.errors)
             return
         
         # We are happy with the message format so ask our run message processor to 

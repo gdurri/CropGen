@@ -72,38 +72,38 @@ class ProblemBase(Problem):
     #
     # Simply performs what's required when the problem run is started.
     #
-    async def run_started(self, websocket):
+    async def run_started(self, websocket_client):
         self.run_errors = []
         self.run_start_time = DateTimeHelper.get_date_time()
         message = StartOfRunMessage(self.job_type, self.run_job_request.job_id)
-        await websocket.send_text(message.to_json())
+        await websocket_client.send_text(message.to_json())
 
     #
     # Simply performs what's required when the problem run is ended.
     #
-    async def run_ended(self, websocket):
+    async def run_ended(self, websocket_client):
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
         message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
-        await websocket.send_text(message.to_json())
+        await websocket_client.send_text(message.to_json())
 
     #
     # Report the errors.
     #
-    async def report_run_errors(self, websocket):
+    async def report_run_errors(self, websocket_client):
         if self.run_errors:
-            await websocket.send_text(ErrorMessage(self.run_errors).to_json())
+            await websocket_client.send_error(self.run_errors)
 
     #
     # Outputs all of the run data.
     #
-    async def send_results(self, opt_data_frame, all_data_frame, websocket):
+    async def send_results(self, opt_data_frame, all_data_frame, websocket_client):
         # Log the raw data frames.
-        await self.send_results_message(opt_data_frame, websocket)
-        await self.send_results_message(all_data_frame, websocket)
+        await self.send_results_message(opt_data_frame, websocket_client)
+        await self.send_results_message(all_data_frame, websocket_client)
 
     #
     # Helper for constructing a results message from a data frame.
     #
-    async def send_results_message(self, data_frame, websocket):
+    async def send_results_message(self, data_frame, websocket_client):
         message = ResultsMessage(self.job_type, self.run_job_request.job_id, data_frame)
-        await websocket.send_text(message.to_json())
+        await websocket_client.send_text(message.to_json())

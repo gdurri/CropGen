@@ -6,6 +6,7 @@
 import uvicorn
 from fastapi import FastAPI, WebSocket
 from lib.message_processing.message_processor import MessageProcessor
+from lib.socket.websocket_client import WebSocketClient
 from lib.utils.config import Config
 
 # Constructs the app using the Fast API
@@ -20,11 +21,16 @@ config = Config()
 # Run endpoint
 @app.websocket("/cropgen/run")
 async def run(websocket: WebSocket):
-    await websocket.accept()
-    message_processor = MessageProcessor(config, websocket)
+    websocket_client = WebSocketClient(config, websocket)
+    await websocket_client.connect()
+    
+    websocket_client = WebSocketClient(config, websocket)
+    message_processor = MessageProcessor(config, websocket_client)
+
+    websocket_client.receive_text()
 
     while True:
-        request = await websocket.receive_text()
+        request = await websocket_client.receive_text()
         await message_processor.process_run_message(request)
 
 

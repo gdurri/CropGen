@@ -2,7 +2,7 @@ from lib.wgp_server.wgp_client import WGPClient
 from lib.wgp_server.wgp_client_mock import WGPClientMock
 
 #
-# Factor class for creating WGP Clients, depending on the config.
+# Factory class for creating WGP Clients, depending on the config.
 #
 class WGPClientFactory():
 

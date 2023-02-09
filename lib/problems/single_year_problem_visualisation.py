@@ -22,8 +22,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Invokes the running of the problem.
     #
-    async def run(self, websocket):
-        await super().run_started(websocket)
+    async def run(self, websocket_client):
+        await super().run_started(websocket_client)
 
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.individuals)
 
@@ -41,7 +41,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         # Now that everything has been evaluated, check for any run errors and only
         # continue if there aren't any.
         if self.run_errors:
-            await super().report_run_errors(websocket)
+            await super().report_run_errors(websocket_client)
             return
 
         # Variable values for non-dominated individuals in the last generation
@@ -71,10 +71,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         opt_data_frame = super().construct_data_frame(total, columns)
         all_data_frame = super().construct_data_frame(self.individual_results, columns)
 
-        await super().send_results(opt_data_frame, all_data_frame, websocket)
+        await super().send_results(opt_data_frame, all_data_frame, websocket_client)
 
         # Now that we are done, report back.
-        await super().run_ended(websocket)
+        await super().run_ended(websocket_client)
     
     #
     # Iterate over each population and perform calcs.
