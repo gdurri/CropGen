@@ -28,7 +28,7 @@ class RunMessageProcessor():
             await problem.run(self.websocket_client)
         # Otherwise send an error message.
         else:
-            await self.websocket_client.send_error([f"Unknown run job type: {run_job_request.job_type}."])
+            await self.websocket_client.send_error_async([f"Unknown run job type: {run_job_request.job_type}."])
 
     #
     # Constructs a problem using the job type, or None if we don't know 

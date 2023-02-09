@@ -1,5 +1,4 @@
 from lib.message_processing.run_message_processor import RunMessageProcessor
-from lib.models.error_message import ErrorMessage
 from lib.models.run_job_request import RunJobRequest
 
 
@@ -15,7 +14,7 @@ class MessageProcessor():
         
         # If it's invalid, report the error and exit out of this.
         if not run_job_request.is_valid():
-            await self.websocket_client.send_error(run_job_request.errors)
+            await self.websocket_client.send_error_async(run_job_request.errors)
             return
         
         # We are happy with the message format so ask our run message processor to 

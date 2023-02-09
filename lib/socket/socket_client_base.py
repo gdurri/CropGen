@@ -9,8 +9,7 @@ class SocketClientBase():
     #
     # Constructor
     #
-    def __init__(self, config, raw_socket):
-        self.config = config
+    def __init__(self, raw_socket):
         self.logger = Logger()
         self.raw_socket = raw_socket
 
@@ -18,21 +17,28 @@ class SocketClientBase():
     # Connect method
     #
     @abstractmethod
-    async def connect(self):
+    def connect(self):
         pass
 
     #
-    # Disconnect method
+    # Connect method
     #
     @abstractmethod
-    async def disconnect(self):
+    async def connect_async(self):
         pass
 
     #
     # Send data method
     #
     @abstractmethod
-    async def send_text(self, data):
+    def send_text(self, data):
+        pass
+
+    #
+    # Send data method
+    #
+    @abstractmethod
+    async def send_text_async(self, data):
         pass
 
     #
@@ -43,8 +49,22 @@ class SocketClientBase():
         pass
 
     #
+    # Send error method
+    #
+    @abstractmethod
+    async def send_error_async(self, data):
+        pass
+
+    #
     # Receive data method
     #
     @abstractmethod
     async def receive_text(self):
+        pass
+
+    #
+    # Receive data method
+    #
+    @abstractmethod
+    async def receive_text_async(self):
         pass
