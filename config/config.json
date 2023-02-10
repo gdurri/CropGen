@@ -4,6 +4,8 @@
     "wgpSocketTimeoutSeconds": 5,
     "useMockWgpClient": false,
     "reverseMockedResults": true,
+    "socketServerHost": "localhost",
     "socketServerPort": 8000,
+    "socketReceiveBufferSize": 1024,
     "webServerLogLevel" : "info"
 }

@@ -3,40 +3,34 @@
 #
 
 # Imports
-import uvicorn
-from fastapi import FastAPI, WebSocket
-from lib.message_processing.message_processor import MessageProcessor
-from lib.socket.fast_api_websocket_client import FastAPIWebSocketClient
+import asyncio
+from lib.server.socket_server import SocketServer
 from lib.utils.config import Config
 
-# Constructs the app using the Fast API
-app = FastAPI()
-# Construct and parse the config. This gets passed around to minimise the
-# amount of file reading we do.
 config = Config()
 
-
-# Web socket endpoints - All Comms expect JSON.
-
-# Run endpoint
-@app.websocket("/cropgen/run")
-async def run(websocket: WebSocket):
-    websocket_client = FastAPIWebSocketClient(websocket)
-
-    await websocket_client.connect_async()
-    message_processor = MessageProcessor(config, websocket_client)
-
-    while True:
-        request = await websocket_client.receive_text_async()
-        await message_processor.process_run_message(request)
-
+def client_connected_cb(client_reader, client_writer):
+    server = SocketServer(config)
+    server.client_connected_callback(client_reader, client_writer)
 
 # Main entry point
 if __name__ == "__main__":
-    # Run the web server.
-    uvicorn.run(
-        "main:app", 
-        port = config.socket_server_port,
-        reload = True,
-        log_level = config.web_server_log_level
+    loop = asyncio.get_event_loop()
+    server_coro = asyncio.start_server(
+        client_connected_cb,
+        host=config.socket_server_host,
+        port=config.socket_server_port,
+        loop=loop,
     )
+
+    server = loop.run_until_complete(server_coro)
+
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt as e:
+        pass
+
+    # Close the server
+    server.close()
+    loop.run_until_complete(server.wait_closed())
+    loop.close()

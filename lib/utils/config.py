@@ -37,7 +37,9 @@ class Config:
         self.wgp_socket_timeout_seconds = self._get_config_setting('wgpSocketTimeoutSeconds')
         self.use_mock_wgp_client = self._get_config_setting('useMockWgpClient', False)        
         self.reverse_mocked_results = self._get_config_setting('reverseMockedResults', False)
+        self.socket_server_host = self._get_config_setting('socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting('socketServerPort', 8000)
+        self.socket_receive_buffer_size = self._get_config_setting('socketReceiveBufferSize', 1024)
         self.web_server_log_level = self._get_config_setting('webServerLogLevel', 'info')
 
     #
