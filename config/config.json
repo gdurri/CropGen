@@ -5,6 +5,7 @@
     "useMockWgpClient": false,
     "reverseMockedResults": true,
     "socketServerHost": "localhost",
+    "socketServerHostDocker": "0.0.0.0",
     "socketServerPort": 8000,
     "socketReceiveBufferSize": 1024,
     "webServerLogLevel" : "info"

@@ -4,17 +4,23 @@
 
 # Imports
 import asyncio
+from lib.logging.logger import Logger
+
 from lib.server.socket_server import SocketServer
 from lib.utils.config import Config
 
 config = Config()
 
+# Functions
 def client_connected_cb(client_reader, client_writer):
     server = SocketServer(config)
     server.client_connected_callback(client_reader, client_writer)
 
 # Main entry point
 if __name__ == "__main__":
+    logger = Logger()
+    logger.raw_logger.debug("Started CropGen application")
+
     loop = asyncio.get_event_loop()
     server_coro = asyncio.start_server(
         client_connected_cb,
@@ -34,3 +40,4 @@ if __name__ == "__main__":
     server.close()
     loop.run_until_complete(server.wait_closed())
     loop.close()
+    logger.raw_logger.debug("Closing CropGen application")
