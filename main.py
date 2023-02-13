@@ -4,7 +4,8 @@
 
 # Imports
 import asyncio
-from lib.logging.logger import Logger
+import logging
+from lib.logging import set_logger_config
 
 from lib.server.socket_server import SocketServer
 from lib.utils.config import Config
@@ -18,8 +19,7 @@ def client_connected_cb(client_reader, client_writer):
 
 # Main entry point
 if __name__ == "__main__":
-    logger = Logger()
-    logger.raw_logger.debug("Started CropGen application")
+    logging.debug("Started CropGen application")
 
     loop = asyncio.get_event_loop()
     server_coro = asyncio.start_server(
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     server.close()
     loop.run_until_complete(server.wait_closed())
     loop.close()
-    logger.raw_logger.debug("Closing CropGen application")
+    logging.debug("Closing CropGen application")

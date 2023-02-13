@@ -1,4 +1,5 @@
-from lib.logging.logger import Logger
+import logging
+
 from lib.models.wgp_server_response_mock  import WGPServerResponseMock
 from lib.utils.wgp_helper import WgpHelper
 
@@ -12,7 +13,6 @@ class WGPClientMock:
     #
     def __init__(self, config):
         self.config = config
-        self.logger = Logger()
 
     #
     # Mock the run by returning a mocked response objects.
@@ -28,10 +28,10 @@ class WGPClientMock:
         wgp_server_response = WGPServerResponseMock()
         wgp_server_response.outputs = output_values
 
-        self.logger.log_debug(f"-------------------------------------------------------------")
-        self.logger.log_debug(f"{self.__class__.__name__} _run")
-        self.logger.log_debug(f"wgp_server_request: {wgp_server_request.to_json()}")
-        self.logger.log_debug(f"wgp_server_response: {wgp_server_response.to_json()}")
-        self.logger.log_debug(f"-------------------------------------------------------------")
+        logging.debug(f"-------------------------------------------------------------")
+        logging.debug(f"{self.__class__.__name__} _run")
+        logging.debug(f"wgp_server_request: {wgp_server_request.to_json()}")
+        logging.debug(f"wgp_server_response: {wgp_server_response.to_json()}")
+        logging.debug(f"-------------------------------------------------------------")
 
         return wgp_server_response

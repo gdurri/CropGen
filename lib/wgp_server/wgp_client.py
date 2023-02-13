@@ -1,4 +1,5 @@
-from lib.logging.logger import Logger
+import logging
+
 from lib.models.wgp_server_response import WGPServerResponse
 from lib.socket.websocket_client import WebSocketClient
 
@@ -12,7 +13,6 @@ class WGPClient:
     #
     def __init__(self, config):
         self.config = config
-        self.logger = Logger()
 
     #
     # Run method which will run APSIM and retrieve the run results.
@@ -26,5 +26,5 @@ class WGPClient:
             response = websocket.receive_text()
             wgp_server_response = WGPServerResponse(response)
         except Exception as ex:
-            self.logger.log_error(f"Failed to contact WGP Server. Exception: {ex}")
+            logging.exception("Failed to contact WGP Server")
         return wgp_server_response

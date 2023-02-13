@@ -1,7 +1,5 @@
 from abc import abstractmethod
 
-from lib.logging.logger import Logger
-
 #
 # An abstract socket client base class.
 #
@@ -10,7 +8,6 @@ class SocketClientBase():
     # Constructor
     #
     def __init__(self, raw_socket):
-        self.logger = Logger()
         self.raw_socket = raw_socket
 
     #

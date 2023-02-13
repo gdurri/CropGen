@@ -2,7 +2,6 @@ from pymoo.core.problem import Problem
 import numpy as NumPy
 import pandas as Pandas
 
-from lib.logging.logger import Logger
 from lib.models.results_message import ResultsMessage
 from lib.models.start_of_run_message import StartOfRunMessage
 from lib.models.error_message import ErrorMessage
@@ -30,7 +29,6 @@ class ProblemBase(Problem):
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
         self.wgp_server_client = WGPClientFactory().create(self.config)
-        self.logger = Logger()
         self.individual_results = []
         self.run_start_time = DateTimeHelper.get_date_time()
         self.run_errors = []
