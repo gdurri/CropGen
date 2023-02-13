@@ -1,6 +1,6 @@
 {
     "wgpEndPoint": "ws://127.0.0.1:9000/wgptest/run",
-    "wgpEndPointDocker": "ws://wgp-server-test-harness:9000/wgptest/run",
+    "wgpEndPointDocker": "ws://wgp-server-test-harness-app:9000/wgptest/run",
     "wgpSocketTimeoutSeconds": 5,
     "useMockWgpClient": false,
     "reverseMockedResults": true,
