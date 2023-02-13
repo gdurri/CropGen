@@ -3,7 +3,6 @@ import logging
 
 from lib.socket.socket_client import SocketClient
 from lib.message_processing.message_processor import MessageProcessor
-from lib.models.error_message  import ErrorMessage
 
 #
 # A socket server that handles incoming requests from clients.
@@ -33,7 +32,7 @@ class SocketServer():
         logging.debug('Connected to client %s. Waiting for commands', client_address)
 
         while True:
-            data = await reader.read(self.config.socket_receive_buffer_size)
+            data = await socket_client.receive_text_async()
 
             if data == b'':
                 logging.debug('Client %s disconnected', client_address)

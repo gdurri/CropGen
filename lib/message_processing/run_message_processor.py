@@ -43,6 +43,7 @@ class RunMessageProcessor():
                 self.config,
                 run_job_request
             )
+            
         elif cleansed_job_type == RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR:
             return MultiYearProblemVisualisation(
                 RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR,

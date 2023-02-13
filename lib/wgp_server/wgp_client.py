@@ -26,5 +26,5 @@ class WGPClient:
             response = websocket.receive_text()
             wgp_server_response = WGPServerResponse(response)
         except Exception as ex:
-            logging.exception("Failed to contact WGP Server")
+            logging.exception("Failed to contact WGP Server on address: %s", self.config.wgp_end_point)
         return wgp_server_response

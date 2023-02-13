@@ -7,7 +7,7 @@ import uvicorn
 from fastapi import FastAPI, WebSocket
 from lib.message_processing.message_processor import MessageProcessor
 from lib.socket.fast_api_websocket_client import FastAPIWebSocketClient
-from lib.utils.config import Config
+from lib.config.config import Config
 
 # Constructs the app using the Fast API
 app = FastAPI()
