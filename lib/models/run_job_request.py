@@ -45,9 +45,10 @@ class RunJobRequest(Model):
 
             if body != None:
                 self.job_id = self.get_attribute(body, 'jobId')
+                self.iterations = self.get_attribute(body, 'iterations')
                 self.individuals = self.get_attribute(body, 'individuals')
                 self.inputs = self.get_attribute(body, 'inputs')
                 self.outputs = self.get_attribute(body, 'outputs')
             
         except JSONDecodeError as error:
-            self.errors.append(f"Failed to parse run JSON: {message}. Error: {error}")
+            self.errors.append(f"Failed to parse run JSON: '{message}'. Error: '{error}'")

@@ -6,12 +6,12 @@ from lib.models.wgp_server_request import WGPServerRequest
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
+from lib.utils.wgp_helper import WgpHelper
 
 #
 # Represents a Multi Year Problem
 #
 class MultiYearProblemVisualisation(ProblemBase):
-    MULTI_YEAR_GEN_NUMBER = 5
 
     #
     # Construct problem with the given dimensions and variable ranges
@@ -22,10 +22,10 @@ class MultiYearProblemVisualisation(ProblemBase):
     #
     # Invokes the running of the problem.
     #
-    async def run(self, websocket):
-        await super().run_started(websocket)
+    async def run(self, socket_client):
+        await super().run_started(socket_client)
 
-        algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.individuals)        
+        algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.individuals)
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
@@ -33,9 +33,18 @@ class MultiYearProblemVisualisation(ProblemBase):
         minimize_result = minimize(
             problem=self,
             algorithm=algorithm,
-            termination=(Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS, MultiYearProblemVisualisation.MULTI_YEAR_GEN_NUMBER),
+            termination=(
+                Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS, 
+                self.run_job_request.iterations
+            ),
             save_history=True,
             verbose=False)
+            
+        # Now that everything has been evaluated, check for any run errors and only
+        # continue if there aren't any.
+        if self.run_errors:
+            await super().report_run_errors(socket_client)
+            return
 
         # Variable values for non-dominated individuals in the last generation
         X = minimize_result.X
@@ -47,27 +56,35 @@ class MultiYearProblemVisualisation(ProblemBase):
                 X[:, 1], 
                 F[:, 0], 
                 (-0.01 * F[:, 1])
-                )
+            )
         )
 
-        columns = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA]
+        columns_hardcoded = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA]
+        # NEW
+        columns = super().get_combined_inputs_outputs()
         opt_data_frame = super().construct_data_frame(total, columns)
         all_data_frame = super().construct_data_frame(self.individual_results, columns)
 
-        await super().send_results(opt_data_frame, all_data_frame, websocket)
+        await super().send_results(opt_data_frame, all_data_frame, socket_client)
 
         # Now that we are done, report back.
-        await super().run_ended(websocket)
+        await super().run_ended(socket_client)
 
     #
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
+        if self.run_errors: 
+            # Initialise the out array to satisfy the algorithm.
+            out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+                [len(variable_values_for_population), len(self.run_job_request.inputs)]
+            )
+            return
+            
         wgp_server_request = WGPServerRequest(self.run_job_request, variable_values_for_population)
         
         self._handle_evaluate_value_for_population(
             wgp_server_request,
-            variable_values_for_population,
             out_objective_values
         )
 

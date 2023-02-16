@@ -29,14 +29,14 @@ class SocketServer():
     async def client_listener(self, reader, writer):
         socket_client = SocketClient(self.config, reader, writer)
         client_address = writer.get_extra_info('peername')
-        logging.debug('Connected to client %s. Waiting for commands', client_address)
+        logging.debug("Connected to client '%s'. Waiting for commands", client_address)
 
         while True:
             data = await socket_client.receive_text_async()
 
             if data == b'':
-                logging.debug('Client %s disconnected', client_address)
+                logging.debug("Client '%s' disconnected", client_address)
                 return
             else:
                 message_processor = MessageProcessor(self.config, socket_client)
-                await message_processor.process_run_message(data)
+                await message_processor.process_run_message(data.decode(SocketClient.ENCODING))

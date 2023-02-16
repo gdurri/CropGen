@@ -4,7 +4,6 @@ import pandas as Pandas
 
 from lib.models.results_message import ResultsMessage
 from lib.models.start_of_run_message import StartOfRunMessage
-from lib.models.error_message import ErrorMessage
 from lib.models.end_of_run_message import EndOfRunMessage
 from lib.utils.date_time_helper import DateTimeHelper
 from lib.wgp_server.wgp_client_factory import WGPClientFactory

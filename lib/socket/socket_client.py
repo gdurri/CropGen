@@ -5,6 +5,8 @@ from lib.models.error_message import ErrorMessage
 # A websocket client.
 #
 class SocketClient(SocketClientBase):
+    ENCODING = 'utf-8'
+
     #
     # Constructor
     #
@@ -36,7 +38,14 @@ class SocketClient(SocketClientBase):
     # Send data method
     #
     async def send_text_async(self, data):
-        self.writer.write(data.encode('ascii'))
+        # Encode the data to ascii.
+        encoded_data = data.encode(SocketClient.ENCODING)
+        # Store the length.        
+        encoded_data_length = len(encoded_data)
+        # Send the length of the encoded data.
+        self.writer.write(str(encoded_data_length).encode(SocketClient.ENCODING))
+        # Now the data.
+        self.writer.write(encoded_data)
         await self.writer.drain()
 
     #
