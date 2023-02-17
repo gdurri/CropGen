@@ -32,7 +32,7 @@ class SocketServer():
         logging.debug("Connected to client '%s'. Waiting for commands", client_address)
 
         while True:
-            data = await socket_client.read_text_async(self.config.socket_data_encoding)
+            data = await socket_client.read_text_async()
 
             if data == b'':
                 logging.debug("Disconnected from '%s'", client_address)
