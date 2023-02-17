@@ -71,7 +71,16 @@ class SocketClient(SocketClientBase):
     # Receive data method
     #
     async def receive_text_async(self, encoding=ENCODING):
+        # Read the message size byte array that proceeds each message.
         message_size_byte_array = await self.reader.read(4)
+        # Convert it to an integer and then use this to read the message itself
+        # with the known size.
         message_size_bytes = int.from_bytes(message_size_byte_array, SocketClient.LITTLE_ENDIAN)
         message_data = await self.reader.readexactly(message_size_bytes)
-        return message_data
+
+        # If it is an empty message, this is our disconnect message so don't decode it.
+        if message_data == b'':
+            return message_data
+        
+        # It's not a disconnect to decode it.
+        return message_data.decode(encoding)

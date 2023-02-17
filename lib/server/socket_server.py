@@ -35,8 +35,8 @@ class SocketServer():
             data = await socket_client.receive_text_async()
 
             if data == b'':
-                logging.debug("Client '%s' disconnected", client_address)
+                logging.debug("Disconnected from '%s'", client_address)
                 return
             else:
                 message_processor = MessageProcessor(self.config, socket_client)
-                await message_processor.process_run_message(data.decode(SocketClient.ENCODING))
+                await message_processor.process_run_message(data)
