@@ -1,12 +1,13 @@
 {
-    "wgpEndPoint": "ws://127.0.0.1:9000/wgptest/run",
-    "wgpEndPointDocker": "ws://wgp-server-test-harness-app:9000/wgptest/run",
-    "wgpSocketTimeoutSeconds": 5,
+    "wgpHost": "localhost",
+    "wgpHostDocker": "wgp-server-test-harness-app",
+    "wgpPort": 9000,
     "useMockWgpClient": false,
     "reverseMockedResults": true,
     "socketServerHost": "localhost",
     "socketServerHostDocker": "0.0.0.0",
     "socketServerPort": 8000,
-    "socketReceiveBufferSize": 1024,
+    "socketDataEndianness": "little",
+    "socketDataEncoding": "utf-8",
     "webServerLogLevel" : "info"
 }

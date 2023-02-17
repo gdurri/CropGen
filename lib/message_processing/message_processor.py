@@ -14,7 +14,7 @@ class MessageProcessor():
         
         # If it's invalid, report the error and exit out of this.
         if not run_job_request.is_valid():
-            await self.socket_client.send_error_async(run_job_request.errors)
+            await self.socket_client.write_error_async(run_job_request.errors)
             return
         
         # We are happy with the message format so ask our run message processor to 

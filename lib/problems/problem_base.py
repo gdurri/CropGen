@@ -73,7 +73,7 @@ class ProblemBase(Problem):
         self.run_errors = []
         self.run_start_time = DateTimeHelper.get_date_time()
         message = StartOfRunMessage(self.job_type, self.run_job_request.job_id)
-        await websocket_client.send_text_async(message.to_json())
+        await websocket_client.write_text_async(message.to_json())
 
     #
     # Simply performs what's required when the problem run is ended.
@@ -81,14 +81,14 @@ class ProblemBase(Problem):
     async def run_ended(self, websocket_client):
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
         message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
-        await websocket_client.send_text_async(message.to_json())
+        await websocket_client.write_text_async(message.to_json())
 
     #
     # Report the errors.
     #
     async def report_run_errors(self, websocket_client):
         if self.run_errors:
-            await websocket_client.send_error_async(self.run_errors)
+            await websocket_client.write_error_async(self.run_errors)
 
     #
     # Outputs all of the run data.
@@ -103,4 +103,4 @@ class ProblemBase(Problem):
     #
     async def send_results_message(self, data_frame, websocket_client):
         message = ResultsMessage(self.job_type, self.run_job_request.job_id, data_frame)
-        await websocket_client.send_text_async(message.to_json())
+        await websocket_client.write_text_async(message.to_json())

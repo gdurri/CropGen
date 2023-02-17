@@ -41,13 +41,14 @@ class Config:
     # Populates itself using the config JSON data.
     #
     def _populate_from_data(self, data):
-        self.wgp_end_point = self._get_config_setting(data, 'wgpEndPoint')
-        self.wgp_socket_timeout_seconds = self._get_config_setting(data, 'wgpSocketTimeoutSeconds')
+        self.wgp_host = self._get_config_setting(data, 'wgpHost')
+        self.wgp_port = self._get_config_setting(data, 'wgpPort', 9000)
         self.use_mock_wgp_client = self._get_config_setting(data, 'useMockWgpClient', False)
         self.reverse_mocked_results = self._get_config_setting(data, 'reverseMockedResults', False)
         self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
-        self.socket_receive_buffer_size = self._get_config_setting(data, 'socketReceiveBufferSize', 1024)
+        self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'little')
+        self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
         self.web_server_log_level = self._get_config_setting(data, 'webServerLogLevel', 'info')
 
     #

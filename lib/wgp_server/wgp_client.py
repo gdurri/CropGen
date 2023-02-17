@@ -1,7 +1,7 @@
 import logging
 
 from lib.models.wgp_server_response import WGPServerResponse
-from lib.socket.websocket_client import WebSocketClient
+from lib.socket.socket_client_async import SocketClientAsync
 
 #
 # The real WGP Client
@@ -20,11 +20,11 @@ class WGPClient:
     def run(self, wgp_server_request):
         wgp_server_response = None
         try:
-            websocket = WebSocketClient(self.config.wgp_end_point, self.config.wgp_socket_timeout_seconds)
-            websocket.connect()
-            websocket.send_text(wgp_server_request.to_json())
-            response = websocket.receive_text()
-            wgp_server_response = WGPServerResponse(response)
+            # websocket = SocketClient(self.config)
+            # websocket.connect(self.config.wgp_host, self.config.wgp_port)
+            # websocket.write_text(wgp_server_request.to_json())
+            # response = websocket.receive_text()
+            wgp_server_response = WGPServerResponse("response")
         except Exception as ex:
             logging.exception("Failed to contact WGP Server on address: '%s'", self.config.wgp_end_point)
         return wgp_server_response

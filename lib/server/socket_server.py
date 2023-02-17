@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from lib.socket.socket_client import SocketClient
+from lib.socket.socket_client_async import SocketClientAsync
 from lib.message_processing.message_processor import MessageProcessor
 
 #
@@ -27,12 +27,12 @@ class SocketServer():
     # Handles listening to the connected client and processing any messages.
     #
     async def client_listener(self, reader, writer):
-        socket_client = SocketClient(self.config, reader, writer)
+        socket_client = SocketClientAsync(self.config, reader, writer)
         client_address = writer.get_extra_info('peername')
         logging.debug("Connected to client '%s'. Waiting for commands", client_address)
 
         while True:
-            data = await socket_client.receive_text_async()
+            data = await socket_client.read_text_async(self.config.socket_data_encoding)
 
             if data == b'':
                 logging.debug("Disconnected from '%s'", client_address)
