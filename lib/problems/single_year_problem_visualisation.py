@@ -1,7 +1,7 @@
 from pymoo.optimize import minimize
 import numpy as NumPy
 
-from lib.models.wgp_server_request import WGPServerRequest
+from lib.models.cgm_server_job_request import CGMServerJobRequest
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
@@ -76,10 +76,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         if self.run_errors:
             return
 
-        wgp_server_request = WGPServerRequest(self.run_job_request, variable_values_for_population)
+        cgm_server_job_request = CGMServerJobRequest(self.run_job_request, variable_values_for_population)
         
         self._handle_evaluate_value_for_population(
-            wgp_server_request,
+            cgm_server_job_request,
             out_objective_values
         )
 
@@ -91,7 +91,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     # and 'G' key for constraints
     def _handle_evaluate_value_for_population(
         self,
-        wgp_server_request,
+        cgm_server_job_request,
         out_objective_values
     ):
         # Initialise the out array to satisfy the algorithm.
@@ -99,10 +99,10 @@ class SingleYearProblemVisualisation(ProblemBase):
             [self.run_job_request.individuals, self.run_job_request.total_inputs()]
         )
 
-        response = self.wgp_server_client.run(wgp_server_request)
+        response = self.cgm_server_client.run(cgm_server_job_request)
 
         if not response:
-            self.run_errors.append("No response from wgp server. Cannot handle evaluate.")
+            self.run_errors.append("No response from CGM server. Cannot handle evaluate.")
             return
 
         # We got a valid response so we can start iterating over the results.

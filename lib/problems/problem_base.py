@@ -6,7 +6,7 @@ from lib.models.results_message import ResultsMessage
 from lib.models.start_of_run_message import StartOfRunMessage
 from lib.models.end_of_run_message import EndOfRunMessage
 from lib.utils.date_time_helper import DateTimeHelper
-from lib.wgp_server.wgp_client_factory import WGPClientFactory
+from lib.cgm_server.cgm_client_factory import CGMClientFactory
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -27,7 +27,7 @@ class ProblemBase(Problem):
         self.run_job_request = run_job_request
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
-        self.wgp_server_client = WGPClientFactory().create(self.config)
+        self.cgm_server_client = CGMClientFactory().create(self.config)
         self.run_start_time = DateTimeHelper.get_date_time()
         self.run_errors = []
 

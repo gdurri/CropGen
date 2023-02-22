@@ -6,12 +6,13 @@ from lib.models.model import Model
 #
 # A WGP Server Response, as returned from the WGP Server.
 #
-class WGPServerResponse(Model):
+class CGMServerJobResponse(Model):
     #
     # Constructor
     #
     def __init__(self, message):
         self.errors = []
+        self.outputs = []
         self._parse(message)
 
     #

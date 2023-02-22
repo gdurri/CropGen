@@ -1,7 +1,7 @@
 {
-    "wgpHost": "localhost",
-    "wgpHostDocker": "wgp-server-test-harness-app",
-    "wgpPort": 9000,
+    "cgmServerHost": "localhost",
+    "cgmServerHostDocker": "cgm-server-test-harness-app",
+    "cgmServerPort": 9000,
     "useMockWgpClient": false,
     "reverseMockedResults": true,
     "socketServerHost": "localhost",
