@@ -1,17 +1,18 @@
 import socket
 
+from lib.socket.socket_client_base import SocketClientBase
 from lib.models.error_message import ErrorMessage
 
 #
-# A websocket client.
+# A socket client.
 #
-class SocketClient():
+class SocketClient (SocketClientBase):
 
     #
     # Constructor
     #
     def __init__(self, config):
-        self.config = config
+        super().__init__(config)
         self.socket = socket.socket()
 
     #
@@ -23,18 +24,22 @@ class SocketClient():
     #
     # Writes data
     #
-    def write_text(self, data):
+    def write_text(self, type_name, type_body):
+        message_wrapper = super().construct_message_wrapper(type_name, type_body)
+        message_size_byte_array = message_wrapper[SocketClientBase.MESSAGE_WRAPPER_TUPLE_MESSAGE_SIZE_INDEX]
+        encoded_data = message_wrapper[SocketClientBase.MESSAGE_WRAPPER_TUPLE_ENCODED_DATA]
+
         # Send the length of the encoded data as a byte array.
-        message_size_byte_array = len(data).to_bytes(4, self.config.socket_data_endianness)
         self.socket.sendall(message_size_byte_array)
         # Now send the data.
-        self.socket.sendall(data.encode(self.config.socket_data_encoding))
+        self.socket.sendall(encoded_data)
 
     #
     # Writes a serialised error message.
     #
     def write_error(self, errors):
-        self.write_text_async(ErrorMessage(errors).to_json())
+        error_message = ErrorMessage(errors) 
+        self.write_text(error_message.get_type_name(), error_message.to_json())
 
     #
     # Reads data

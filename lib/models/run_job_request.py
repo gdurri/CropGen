@@ -45,6 +45,7 @@ class RunJobRequest(Model):
 
             if body != None:
                 self.job_id = self.get_attribute(body, 'jobId')
+                self.apsim_url = self.get_attribute(body, 'apsimUrl')
                 self.iterations = self.get_attribute(body, 'iterations')
                 self.individuals = self.get_attribute(body, 'individuals')
                 self.inputs = self.get_attribute(body, 'inputs')
@@ -52,3 +53,9 @@ class RunJobRequest(Model):
             
         except JSONDecodeError as error:
             self.errors.append(f"Failed to parse run JSON: '{message}'. Error: '{error}'")
+
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

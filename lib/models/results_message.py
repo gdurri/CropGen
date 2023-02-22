@@ -21,6 +21,11 @@ class ResultsMessage(Model):
     # Constructor
     #
     def __init__(self, job_type, job_id, data_frame):
-        self.message_type = __class__.__name__
         self.job_type = job_type
         self.data = Data(job_id, data_frame)
+
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

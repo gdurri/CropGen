@@ -21,5 +21,14 @@ class CGMServerJobRequestBody:
 # A WGP Server request object.
 #
 class CGMServerJobRequest(Model):
+    #
+    # Constructor
+    #
     def __init__(self, run_job_request, generated_input_values):
         self.body = CGMServerJobRequestBody(run_job_request, generated_input_values)
+
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

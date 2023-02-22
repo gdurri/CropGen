@@ -32,5 +32,10 @@ class CGMServerJobResponse(Model):
             self.outputs = self.get_attribute(json_object, 'outputs')
             
         except JSONDecodeError as error:
-            self.errors.append(f"Failed to parse run JSON: {message}. Error: {error}")
-        
+            self.errors.append(f"Failed to parse run JSON: {message}. Error: {error}")        
+    
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

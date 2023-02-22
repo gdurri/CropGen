@@ -1,6 +1,6 @@
 import logging
 
-from lib.models.cgm_server_job_response  import CGMServerJobResponse
+from lib.models.cgm.cgm_server_job_response  import CGMServerJobResponse
 from lib.utils.cgm_helper import CgmHelper
 
 #

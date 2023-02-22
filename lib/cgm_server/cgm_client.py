@@ -1,6 +1,6 @@
 import logging
 
-from lib.models.cgm_server_job_response import CGMServerJobResponse
+from lib.models.cgm.cgm_server_job_response import CGMServerJobResponse
 from lib.socket.socket_client import SocketClient
 
 #
@@ -22,7 +22,7 @@ class CGMClient:
         try:
             socket_client = SocketClient(self.config)
             socket_client.connect(self.config.cgm_server_host, self.config.cgm_server_port)
-            socket_client.write_text(cgm_server_job_request.to_json())
+            socket_client.write_text("RelayApsim", cgm_server_job_request.to_json())
             raw_response = socket_client.read_text()
             response = CGMServerJobResponse(raw_response)
         except Exception as ex:

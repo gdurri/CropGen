@@ -2,7 +2,7 @@ from pymoo.optimize import minimize
 import numpy as NumPy
 import statistics as stats
 
-from lib.models.cgm_server_job_request import CGMServerJobRequest
+from lib.models.cgm.cgm_server_job_request import CGMServerJobRequest
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants

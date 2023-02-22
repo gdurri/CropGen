@@ -1,34 +1,39 @@
+from lib.socket.socket_client_base import SocketClientBase
 from lib.models.error_message import ErrorMessage
 
 #
-# A websocket client.
+# A socket client.
 #
-class SocketClientAsync():
+class SocketClientAsync (SocketClientBase):
 
     #
     # Constructor
     #
     def __init__(self, config, reader, writer):
-        self.config = config
+        super().__init__(config)
         self.reader = reader
         self.writer = writer
 
     #
     # Writes data
     #
-    async def write_text_async(self, data):
+    async def write_text_async(self, type_name, type_body):
+        message_wrapper = super().construct_message_wrapper(type_name, type_body)
+        message_size_byte_array = message_wrapper[SocketClientBase.MESSAGE_WRAPPER_TUPLE_MESSAGE_SIZE_INDEX]
+        encoded_data = message_wrapper[SocketClientBase.MESSAGE_WRAPPER_TUPLE_ENCODED_DATA]
+
         # Send the length of the encoded data as a byte array.
-        message_size_byte_array = len(data).to_bytes(4, self.config.socket_data_endianness)
         self.writer.write(message_size_byte_array)
         # Now send the data.
-        self.writer.write(data.encode(self.config.socket_data_encoding))
+        self.writer.write(encoded_data)
         await self.writer.drain()
 
     #
     # Writes a serialised error message.
     #
     async def write_error_async(self, errors):
-        await self.write_text_async(ErrorMessage(errors).to_json())
+        error_message = ErrorMessage(errors) 
+        await self.write_text_async(error_message.get_type_name(), error_message.to_json())
 
     #
     # Reads data
