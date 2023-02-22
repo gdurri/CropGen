@@ -8,7 +8,7 @@
     "socketServerHostDocker": "0.0.0.0",
     "socketServerPort": 8000,
     "socketDataNumBytesBufferSize": 4,
-    "socketDataEndianness": "little",
+    "socketDataEndianness": "big",
     "socketDataEncoding": "utf-8",
     "webServerLogLevel" : "info"
 }

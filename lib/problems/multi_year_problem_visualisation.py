@@ -6,7 +6,6 @@ from lib.models.wgp_server_request import WGPServerRequest
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
-from lib.utils.wgp_helper import WgpHelper
 
 #
 # Represents a Multi Year Problem
@@ -38,7 +37,8 @@ class MultiYearProblemVisualisation(ProblemBase):
                 self.run_job_request.iterations
             ),
             save_history=True,
-            verbose=False)
+            verbose=False
+        )
             
         # Now that everything has been evaluated, check for any run errors and only
         # continue if there aren't any.
@@ -58,14 +58,11 @@ class MultiYearProblemVisualisation(ProblemBase):
                 (-0.01 * F[:, 1])
             )
         )
-
-        columns_hardcoded = [Constants.END_JUV_TO_FI_THERMAL_TIME, Constants.FERTILE_TILLER_NUMBER, Constants.FAILURE_RISK_YIELD_HA, Constants.YIELD_HA]
-        # NEW
+        
         columns = super().get_combined_inputs_outputs()
         opt_data_frame = super().construct_data_frame(total, columns)
-        all_data_frame = super().construct_data_frame(self.individual_results, columns)
 
-        await super().send_results(opt_data_frame, all_data_frame, socket_client)
+        await super().send_results(opt_data_frame, socket_client)
 
         # Now that we are done, report back.
         await super().run_ended(socket_client)
@@ -74,11 +71,7 @@ class MultiYearProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
-        if self.run_errors: 
-            # Initialise the out array to satisfy the algorithm.
-            out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
-                [len(variable_values_for_population), len(self.run_job_request.inputs)]
-            )
+        if self.run_errors:
             return
             
         wgp_server_request = WGPServerRequest(self.run_job_request, variable_values_for_population)
@@ -96,29 +89,29 @@ class MultiYearProblemVisualisation(ProblemBase):
     def _handle_evaluate_value_for_population(
         self,
         wgp_server_request,
-        variable_values_for_population,
         out_objective_values
     ):
-        results=[]
+        # Initialise the out array to satisfy the algorithm.
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+            [self.run_job_request.individuals, self.run_job_request.total_inputs()]
+        )
+        
         response = self.wgp_server_client.run(wgp_server_request)
+
+        if not response:
+            self.run_errors.append("No response from wgp server. Cannot handle evaluate.")
+            return
+        
+        # We got a valid response so we can start iterating over the results.
+        results = []
 
         # Iterate over all of the results from the job run.
         for output_values in response.outputs:
-            # Extract all of the response output values.
-            iteration = output_values[0]
-            output_value1 = 1 * (((output_values[2] < 150).sum())/ len(output_values))
+            # Get the first output
+            output_value1 = (((output_values[1] < 150).sum()) / len(output_values))
             # Force a negative version of this input.
             output_value2 = -abs(stats.mean(output_values[2]))
-            # Get the values that the algorithm generated for this individual
-            individual_population_values = variable_values_for_population[iteration]
-            
+            # Add the results.
             results.append([output_value1, output_value2])
-
-            self.individual_results.append((
-                individual_population_values[0],
-                individual_population_values[1],
-                output_value1,
-                (output_value2 * -0.01)
-            ))
         
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)

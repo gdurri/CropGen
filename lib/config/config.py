@@ -48,7 +48,7 @@ class Config:
         self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
         self.socket_data_num_bytes_buffer_size = self._get_config_setting(data, 'socketDataNumBytesBufferSize', 4)
-        self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'little')        
+        self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'big')        
         self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
         self.web_server_log_level = self._get_config_setting(data, 'webServerLogLevel', 'info')
 

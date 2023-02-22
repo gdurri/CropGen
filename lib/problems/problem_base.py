@@ -28,7 +28,6 @@ class ProblemBase(Problem):
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
         self.wgp_server_client = WGPClientFactory().create(self.config)
-        self.individual_results = []
         self.run_start_time = DateTimeHelper.get_date_time()
         self.run_errors = []
 
@@ -93,14 +92,6 @@ class ProblemBase(Problem):
     #
     # Outputs all of the run data.
     #
-    async def send_results(self, opt_data_frame, all_data_frame, websocket_client):
-        # Log the raw data frames.
-        await self.send_results_message(opt_data_frame, websocket_client)
-        await self.send_results_message(all_data_frame, websocket_client)
-
-    #
-    # Helper for constructing a results message from a data frame.
-    #
-    async def send_results_message(self, data_frame, websocket_client):
-        message = ResultsMessage(self.job_type, self.run_job_request.job_id, data_frame)
+    async def send_results(self, opt_data_frame, websocket_client):
+        message = ResultsMessage(self.job_type, self.run_job_request.job_id, opt_data_frame)
         await websocket_client.write_text_async(message.to_json())
