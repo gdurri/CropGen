@@ -51,7 +51,7 @@ class ProblemBase(Problem):
         columns = []
         for input in self.run_job_request.Inputs:
             columns.append(input)
-        for output in self.run_job_request.outputs:
+        for output in self.run_job_request.Outputs:
             columns.append(output)
         return columns
 

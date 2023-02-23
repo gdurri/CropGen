@@ -21,6 +21,11 @@ class EndOfRunMessage(Model):
     # Constructor
     #
     def __init__(self, JobType, JobId, duration_seconds):
-        super().__init__(__class__.__name__)
         self.JobType = JobType
         self.Data = Data(JobId, duration_seconds)
+
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

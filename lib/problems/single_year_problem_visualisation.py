@@ -2,6 +2,7 @@ from pymoo.optimize import minimize
 import numpy as NumPy
 
 from lib.models.cgm.cgm_server_job_request import CGMServerJobRequest
+from lib.models.cgm.cgm_server_job_response import CGMServerJobResponse
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
@@ -99,11 +100,14 @@ class SingleYearProblemVisualisation(ProblemBase):
             [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
         )
 
-        response = self.cgm_server_client.run(cgm_server_job_request)
+        read_message_data = self.cgm_server_client.call_cgm(cgm_server_job_request)
 
-        if not response:
-            self.run_errors.append(Constants.NO_RESPONSE_FROM_CGM_SERVER_NO_EVALUATE)
-            return
+        if read_message_data.errors:
+            self.run_errors = read_message_data.errors
+            return False
+        
+        response = CGMServerJobResponse()
+        response.parse(read_message_data.message_wrapper.TypeBody)
 
         # We got a valid response so we can start iterating over the results.
         results = []
