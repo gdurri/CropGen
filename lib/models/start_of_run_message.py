@@ -5,8 +5,8 @@ from lib.utils.date_time_helper import DateTimeHelper
 # Represents the data for this message type.
 #
 class Data:
-    def __init__(self, job_id):
-        self.job_id = job_id
+    def __init__(self, JobId):
+        self.JobId = JobId
         self.date_time = DateTimeHelper.get_date_time_now_str()
 
 #
@@ -16,9 +16,9 @@ class StartOfRunMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, job_type, job_id):
-        self.job_type = job_type
-        self.data = Data(job_id)
+    def __init__(self, JobType, JobId):
+        self.JobType = JobType
+        self.Data = Data(JobId)
 
     #
     # Returns the type name.

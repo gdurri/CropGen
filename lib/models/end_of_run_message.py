@@ -8,10 +8,10 @@ class Data:
     #
     # Constructor
     #
-    def __init__(self, job_id, duration_seconds):
-        self.job_id = job_id        
-        self.date_time = DateTimeHelper.get_date_time_now_str()
-        self.duration_seconds = duration_seconds
+    def __init__(self, JobId, duration_seconds):
+        self.JobId = JobId        
+        self.DateTime = DateTimeHelper.get_date_time_now_str()
+        self.DurationSeconds = duration_seconds
 
 #
 # End of run message for signalling that a run has completed.
@@ -20,7 +20,7 @@ class EndOfRunMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, job_type, job_id, duration_seconds):
+    def __init__(self, JobType, JobId, duration_seconds):
         super().__init__(__class__.__name__)
-        self.job_type = job_type
-        self.data = Data(job_id, duration_seconds)
+        self.JobType = JobType
+        self.Data = Data(JobId, duration_seconds)

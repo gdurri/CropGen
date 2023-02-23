@@ -2,6 +2,7 @@ from json.decoder import JSONDecodeError
 import json
 
 from lib.models.model import Model
+from lib.utils.json_helper import JsonHelper
 
 #
 # A WGP Server Response, as returned from the WGP Server.
@@ -10,29 +11,21 @@ class CGMServerJobResponse(Model):
     #
     # Constructor
     #
-    def __init__(self, message):
-        self.errors = []
-        self.outputs = []
-        self._parse(message)
-
-    #
-    # Returns true if there are no errors.
-    #
-    def is_valid(self):
-        return not self.errors
+    def __init__(self):
+        self.Outputs = []
 
     #
     # Parses the JSON data into this class.
     #
-    def _parse(self, message):
-        self.errors.clear()
-
+    def parse(self, message):
+        errors = []
         try:
             json_object = json.loads(message)
-            self.outputs = self.get_attribute(json_object, 'outputs')
-            
+            self.Outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
         except JSONDecodeError as error:
-            self.errors.append(f"Failed to parse run JSON: {message}. Error: {error}")        
+            errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
+        return errors
+
     
     #
     # Returns the type name.

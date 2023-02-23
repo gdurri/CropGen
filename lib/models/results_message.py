@@ -8,8 +8,8 @@ class Data:
     #
     # Constructor
     # 
-    def __init__(self, job_id, data_frame):
-        self.job_id = job_id
+    def __init__(self, JobId, data_frame):
+        self.JobId = JobId
         self.date_time = DateTimeHelper.get_date_time_now_str()
         self.data = data_frame.to_json(indent=2)
 
@@ -20,9 +20,9 @@ class ResultsMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, job_type, job_id, data_frame):
-        self.job_type = job_type
-        self.data = Data(job_id, data_frame)
+    def __init__(self, JobType, JobId, data_frame):
+        self.JobType = JobType
+        self.Data = Data(JobId, data_frame)
 
     #
     # Returns the type name.

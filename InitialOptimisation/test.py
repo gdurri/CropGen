@@ -40,7 +40,7 @@ for i in range(0, numIter):
 endTime = time()
 duration = endTime - startTime
 
-print('Ran %d iterations in %.2fs.' % (numIter, duration))
+print('Ran %d Iterations in %.2fs.' % (numIter, duration))
 
 # self.assertEqual(len(outputNames), len(outputs.columns))
 # simulationNameColumn = outputs[outputNames[0]]

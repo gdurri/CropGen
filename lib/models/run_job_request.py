@@ -2,6 +2,7 @@ from json.decoder import JSONDecodeError
 import json
 
 from lib.models.model import Model
+from lib.utils.json_helper import JsonHelper
 
 #
 # Model that represents a run job request sent from the jobs server
@@ -10,49 +11,47 @@ class RunJobRequest(Model):
     #
     # Constructor. Simply pass the message for parsing.
     #
-    def __init__(self, message):
-        self.errors = []
-        self._parse(message)
+    def __init__(self):        
+        self.JobId = 0
+        self.JobType = ''
+        self.ApsimUrl = ''
+        self.Iterations = 0
+        self.Individuals = 0
+        self.Inputs = []
+        self.Outputs = []
 
     #
-    # Simple helper for getting the total number of inputs defined
+    # Simple helper for getting the total number of Inputs defined
     #
     def total_inputs(self):
-        return len(self.inputs)
+        return len(self.Inputs)
 
     #
     # Simple helper for getting the total number of outputs defined
     #
     def total_outputs(self):
-        return len(self.outputs)
-
-    #
-    # Returns true if there are no errors.
-    #
-    def is_valid(self):
-        return not self.errors
+        return len(self.Outputs)
 
     #
     # Parses the JSON data into this class.
     #
-    def _parse(self, message):
-        self.errors.clear()
+    def parse(self, message):
+        errors = []
 
         try:
             json_object = json.loads(message)
-            self.job_type = self.get_attribute(json_object, 'jobType')
-            body = self.get_attribute(json_object, 'body')
-
-            if body != None:
-                self.job_id = self.get_attribute(body, 'jobId')
-                self.apsim_url = self.get_attribute(body, 'apsimUrl')
-                self.iterations = self.get_attribute(body, 'iterations')
-                self.individuals = self.get_attribute(body, 'individuals')
-                self.inputs = self.get_attribute(body, 'inputs')
-                self.outputs = self.get_attribute(body, 'outputs')
+            self.JobId = JsonHelper.get_attribute(json_object, 'JobId', errors)
+            self.JobType = JsonHelper.get_attribute(json_object, 'JobType', errors)
+            self.ApsimUrl = JsonHelper.get_attribute(json_object, 'ApsimUrl', errors)
+            self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
+            self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
+            self.Inputs = JsonHelper.get_attribute(json_object, 'Inputs', errors)
+            self.Outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
             
         except JSONDecodeError as error:
-            self.errors.append(f"Failed to parse run JSON: '{message}'. Error: '{error}'")
+            errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
+
+        return errors
 
     #
     # Returns the type name.

@@ -1,7 +1,8 @@
 import logging
 
-from lib.models.cgm.cgm_server_job_response import CGMServerJobResponse
+from lib.utils.constants import Constants
 from lib.socket.socket_client import SocketClient
+from lib.socket.socket_client_base import ReadMessageData
 
 #
 # The real CGM Client
@@ -13,18 +14,19 @@ class CGMClient:
     #
     def __init__(self, config):
         self.config = config
-
+    
     #
-    # Run method which will run APSIM and retrieve the run results.
+    # Handles constructing a new socket connection to the CGM, sending the
+    # message and returning the raw response.
     #
-    def run(self, cgm_server_job_request):
-        response = None
+    def call_cgm(self, message):
+        errors = []
         try:
             socket_client = SocketClient(self.config)
             socket_client.connect(self.config.cgm_server_host, self.config.cgm_server_port)
-            socket_client.write_text("RelayApsim", cgm_server_job_request.to_json())
-            raw_response = socket_client.read_text()
-            response = CGMServerJobResponse(raw_response)
-        except Exception as ex:
-            logging.exception("Failed to contact CGM Server on host: '%s' port: '%s'", self.config.cgm_server_host, self.config.cgm_server_port)
-        return response
+            socket_client.write_text(message)
+            return socket_client.read_text()
+        except Exception:
+            logging.exception("Exception - Failed to contact CGM Server. Host: '%s' Port: '%s'", self.config.cgm_server_host, self.config.cgm_server_port)
+            errors.append(Constants.NO_RESPONSE_FROM_CGM_SERVER)
+        return ReadMessageData(errors, None)

@@ -20,9 +20,9 @@ class ProblemBase(Problem):
     #
     # Constructor
     #
-    def __init__(self, job_type, config, run_job_request):
+    def __init__(self, JobType, config, run_job_request):
         # Member variables
-        self.job_type = job_type
+        self.JobType = JobType
         self.config = config
         self.run_job_request = run_job_request
         # Use our factory to provide us with a job server client. This is responsible
@@ -49,7 +49,7 @@ class ProblemBase(Problem):
     #
     def get_combined_inputs_outputs(self):
         columns = []
-        for input in self.run_job_request.inputs:
+        for input in self.run_job_request.Inputs:
             columns.append(input)
         for output in self.run_job_request.outputs:
             columns.append(output)
@@ -71,16 +71,16 @@ class ProblemBase(Problem):
     async def run_started(self, websocket_client):
         self.run_errors = []
         self.run_start_time = DateTimeHelper.get_date_time()
-        message = StartOfRunMessage(self.job_type, self.run_job_request.job_id)
-        await websocket_client.write_text_async(message.get_type_name(), message.to_json())
+        message = StartOfRunMessage(self.JobType, self.run_job_request.JobId)
+        await websocket_client.write_text_async(message)
 
     #
     # Simply performs what's required when the problem run is ended.
     #
     async def run_ended(self, websocket_client):
         duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
-        message = EndOfRunMessage(self.job_type, self.run_job_request.job_id, duration_seconds)
-        await websocket_client.write_text_async(message.get_type_name(), message.to_json())
+        message = EndOfRunMessage(self.JobType, self.run_job_request.JobId, duration_seconds)
+        await websocket_client.write_text_async(message)
 
     #
     # Report the errors.
@@ -93,5 +93,5 @@ class ProblemBase(Problem):
     # Outputs all of the run data.
     #
     async def send_results(self, opt_data_frame, websocket_client):
-        message = ResultsMessage(self.job_type, self.run_job_request.job_id, opt_data_frame)
-        await websocket_client.write_text_async(message.get_type_name(), message.to_json())
+        message = ResultsMessage(self.JobType, self.run_job_request.JobId, opt_data_frame)
+        await websocket_client.write_text_async(message)

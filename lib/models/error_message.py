@@ -9,9 +9,8 @@ class ErrorMessage(Model):
     # Constructor, requires the errors.
     #
     def __init__(self, errors):
-        self.message_type = __class__.__name__
-        self.date_time = DateTimeHelper.get_date_time_now_str()
-        self.errors = errors
+        self.DateTime = DateTimeHelper.get_date_time_now_str()
+        self.Errors = errors
 
     #
     # Returns the type name.

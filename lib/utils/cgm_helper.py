@@ -26,14 +26,14 @@ class CgmHelper():
     def create_input_values(generated_input_values):
         input_values = []
         for individual in range(0, len(generated_input_values)):
-            inputs = generated_input_values[individual]
+            Inputs = generated_input_values[individual]
             # Add the iteration id to the beginning of the array. 
             # We use the individual index for a convenient auto incrementing id.
             values = [individual]
 
             # Iterate over all of the input values that were passed in,
             # adding each one to the values array
-            for input_value in inputs:
+            for input_value in Inputs:
                 values.append(input_value)
 
             # Now add the complete list of values which will contain the iteration

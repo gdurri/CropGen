@@ -45,4 +45,4 @@ if __name__ == "__main__":
         loop.close()
         logging.debug("Closing CropGen application")
     except:
-        logging.exception("CropGen Error")
+        logging.exception("Exception - CropGen Main Application catch handler")

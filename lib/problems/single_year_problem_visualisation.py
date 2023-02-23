@@ -14,8 +14,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, job_type, config, run_job_request):
-        super().__init__(job_type, config, run_job_request)
+    def __init__(self, JobType, config, run_job_request):
+        super().__init__(JobType, config, run_job_request)
     
     #
     # Invokes the running of the problem.
@@ -23,7 +23,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     async def run(self, socket_client):
         await super().run_started(socket_client)
 
-        algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.individuals)
+        algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
@@ -33,7 +33,7 @@ class SingleYearProblemVisualisation(ProblemBase):
             algorithm=algorithm,
             termination=(
                 Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS, 
-                self.run_job_request.iterations
+                self.run_job_request.Iterations
             ),
             save_history=True,
             verbose=False
@@ -45,9 +45,9 @@ class SingleYearProblemVisualisation(ProblemBase):
             await super().report_run_errors(socket_client)
             return
 
-        # Variable values for non-dominated individuals in the last generation
+        # Variable values for non-dominated Individuals in the last generation
         X = minimize_result.X
-        # Objective values for non-dominated individuals in the last generation
+        # Objective values for non-dominated Individuals in the last generation
         F = minimize_result.F
         # History of data from all generations
         self.results_history = minimize_result.history
@@ -84,7 +84,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         )
 
     #
-    # Evaluate fitness of the individuals in the population
+    # Evaluate fitness of the Individuals in the population
     # Parameters:
     # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
     # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
@@ -96,20 +96,20 @@ class SingleYearProblemVisualisation(ProblemBase):
     ):
         # Initialise the out array to satisfy the algorithm.
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
-            [self.run_job_request.individuals, self.run_job_request.total_inputs()]
+            [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
         )
 
         response = self.cgm_server_client.run(cgm_server_job_request)
 
         if not response:
-            self.run_errors.append("No response from CGM server. Cannot handle evaluate.")
+            self.run_errors.append(Constants.NO_RESPONSE_FROM_CGM_SERVER_NO_EVALUATE)
             return
 
         # We got a valid response so we can start iterating over the results.
         results = []
 
         # Iterate over all of the results from the job run.
-        for output_values in response.outputs:
+        for output_values in response.Outputs:
             # Get the first output
             output_value1 = output_values[1]
             # Force a negative version of this output.
