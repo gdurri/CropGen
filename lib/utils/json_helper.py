@@ -8,14 +8,14 @@ class JsonHelper():
     #
     @staticmethod
     def get_attribute(
-        body, 
+        json, 
         attribute_name, 
         errors,
         value_if_not_present = None
     ):
         value = value_if_not_present
-        if attribute_name in body:
-            value = body[attribute_name]
+        if attribute_name in json:
+            value = json[attribute_name]
         else:
             errors.append(f"No {attribute_name} specified")
         return value

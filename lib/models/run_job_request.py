@@ -5,11 +5,22 @@ from lib.models.model import Model
 from lib.utils.json_helper import JsonHelper
 
 #
+# Represents the output
+#
+class Output(Model):
+    #
+    # Constructor
+    #
+    def __init__(self, name, multiplier):        
+        self.Name = name
+        self.Multiplier = multiplier
+
+#
 # Model that represents a run job request sent from the jobs server
 #
 class RunJobRequest(Model):
     #
-    # Constructor. Simply pass the message for parsing.
+    # Constructor.
     #
     def __init__(self):        
         self.JobId = 0
@@ -46,12 +57,31 @@ class RunJobRequest(Model):
             self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
             self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
             self.Inputs = JsonHelper.get_attribute(json_object, 'Inputs', errors)
-            self.Outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
-            
+            self.Outputs = RunJobRequest.parse_outputs(json_object, errors)
         except JSONDecodeError as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 
         return errors
+
+    #
+    # Parses the outputs
+    #
+    @staticmethod
+    def parse_outputs(json_object, errors):
+        parsed_outputs = [] 
+        outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
+        for output_value in outputs:
+            name = JsonHelper.get_attribute(output_value, 'Name', errors)
+            multiplier = JsonHelper.get_attribute(output_value, 'Multiplier', errors, 1)
+
+            parsed_outputs.append(
+                Output(
+                    name, 
+                    multiplier
+                )
+            )
+            
+        return parsed_outputs
 
     #
     # Returns the type name.
