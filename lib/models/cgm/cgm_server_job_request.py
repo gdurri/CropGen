@@ -8,6 +8,7 @@ class CGMServerJobRequest(Model):
     # Constructor
     #
     def __init__(self, run_job_request, generated_input_values):
+        # TODO - Should this be JobID or JobId?
         self.JobID = run_job_request.JobId
         self.Individuals = run_job_request.Individuals
         self.Inputs = CgmHelper.create_input_values(generated_input_values)

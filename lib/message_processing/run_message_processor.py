@@ -51,6 +51,11 @@ class RunMessageProcessor():
         if errors:
             await self.socket_client.write_error_async(errors)
             return False
+        
+        # Rerport the init workers response.
+        response = InitWorkersResponse()
+        response.parse(read_message_data.message_wrapper.TypeBody)
+        await self.socket_client.write_text_async(response)
 
         return True
         
