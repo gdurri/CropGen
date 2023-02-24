@@ -101,9 +101,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         )
 
         read_message_data = self.cgm_server_client.call_cgm(cgm_server_job_request)
+        errors = self.cgm_server_client.validate_cgm_call(read_message_data)
 
-        if read_message_data.errors:
-            self.run_errors = read_message_data.errors
+        if errors:
+            self.run_errors = errors
             return False
         
         response = CGMServerJobResponse()

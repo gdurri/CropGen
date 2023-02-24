@@ -8,9 +8,11 @@ class Model:
     # Serialises itself to JSON.
     #
     def to_json(self):
-        return json.dumps(
+        json_str = json.dumps(
             self, 
             default = lambda
             obj: obj.__dict__,
-            indent = 2
+            separators=(',', ':')
         )
+
+        return json_str

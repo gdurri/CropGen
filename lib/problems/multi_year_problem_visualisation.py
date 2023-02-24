@@ -99,7 +99,7 @@ class MultiYearProblemVisualisation(ProblemBase):
         response = self.cgm_server_client.run(cgm_server_job_request)
 
         if not response:
-            self.run_errors.append(Constants.NO_RESPONSE_FROM_CGM_SERVER_NO_EVALUATE)
+            self.run_errors.append(Constants.CGM_SERVER_NO_RESPONSE_NO_EVALUATE)
             return
         
         # We got a valid response so we can start iterating over the results.

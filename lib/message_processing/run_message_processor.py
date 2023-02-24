@@ -46,9 +46,10 @@ class RunMessageProcessor():
 
         cgm_server_client = CGMClientFactory().create(self.config)
         read_message_data = cgm_server_client.call_cgm(init_workers_request)
+        errors = cgm_server_client.validate_cgm_call(read_message_data)
 
-        if read_message_data.errors:
-            await self.socket_client.write_error_async(read_message_data.errors)
+        if errors:
+            await self.socket_client.write_error_async(errors)
             return False
 
         return True

@@ -22,6 +22,12 @@ class SocketClient (SocketClientBase):
         self.socket.connect((host, port))
 
     #
+    # Sets the timeout
+    #
+    def set_timeout(self, timeout_seconds):
+        self.socket.settimeout(timeout_seconds)
+
+    #
     # Writes data
     #
     def write_text(self, message):
