@@ -48,7 +48,7 @@ class CgmHelper():
     @staticmethod
     def create_random_output_values(
         total_individuals, 
-        total_outputs,
+        outputs,
         reverse_mocked_results,
         random_min = 0.0,
         random_max = 100.0
@@ -59,7 +59,7 @@ class CgmHelper():
         for individual in range(0, total_individuals):
             individual_to_use = individual_in_reverse if reverse_mocked_results else individual
             random_outputs = [individual_to_use]
-            for output in total_outputs:
+            for output in outputs:
                 random_outputs.append(random.uniform(random_min, random_max))
             
             output_values.append(random_outputs)

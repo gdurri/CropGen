@@ -50,10 +50,6 @@ class RunMessageProcessor():
         if read_message_data.errors:
             await self.socket_client.write_error_async(read_message_data.errors)
             return False
-        
-        # TODO - Should I test the response for something??
-        response = InitWorkersResponse()
-        response.parse(read_message_data.message_wrapper.TypeBody)
 
         return True
         
