@@ -18,4 +18,5 @@ class InitWorkersRequest(Model):
     # Returns the type name.
     #
     def get_type_name(self):
-        return __class__.__name__
+        return "InitWorkers"
+        #return __class__.__name__

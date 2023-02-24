@@ -16,4 +16,5 @@ class CGMServerJobRequest(Model):
     # Returns the type name.
     #
     def get_type_name(self):
+        return "RelayApsim"
         return __class__.__name__

@@ -43,7 +43,6 @@ class Config:
     def _populate_from_data(self, data):
         self.cgm_server_host = self._get_config_setting(data, 'cgmServerHost')
         self.cgm_server_port = self._get_config_setting(data, 'cgmServerPort', 9000)
-        self.use_mock_cgm_client = self._get_config_setting(data, 'useMockCgmClient', False)
         self.reverse_mocked_results = self._get_config_setting(data, 'reverseMockedResults', False)
         self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
