@@ -1,29 +1,31 @@
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
-from lib.models.cgm.init_workers_request import InitWorkersRequest
+from lib.models.cgm.init_workers import InitWorkers
 from lib.models.cgm.init_workers_response import InitWorkersResponse
+from lib.models.end_of_run_message import EndOfRunMessage
+from lib.models.start_of_run_message import StartOfRunMessage
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
+from lib.utils.constants import Constants
+from lib.utils.date_time_helper import DateTimeHelper
 
 
 class RunMessageProcessor():
-    # This represents the single year job type that is communicated
-    # via the Socket interface.
-    SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR = 'singleyear'
-    # Same as above but for Multi Year
-    SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR = 'multiyear'
-
     #
     # Constructor
     #
     def __init__(self, config, socket_client):
         self.config = config
         self.socket_client = socket_client
+        self.run_start_time = DateTimeHelper.get_date_time()
 
     #
     # Processes the run job request passed in from the websocket.
     #
     async def process_run_message(self, run_job_request):
-        if not await self.init_cgm(run_job_request):
+        # Report that we are starting the run.
+        await self._send_run_started_message(run_job_request)
+
+        if not await self._init_cgm(run_job_request):
             return
 
         # Next step is to try and create a "Problem" using the job type.
@@ -34,15 +36,18 @@ class RunMessageProcessor():
             await problem.run(self.socket_client)
         # Otherwise send an error message.
         else:
-            await self.socket_client.write_error_async([f"Unknown run JobType: '{run_job_request.JobType}'."])
+            await self.socket_client.write_error_async([f"{Constants.UNKNOWN_JOB_TYPE}: '{run_job_request.JobType}'."])
+
+        # Report that we are ending the run.
+        await self._send_run_ended_message(run_job_request)
 
     #
     # Calls init on the CGM server and returns the response.
     #
-    async def init_cgm(self, run_job_request):
+    async def _init_cgm(self, run_job_request):
 
         # Create an init workers request, using the contents of the run_job_request.
-        init_workers_request = InitWorkersRequest(run_job_request)
+        init_workers_request = InitWorkers(run_job_request)
 
         cgm_server_client = CGMClientFactory().create(self.config)
         read_message_data = cgm_server_client.call_cgm(init_workers_request)
@@ -66,17 +71,25 @@ class RunMessageProcessor():
     def _create_problem(self, run_job_request):
         cleansed_job_type = run_job_request.JobType.lower().strip()
 
-        if cleansed_job_type == RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR:
-            return SingleYearProblemVisualisation(
-                RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR,
-                self.config,
-                run_job_request
-            )
-            
-        elif cleansed_job_type == RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR:
-            return MultiYearProblemVisualisation(
-                RunMessageProcessor.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR,
-                self.config,
-                run_job_request
-            )
+        if cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR:
+            return SingleYearProblemVisualisation(run_job_request.JobType, self.config, run_job_request)
+        elif cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR:
+            return MultiYearProblemVisualisation(run_job_request.JobType, self.config, run_job_request)
         return None
+    
+    #
+    # Sends a run started message.
+    #
+    async def _send_run_started_message(self, run_job_request):
+        self.run_errors = []
+        self.run_start_time = DateTimeHelper.get_date_time()
+        message = StartOfRunMessage(run_job_request.JobType, run_job_request.JobID)
+        await self.socket_client.write_text_async(message)
+
+    #
+    # Sends a run ended message.
+    #
+    async def _send_run_ended_message(self, run_job_request):
+        duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
+        message = EndOfRunMessage(run_job_request.JobType, run_job_request, duration_seconds)
+        await self.socket_client.write_text_async(message)

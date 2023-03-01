@@ -8,8 +8,8 @@ class Data:
     #
     # Constructor
     #
-    def __init__(self, JobId, duration_seconds):
-        self.JobId = JobId        
+    def __init__(self, job_id, duration_seconds):
+        self.JobID = job_id        
         self.DateTime = DateTimeHelper.get_date_time_now_str()
         self.DurationSeconds = duration_seconds
 
@@ -20,9 +20,9 @@ class EndOfRunMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, JobType, JobId, duration_seconds):
-        self.JobType = JobType
-        self.Data = Data(JobId, duration_seconds)
+    def __init__(self, job_type, job_id, duration_seconds):
+        self.JobType = job_type
+        self.Data = Data(job_id, duration_seconds)
 
     #
     # Returns the type name.

@@ -5,8 +5,8 @@ from lib.utils.date_time_helper import DateTimeHelper
 # Represents the data for this message type.
 #
 class Data:
-    def __init__(self, JobId):
-        self.JobId = JobId
+    def __init__(self, job_id):
+        self.JobID = job_id
         self.date_time = DateTimeHelper.get_date_time_now_str()
 
 #

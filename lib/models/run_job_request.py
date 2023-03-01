@@ -23,7 +23,7 @@ class RunJobRequest(Model):
     # Constructor.
     #
     def __init__(self):        
-        self.JobId = 0
+        self.JobID = 0
         self.JobType = ''
         self.ApsimUrl = ''
         self.Iterations = 0
@@ -42,6 +42,17 @@ class RunJobRequest(Model):
     #
     def total_outputs(self):
         return len(self.Outputs)
+    
+    #
+    # Extract the output names from the array of output objects.
+    #
+    def get_output_names(self):
+        output_names = []
+
+        for output in self.Outputs:
+            output_names.append(output.Name)
+
+        return output_names
 
     #
     # Parses the JSON data into this class.
@@ -51,7 +62,7 @@ class RunJobRequest(Model):
 
         try:
             json_object = json.loads(message)
-            self.JobId = JsonHelper.get_attribute(json_object, 'JobId', errors)
+            self.JobID = JsonHelper.get_attribute(json_object, 'JobID', errors)
             self.JobType = JsonHelper.get_attribute(json_object, 'JobType', errors)
             self.ApsimUrl = JsonHelper.get_attribute(json_object, 'ApsimUrl', errors)
             self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
@@ -74,12 +85,10 @@ class RunJobRequest(Model):
             name = JsonHelper.get_attribute(output_value, 'Name', errors)
             multiplier = JsonHelper.get_attribute(output_value, 'Multiplier', errors, 1)
 
-            parsed_outputs.append(
-                Output(
-                    name, 
-                    multiplier
-                )
-            )
+            parsed_outputs.append(Output(
+                name, 
+                multiplier
+            ))
             
         return parsed_outputs
 

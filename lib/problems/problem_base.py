@@ -4,10 +4,6 @@ import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.results_message import ResultsMessage
-from lib.models.start_of_run_message import StartOfRunMessage
-from lib.models.end_of_run_message import EndOfRunMessage
-from lib.utils.constants import Constants
-from lib.utils.date_time_helper import DateTimeHelper
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -29,7 +25,6 @@ class ProblemBase(Problem):
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
         self.cgm_server_client = CGMClientFactory().create(self.config)
-        self.run_start_time = DateTimeHelper.get_date_time()
         self.run_errors = []
 
         super().__init__(
@@ -67,23 +62,6 @@ class ProblemBase(Problem):
         )
 
     #
-    # Simply performs what's required when the problem run is started.
-    #
-    async def run_started(self, websocket_client):
-        self.run_errors = []
-        self.run_start_time = DateTimeHelper.get_date_time()
-        message = StartOfRunMessage(self.JobType, self.run_job_request.JobId)
-        await websocket_client.write_text_async(message)
-
-    #
-    # Simply performs what's required when the problem run is ended.
-    #
-    async def run_ended(self, websocket_client):
-        duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
-        message = EndOfRunMessage(self.JobType, self.run_job_request.JobId, duration_seconds)
-        await websocket_client.write_text_async(message)
-
-    #
     # Report the errors.
     #
     async def report_run_errors(self, websocket_client):
@@ -94,5 +72,5 @@ class ProblemBase(Problem):
     # Outputs all of the run data.
     #
     async def send_results(self, opt_data_frame, websocket_client):
-        message = ResultsMessage(self.JobType, self.run_job_request.JobId, opt_data_frame)
+        message = ResultsMessage(self.JobType, self.run_job_request.JobID, opt_data_frame)
         await websocket_client.write_text_async(message)

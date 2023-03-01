@@ -14,6 +14,12 @@ class Constants():
     CGM_SERVER_NO_RESPONSE = f'No response from {CGM_SERVER}.'
     CGM_SERVER_NO_RESPONSE_NO_EVALUATE = f"{CGM_SERVER_NO_RESPONSE}. Cannot handle evaluate."
     CGM_SERVER_INVALID_RESPONSE = f"Invalid data returned from {CGM_SERVER}."
+    UNKNOWN_JOB_TYPE = 'Unknown run JobType'
 
     # Messages - Comparisons are made after converting the value to test to lowercase.
     RUN_CROP_GEN = 'runcropgen'
+    # This represents the single year job type that is communicated
+    # via the Socket interface.
+    SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR = 'singleyear'
+    # Same as above but for Multi Year
+    SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR = 'multiyear'

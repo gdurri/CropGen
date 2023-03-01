@@ -3,20 +3,19 @@ from lib.models.model import Model
 #
 # Represents the initialise message request that is sent to the CGM server.
 #
-class InitWorkersRequest(Model):
+class InitWorkers(Model):
 
     #
     # Constructor
     #
     def __init__(self, run_job_request):
-        self.JobId = run_job_request.JobId
+        self.JobId = run_job_request.JobID
         self.Url = run_job_request.ApsimUrl
         self.InputTraits = run_job_request.Inputs
-        self.Outputs = run_job_request.Outputs
+        self.Outputs = run_job_request.get_output_names()
 
     #
     # Returns the type name.
     #
     def get_type_name(self):
-        return "InitWorkers"
-        #return __class__.__name__
+        return __class__.__name__

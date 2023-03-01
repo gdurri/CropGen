@@ -2,7 +2,7 @@ from pymoo.optimize import minimize
 import numpy as NumPy
 import statistics as stats
 
-from lib.models.cgm.cgm_server_job_request import CGMServerJobRequest
+from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
@@ -22,8 +22,6 @@ class MultiYearProblemVisualisation(ProblemBase):
     # Invokes the running of the problem.
     #
     async def run(self, socket_client):
-        await super().run_started(socket_client)
-
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
@@ -64,9 +62,6 @@ class MultiYearProblemVisualisation(ProblemBase):
 
         await super().send_results(opt_data_frame, socket_client)
 
-        # Now that we are done, report back.
-        await super().run_ended(socket_client)
-
     #
     # Iterate over each population and perform calcs.
     #
@@ -74,7 +69,7 @@ class MultiYearProblemVisualisation(ProblemBase):
         if self.run_errors:
             return
             
-        cgm_server_job_request = CGMServerJobRequest(self.run_job_request, variable_values_for_population)
+        cgm_server_job_request = RelayApsim(self.run_job_request, variable_values_for_population)
         
         self._handle_evaluate_value_for_population(
             cgm_server_job_request,
