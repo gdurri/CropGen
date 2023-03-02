@@ -10,8 +10,8 @@ class Data:
     # 
     def __init__(self, job_id, data_frame):
         self.JobID = job_id
-        self.date_time = DateTimeHelper.get_date_time_now_str()
-        self.data = data_frame.to_json(indent=2)
+        self.DateTime = DateTimeHelper.get_date_time_now_str()
+        self.Data = data_frame.to_json()
 
 #
 # The Results Message contains data information for clients.

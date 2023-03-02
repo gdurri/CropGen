@@ -9,7 +9,7 @@ class InitWorkers(Model):
     # Constructor
     #
     def __init__(self, run_job_request):
-        self.JobId = run_job_request.JobID
+        self.JobID = run_job_request.JobID
         self.Url = run_job_request.ApsimUrl
         self.InputTraits = run_job_request.Inputs
         self.Outputs = run_job_request.get_output_names()

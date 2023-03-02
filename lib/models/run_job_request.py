@@ -57,7 +57,7 @@ class RunJobRequest(Model):
     #
     # Parses the JSON data into this class.
     #
-    def parse(self, message):
+    def parse_from_json_string(self, message):
         errors = []
 
         try:

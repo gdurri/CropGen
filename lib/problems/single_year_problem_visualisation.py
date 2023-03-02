@@ -45,20 +45,17 @@ class SingleYearProblemVisualisation(ProblemBase):
             return
 
         # Variable values for non-dominated Individuals in the last generation
-        X = minimize_result.X
+        minimize_result_x = minimize_result.X
         # Objective values for non-dominated Individuals in the last generation
-        F = minimize_result.F
-        # History of data from all generations
-        self.results_history = minimize_result.history
+        minimize_result_f = minimize_result.F
 
         # Everything ran successfully so continue processing and reporting.
-        total = list(
-            zip(X[:, 0], 
-                X[:, 1], 
-                F[:, 0], 
-                (-0.01 * F[:, 1])
-            )
-        )
+        total = list(zip(
+            minimize_result_x[:, 0], 
+            minimize_result_x[:, 1], 
+            minimize_result_f[:, 0], 
+            minimize_result_f[:, 1]
+        ))
 
         columns = super().get_combined_inputs_outputs()
         opt_data_frame = super().construct_data_frame(total, columns)
@@ -72,10 +69,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         if self.run_errors:
             return
 
-        cgm_server_job_request = RelayApsim(self.run_job_request, variable_values_for_population)
+        relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         
         self._handle_evaluate_value_for_population(
-            cgm_server_job_request,
+            relay_apsim_request,
             out_objective_values
         )
 
@@ -87,7 +84,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     # and 'G' key for constraints
     def _handle_evaluate_value_for_population(
         self,
-        cgm_server_job_request,
+        relay_apsim_request,
         out_objective_values
     ):
         # Initialise the out array to satisfy the algorithm.
@@ -95,7 +92,7 @@ class SingleYearProblemVisualisation(ProblemBase):
             [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
         )
 
-        read_message_data = self.cgm_server_client.call_cgm(cgm_server_job_request)
+        read_message_data = self.cgm_server_client.call_cgm(relay_apsim_request)
         errors = self.cgm_server_client.validate_cgm_call(read_message_data)
 
         if errors:
@@ -103,18 +100,14 @@ class SingleYearProblemVisualisation(ProblemBase):
             return False
         
         response = RunApsimResponse()
-        response.parse(read_message_data.message_wrapper.TypeBody)
+        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
 
         # We got a valid response so we can start iterating over the results.
         results = []
 
         # Iterate over all of the results from the job run.
-        for output_values in response.Outputs:
-            # Get the first output
-            output_value1 = output_values[1]
-            # Force a negative version of this output.
-            output_value2 = -abs(output_values[2])
-            # Add the results.
-            results.append([output_value1, output_value2])
+        for apsim_result in response.Rows:
+            if not super()._process_apsim_result(apsim_result, results):
+                return False
         
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)

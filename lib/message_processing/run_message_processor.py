@@ -59,7 +59,7 @@ class RunMessageProcessor():
         
         # Rerport the init workers response.
         response = InitWorkersResponse()
-        response.parse(read_message_data.message_wrapper.TypeBody)
+        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
         await self.socket_client.write_text_async(response)
 
         return True

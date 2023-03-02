@@ -16,9 +16,9 @@ class StartOfRunMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, JobType, JobId):
-        self.JobType = JobType
-        self.Data = Data(JobId)
+    def __init__(self, job_type, job_id):
+        self.JobType = job_type
+        self.Data = Data(job_id)
 
     #
     # Returns the type name.

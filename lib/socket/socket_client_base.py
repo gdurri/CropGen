@@ -48,6 +48,6 @@ class SocketClientBase:
         
         decoded_message_data = message_data.decode(self.config.socket_data_encoding)
         message_wrapper = MessageWrapper()
-        errors = message_wrapper.parse(decoded_message_data)
+        errors = message_wrapper.parse_from_json_string(decoded_message_data)
         
         return ReadMessageData(errors, message_wrapper)

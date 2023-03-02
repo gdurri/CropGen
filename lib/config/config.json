@@ -11,6 +11,6 @@
     "socketDataNumBytesBufferSize": 4,
     "socketDataEndianness": "big",
     "socketDataEncoding": "utf-8",
-    "socketTimeoutSeconds": 5.0,
+    "socketTimeoutSeconds": 120.0,
     "webServerLogLevel" : "info"
 }

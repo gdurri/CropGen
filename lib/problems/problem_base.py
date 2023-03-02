@@ -4,6 +4,7 @@ import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.results_message import ResultsMessage
+from lib.utils.constants import Constants
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -47,7 +48,7 @@ class ProblemBase(Problem):
         columns = []
         for input in self.run_job_request.Inputs:
             columns.append(input)
-        for output in self.run_job_request.Outputs:
+        for output in self.run_job_request.get_output_names():
             columns.append(output)
         return columns
 
@@ -74,3 +75,27 @@ class ProblemBase(Problem):
     async def send_results(self, opt_data_frame, websocket_client):
         message = ResultsMessage(self.JobType, self.run_job_request.JobID, opt_data_frame)
         await websocket_client.write_text_async(message)
+
+    #
+    # Extracts the APSIM results, apply the multipliers and then return them.
+    #
+    def _process_apsim_result(self, apsim_result, results):
+        # The lengths have to be the same.
+        expected_outputs_length = len(self.run_job_request.Outputs)
+        actual_outputs_length = len(apsim_result.Values)
+
+        # Error out if the total outputs returned from APSIM don't match the requested outputs.
+        if expected_outputs_length != actual_outputs_length:
+            self.run_errors.append(f'{Constants.APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED}. Expected: {expected_outputs_length} Actual: {actual_outputs_length}')
+            return False
+
+        outputs = []
+        for output_index in range(0, actual_outputs_length):
+            apsim_output = apsim_result.Values[output_index]
+            multiplier = self.run_job_request.Outputs[output_index].Multiplier
+            apsim_output_with_multiplier_applied = apsim_output * multiplier
+            outputs.append(apsim_output_with_multiplier_applied)
+
+        results.append(outputs)
+
+        return True

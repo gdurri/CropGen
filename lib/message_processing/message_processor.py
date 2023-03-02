@@ -40,7 +40,7 @@ class MessageProcessor():
     async def process_run_message(self, message):
         # Construct a Run Job Request, using the JSON body.
         run_job_request = RunJobRequest()
-        errors = run_job_request.parse(message)
+        errors = run_job_request.parse_from_json_string(message)
         
         # If it's invalid, report the error and exit out of this.
         if errors:
