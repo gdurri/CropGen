@@ -4,6 +4,7 @@ from lib.models.model import Model
 # A WGP Server request object.
 #
 class RelayApsim(Model):
+    INPUT_START_INDEX = 0
     #
     # Constructor
     #
@@ -24,8 +25,9 @@ class RelayApsim(Model):
     @staticmethod
     def create_input_values(generated_input_values):
         input_values = []
-        for individual in range(0, len(generated_input_values)):
+        for individual in range(RelayApsim.INPUT_START_INDEX, len(generated_input_values)):
             Inputs = generated_input_values[individual]
+
             # Add the iteration id to the beginning of the array. 
             # We use the individual index for a convenient auto incrementing id.
             values = [individual]

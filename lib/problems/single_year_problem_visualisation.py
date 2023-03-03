@@ -101,13 +101,9 @@ class SingleYearProblemVisualisation(ProblemBase):
         
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-
-        # We got a valid response so we can start iterating over the results.
-        results = []
-
-        # Iterate over all of the results from the job run.
-        for apsim_result in response.Rows:
-            if not super()._process_apsim_result(apsim_result, results):
-                return False
+        results = super()._process_apsim_response(response)
+        
+        if not results:
+            return False
         
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)

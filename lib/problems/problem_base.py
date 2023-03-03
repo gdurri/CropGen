@@ -1,8 +1,10 @@
 from pymoo.core.problem import Problem
+import logging
 import numpy as NumPy
 import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
+from lib.models.cgm.relay_apsim import RelayApsim
 from lib.models.results_message import ResultsMessage
 from lib.utils.constants import Constants
 
@@ -77,9 +79,37 @@ class ProblemBase(Problem):
         await websocket_client.write_text_async(message)
 
     #
+    # Processes and returns the results, from the APSIM response object.
+    #
+    def _process_apsim_response(self, response):
+        results_for_individuals_received = len(response.Rows)
+
+        if results_for_individuals_received != self.run_job_request.Individuals:
+            self.run_errors.append(f'{Constants.APSIM_RESULTS_NOT_EQUAL_TO_INDIVIDUALS}. Expected: {self.run_job_request.Individuals} Actual: {results_for_individuals_received}')
+            return None
+
+        # We got a valid response so we can start iterating over the results.
+        # Process the results in the order that we sent them by iterating over
+        # the individuals in a for loop.
+        results = []
+        for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
+            apsim_result = response.get_apsim_result_for_individual(individual)
+            if not apsim_result:
+                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
+                return None
+            
+            outputs = self._process_apsim_result(apsim_result)
+            if not outputs: return None
+            results.append(outputs)
+            
+        return results
+
+    #
     # Extracts the APSIM results, apply the multipliers and then return them.
     #
-    def _process_apsim_result(self, apsim_result, results):
+    def _process_apsim_result(self, apsim_result):
+        logging.info(f"Processing APSIM result for individual: {apsim_result.ID}")
+
         # The lengths have to be the same.
         expected_outputs_length = len(self.run_job_request.Outputs)
         actual_outputs_length = len(apsim_result.Values)
@@ -87,7 +117,7 @@ class ProblemBase(Problem):
         # Error out if the total outputs returned from APSIM don't match the requested outputs.
         if expected_outputs_length != actual_outputs_length:
             self.run_errors.append(f'{Constants.APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED}. Expected: {expected_outputs_length} Actual: {actual_outputs_length}')
-            return False
+            return None
 
         outputs = []
         for output_index in range(0, actual_outputs_length):
@@ -95,7 +125,6 @@ class ProblemBase(Problem):
             multiplier = self.run_job_request.Outputs[output_index].Multiplier
             apsim_output_with_multiplier_applied = apsim_output * multiplier
             outputs.append(apsim_output_with_multiplier_applied)
+            logging.debug(f"ApsimOutput: {apsim_output}. Applying multiplier: *{multiplier}. New value: {apsim_output_with_multiplier_applied}")
 
-        results.append(outputs)
-
-        return True
+        return outputs
