@@ -1,3 +1,5 @@
+import logging
+
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.init_workers import InitWorkers
 from lib.models.cgm.init_workers_response import InitWorkersResponse
@@ -22,6 +24,8 @@ class RunMessageProcessor():
     # Processes the run job request passed in from the websocket.
     #
     async def process_run_message(self, run_job_request):
+        logging.info(f"Processing run job request: {run_job_request.to_json()}")
+
         # Report that we are starting the run.
         await self._send_run_started_message(run_job_request)
 

@@ -1,4 +1,5 @@
 from pymoo.optimize import minimize
+import logging
 import numpy as NumPy
 
 from lib.models.cgm.relay_apsim import RelayApsim
@@ -66,15 +67,13 @@ class SingleYearProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
+        logging.info("Handling evaluation")
+
         if self.run_errors:
             return
 
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
-        
-        self._handle_evaluate_value_for_population(
-            relay_apsim_request,
-            out_objective_values
-        )
+        self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values)
 
     #
     # Evaluate fitness of the Individuals in the population

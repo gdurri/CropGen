@@ -22,6 +22,8 @@ class CGMClient:
     def call_cgm(self, message):
         errors = []
         try:
+            logging.debug(f"Calling CGM with message: {message.to_json()}")
+
             socket_client = SocketClient(self.config)
             socket_client.connect(self.config.cgm_server_host, self.config.cgm_server_port)
             socket_client.write_text(message)
