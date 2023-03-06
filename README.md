@@ -45,33 +45,4 @@ a remote (Linux) VM.
 test
 test2
 
-To test the Websocket API you can use off the shelve tools such as PostMan or Chrome
-extensions. The following address can be used:
-
-Docker:
-  ws://127.0.0.1:8000/cropgen/run
-
-Visual Code (Debug):
-  ws://127.0.0.1:<port>/cropgen/run
-  Where Port is whatever is configured in the CropGen\config\config.json file for the socketServerPort.
-
-Using the following Payload:
-{
-    "jobType": "multiyear",
-    "body": {
-        "jobId": 2222,
-        "individuals": 10,
-        "inputs": [
-            "[Sorghum].Phenology.TTEndJuvToInit.FixedValue", 
-            "[Sow on a fixed date].Script.Tillering"
-        ],
-        "outputs": [
-            "Total Crop Water Use (mm)", 
-            "Yield (t/ha)"
-        ]
-    }
-}
-
-Where jobType can be any of the following (Case insensitive):
-singleyear
-multiyear
+To test the socket API you can use the SocketTestApp: https://github.com/QAAFI/SocketTest. This provides a default JSON file that can be used to run the SingleYear job. CropGen is designed to talk to the CGMServer (https://github.com/QAAFI/CGMServer) which in turn will run APSIM. If you want to run without APSIM you can also download and run the cgm_server_test_harness (https://github.com/QAAFI/cgm_server_test_harness). This provides a similar config file to CropGen which shows the port it will listen on by default etc.
