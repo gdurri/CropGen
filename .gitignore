@@ -3,3 +3,4 @@
 *.db-shm
 *.apsimx.bak
 __pycache__/
+/results/
