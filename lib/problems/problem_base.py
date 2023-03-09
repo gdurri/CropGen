@@ -12,35 +12,54 @@ from lib.utils.constants import Constants
 # The base class for Problems, provides some useful problem specific functionality.
 #
 class ProblemBase(Problem):
-    NUMBER_OF_INEQUALITY_CONSTRAINTS_1 = 130.0
-    NUMBER_OF_INEQUALITY_CONSTRAINTS_2 = 0.0
-    NUMBER_OF_EQUALITY_CONSTRAINTS_1 = 190.0
-    NUMBER_OF_EQUALITY_CONSTRAINTS_2 = 0.0
-
     #
     # Constructor
     #
-    def __init__(self, JobType, config, run_job_request):
+    def __init__(self, config, run_job_request):
         # Member variables
-        self.JobType = JobType
         self.config = config
         self.run_job_request = run_job_request
         # Use our factory to provide us with a job server client. This is responsible
         # for returning a mock one depending on the configuration.
-        self.cgm_server_client = CGMClientFactory().create(self.config)
+        self.cgm_server_client = CGMClientFactory().create(
+            run_job_request.CGMServerHost, 
+            run_job_request.CGMServerPort, 
+            self.config
+        )
         self.run_errors = []
 
+        total_inputs = run_job_request.total_inputs()
+        lower_bounds = self._construct_input_lower_bounds()
+        upper_bounds = self._construct_input_upper_bounds()
+
+        logging.info(f"Constructing Problem with {total_inputs} inputs. Setting the lowerbounds to: {lower_bounds} and the upperbounds to: {upper_bounds}")
+
         super().__init__(
-            n_var = 2,
+            n_var = total_inputs,
             n_obj = 2,
-            xl = NumPy.array([
-                ProblemBase.NUMBER_OF_INEQUALITY_CONSTRAINTS_1,
-                ProblemBase.NUMBER_OF_INEQUALITY_CONSTRAINTS_2
-            ]),
-            xu = NumPy.array([
-                ProblemBase.NUMBER_OF_EQUALITY_CONSTRAINTS_1,
-                ProblemBase.NUMBER_OF_EQUALITY_CONSTRAINTS_2
-            ]))
+            xl = NumPy.array(lower_bounds),
+            xu = NumPy.array(upper_bounds)
+        )
+
+    #
+    # Create the input lower bounds by using the values from the run job request
+    # input min values.
+    #
+    def _construct_input_lower_bounds(self):
+        input_lower_bounds = []
+        for input in self.run_job_request.Inputs:
+            input_lower_bounds.append(input.Min)
+        return input_lower_bounds
+    
+    #
+    # Create the input lower bounds by using the values from the run job request
+    # input min values.
+    #
+    def _construct_input_upper_bounds(self):
+        input_upper_bounds = []
+        for input in self.run_job_request.Inputs:
+            input_upper_bounds.append(input.Max)
+        return input_upper_bounds
 
     #
     # Constructs a data frame containing the input and output data
@@ -48,7 +67,7 @@ class ProblemBase(Problem):
     #
     def get_combined_inputs_outputs(self):
         columns = []
-        for input in self.run_job_request.Inputs:
+        for input in self.run_job_request.get_input_names():
             columns.append(input)
         for output in self.run_job_request.get_output_names():
             columns.append(output)
@@ -75,7 +94,7 @@ class ProblemBase(Problem):
     # Outputs all of the run data.
     #
     async def send_results(self, opt_data_frame, websocket_client):
-        message = ResultsMessage(self.JobType, self.run_job_request.JobID, opt_data_frame)
+        message = ResultsMessage(self.run_job_request.JobType, self.run_job_request.JobID, opt_data_frame)
         await websocket_client.write_text_async(message)
 
     #

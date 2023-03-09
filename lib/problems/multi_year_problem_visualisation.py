@@ -15,8 +15,8 @@ class MultiYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, JobType, config, run_job_request):
-        super().__init__(JobType, config, run_job_request)
+    def __init__(self, config, run_job_request):
+        super().__init__(config, run_job_request)
 
     #
     # Invokes the running of the problem.

@@ -12,7 +12,13 @@ class CGMClient:
     #
     # Constructor
     #
-    def __init__(self, config):
+    def __init__(self, 
+                 host, 
+                 port, 
+                 config
+    ):
+        self.host = host
+        self.port = port
         self.config = config
     
     #
@@ -25,12 +31,12 @@ class CGMClient:
             logging.debug(f"Calling CGM with message: {message.to_json()}")
 
             socket_client = SocketClient(self.config)
-            socket_client.connect(self.config.cgm_server_host, self.config.cgm_server_port)
+            socket_client.connect(self.host, self.port)
             socket_client.write_text(message)
             socket_client.set_timeout(self.config.socket_timeout_seconds)
             return socket_client.read_text()
         except Exception as exception:
-            error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.config.cgm_server_host}:{self.config.cgm_server_port}) - {exception}"
+            error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
             logging.error(error)
             errors.append(error)
 

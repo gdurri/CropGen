@@ -22,6 +22,7 @@ class Constants():
 
     # Messages - Comparisons are made after converting the value to test to lowercase.
     RUN_CROP_GEN = 'runcropgen'
+    STATUS = 'status'
     # This represents the single year job type that is communicated
     # via the Socket interface.
     SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR = 'singleyear'

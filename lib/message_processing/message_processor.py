@@ -31,8 +31,17 @@ class MessageProcessor():
 
         if type_name_lower == Constants.RUN_CROP_GEN:
             await self.process_run_message(message_wrapper.TypeBody)
+        elif  type_name_lower == Constants.STATUS:
+            await self.get_status()
         else:
             await self.socket_client.write_error_async([f"Unknown TypeName: '{message_wrapper.TypeName}'."])
+
+    #
+    # Gets the current status of the application. This can be 
+    # used to determine whether a job is currently running.
+    #
+    async def get_status(self):
+        return "Status"
 
     #
     # Processes a run message

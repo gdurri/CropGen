@@ -8,5 +8,10 @@ class CGMClientFactory():
     #
     # Creates an instance of a CGM Client.
     #
-    def create(self, config):
-        return CGMClient(config)
+    def create(
+        self, 
+        host,
+        port, 
+        config
+    ):
+        return CGMClient(host, port, config)

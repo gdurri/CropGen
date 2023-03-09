@@ -1,9 +1,4 @@
 {
-    "cgmServerHost": "localhost",
-    "cgmServerHostDocker": "cgmserver",
-    "test_app_cgmServerHostDocker": "cgm-server-test-harness-app",
-    "real_app_cgmServerHostDocker": "cgmserver",
-    "cgmServerPort": 27746,
     "useMockCgmClient": false,
     "reverseMockedResults": true,
     "socketServerHost": "localhost",

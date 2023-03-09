@@ -16,8 +16,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, JobType, config, run_job_request):
-        super().__init__(JobType, config, run_job_request)
+    def __init__(self, config, run_job_request):
+        super().__init__(config, run_job_request)
     
     #
     # Invokes the running of the problem.
@@ -67,7 +67,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
-        logging.info("Handling evaluation")
+        logging.info(f"Handling evaluation with {len(variable_values_for_population)} values.")
 
         if self.run_errors:
             return

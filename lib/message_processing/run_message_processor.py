@@ -52,8 +52,11 @@ class RunMessageProcessor():
 
         # Create an init workers request, using the contents of the run_job_request.
         init_workers_request = InitWorkers(run_job_request)
-
-        cgm_server_client = CGMClientFactory().create(self.config)
+        cgm_server_client = CGMClientFactory().create(
+            run_job_request.CGMServerHost, 
+            run_job_request.CGMServerPort, 
+            self.config
+        )
         read_message_data = cgm_server_client.call_cgm(init_workers_request)
         errors = cgm_server_client.validate_cgm_call(read_message_data)
 
@@ -76,9 +79,9 @@ class RunMessageProcessor():
         cleansed_job_type = run_job_request.JobType.lower().strip()
 
         if cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR:
-            return SingleYearProblemVisualisation(run_job_request.JobType, self.config, run_job_request)
+            return SingleYearProblemVisualisation(self.config, run_job_request)
         elif cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR:
-            return MultiYearProblemVisualisation(run_job_request.JobType, self.config, run_job_request)
+            return MultiYearProblemVisualisation(self.config, run_job_request)
         return None
     
     #
