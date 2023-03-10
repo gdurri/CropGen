@@ -49,6 +49,7 @@ class Config:
         self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
         self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 5)
         self.web_server_log_level = self._get_config_setting(data, 'webServerLogLevel', 'info')
+        self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')
 
     #
     # Safely gets a config setting, taking into consideration docker

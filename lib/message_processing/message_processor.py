@@ -1,5 +1,6 @@
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run_job_request import RunJobRequest
+from lib.models.status_message  import StatusMessage
 from lib.utils.constants import Constants
 
 #
@@ -10,8 +11,9 @@ class MessageProcessor():
     #
     # Constructor
     #
-    def __init__(self, config, socket_client):
+    def __init__(self, config, socket_client, server_state):
         self.socket_client = socket_client
+        self.server_state = server_state
         self.run_message_processor = RunMessageProcessor(config, socket_client)
 
     #
@@ -41,7 +43,8 @@ class MessageProcessor():
     # used to determine whether a job is currently running.
     #
     async def get_status(self):
-        return "Status"
+        message = StatusMessage(self.server_state.get_running_job_id())
+        await self.socket_client.write_text_async(message)
 
     #
     # Processes a run message
@@ -56,6 +59,12 @@ class MessageProcessor():
             await self.socket_client.write_error_async(errors)
             return
 
+        # Record that a job is currently running on the server.
+        self.server_state.set_running_job_id(run_job_request.JobID)
+
         # We are happy with the message format so ask our run message processor to 
         # run it.
         await self.run_message_processor.process_run_message(run_job_request)
+
+        # Now that we're done, clear the currently running job.
+        self.server_state.clear_running_job_id()

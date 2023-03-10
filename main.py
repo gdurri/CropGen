@@ -8,13 +8,15 @@ import logging
 from lib.logging import set_logger_config
 
 from lib.server.socket_server import SocketServer
+from lib.server.server_state import ServerState
 from lib.config.config import Config
 
 config = Config()
+server_state = ServerState()
 
 # Functions
 def client_connected_cb(client_reader, client_writer):
-    server = SocketServer(config)
+    server = SocketServer(config, server_state)
     server.client_connected_callback(client_reader, client_writer)
 
 # Main entry point

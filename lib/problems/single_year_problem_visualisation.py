@@ -67,7 +67,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
-        logging.info(f"Handling evaluation with {len(variable_values_for_population)} values.")
+        logging.info("Handling evaluation with %d values.", len(variable_values_for_population))
 
         if self.run_errors:
             return

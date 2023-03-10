@@ -23,7 +23,8 @@ class RunMessageProcessor():
     # Processes the run job request passed in from the websocket.
     #
     async def process_run_message(self, run_job_request):
-        logging.info(f"Processing run job request: {run_job_request.to_json()}")
+        logging.info("Processing run job request for JobID: %s", run_job_request.JobID)        
+        logging.debug("Run job request: %s", run_job_request.to_json())
 
         # Report that we are starting the run.
         await self._send_run_started_message(run_job_request)
