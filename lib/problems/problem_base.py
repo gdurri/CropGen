@@ -7,6 +7,7 @@ from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.models.results_message import ResultsMessage
 from lib.utils.constants import Constants
+from lib.utils.results_publisher import ResultsPublisher
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -19,15 +20,11 @@ class ProblemBase(Problem):
         # Member variables
         self.config = config
         self.run_job_request = run_job_request
-        # Use our factory to provide us with a job server client. This is responsible
-        # for returning a mock one depending on the configuration.
-        self.cgm_server_client = CGMClientFactory().create(
-            run_job_request.CGMServerHost, 
-            run_job_request.CGMServerPort, 
-            self.config
-        )
         self.run_errors = []
 
+        self.results_publisher = ResultsPublisher(run_job_request.ResultsUrl)        
+        self.cgm_server_client = CGMClientFactory().create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
+        
         total_inputs = run_job_request.total_inputs()
         lower_bounds = self._construct_input_lower_bounds()
         upper_bounds = self._construct_input_upper_bounds()
@@ -93,9 +90,9 @@ class ProblemBase(Problem):
     #
     # Outputs all of the run data.
     #
-    async def send_results(self, opt_data_frame, websocket_client):
+    def send_results(self, opt_data_frame):
         message = ResultsMessage(self.run_job_request.JobType, self.run_job_request.JobID, opt_data_frame)
-        await websocket_client.write_text_async(message)
+        self.results_publisher.publish_results(message)
 
     #
     # Processes and returns the results, from the APSIM response object.
@@ -144,6 +141,10 @@ class ProblemBase(Problem):
             multiplier = self.run_job_request.Outputs[output_index].Multiplier
             apsim_output_with_multiplier_applied = apsim_output * multiplier
             outputs.append(apsim_output_with_multiplier_applied)
-            logging.debug(f"ApsimOutput: {apsim_output}. Applying multiplier: *{multiplier}. New value: {apsim_output_with_multiplier_applied}")
+            logging.debug("ApsimOutput: %f. Applying multiplier: %d. New value: %f",
+                apsim_output,
+                multiplier,
+                apsim_output_with_multiplier_applied
+            )
 
         return outputs

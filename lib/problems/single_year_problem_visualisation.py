@@ -61,7 +61,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         columns = super().get_combined_inputs_outputs()
         opt_data_frame = super().construct_data_frame(total, columns)
 
-        await super().send_results(opt_data_frame, socket_client)
+        super().send_results(opt_data_frame)
     
     #
     # Iterate over each population and perform calcs.
