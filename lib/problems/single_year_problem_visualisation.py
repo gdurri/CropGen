@@ -29,8 +29,8 @@ class SingleYearProblemVisualisation(ProblemBase):
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
-        # seed = 1
-        minimize_result = minimize(
+        # TODO - Add self.run_job_request.Seed if it has been set...
+        minimize(
             problem=self,
             algorithm=algorithm,
             termination=(
@@ -46,24 +46,6 @@ class SingleYearProblemVisualisation(ProblemBase):
         if self.run_errors:
             await super().report_run_errors(socket_client)
             return
-
-        # # Variable values for non-dominated Individuals in the last generation
-        # minimize_result_x = minimize_result.X
-        # # Objective values for non-dominated Individuals in the last generation
-        # minimize_result_f = minimize_result.F
-
-        # # Everything ran successfully so continue processing and reporting.
-        # total = list(zip(
-        #     minimize_result_x[:, 0], 
-        #     minimize_result_x[:, 1], 
-        #     minimize_result_f[:, 0], 
-        #     minimize_result_f[:, 1]
-        # ))
-
-        # columns = super().get_combined_inputs_outputs()
-        # opt_data_frame = super().construct_data_frame(total, columns)
-
-        # super().send_results(opt_data_frame)
     
     #
     # Iterate over each population and perform calcs.

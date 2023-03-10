@@ -31,15 +31,8 @@ class ResultsMessage(Model):
     # Constructor
     #
     def __init__(
-            self, 
-            job_type, 
-            job_id, 
-            total_iterations, 
-            iteration_id,
-            input_names,
-            input_values,
-            output_names,
-            output_values
+            self, job_type, job_id, total_iterations, iteration_id, 
+            input_names, input_values, output_names,output_values
         ):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
         self.JobType = job_type

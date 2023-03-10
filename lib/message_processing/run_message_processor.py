@@ -2,9 +2,7 @@ import logging
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.init_workers import InitWorkers
-from lib.models.cgm.init_workers_response import InitWorkersResponse
-from lib.models.end_of_run_message import EndOfRunMessage
-from lib.models.start_of_run_message import StartOfRunMessage
+from lib.models.run_crop_gen_response import RunCropGenResponse
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
 from lib.utils.constants import Constants
 from lib.utils.date_time_helper import DateTimeHelper
@@ -27,7 +25,7 @@ class RunMessageProcessor():
         logging.debug("Run job request: %s", run_job_request.to_json())
 
         # Report that we are starting the run.
-        await self._send_run_started_message(run_job_request)
+        await self._send_run_response_message(True)
 
         if not await self._init_cgm(run_job_request):
             return
@@ -41,9 +39,6 @@ class RunMessageProcessor():
         # Otherwise send an error message.
         else:
             await self.socket_client.write_error_async([f"{Constants.UNKNOWN_JOB_TYPE}: '{run_job_request.JobType}'."])
-
-        # Report that we are ending the run.
-        await self._send_run_ended_message(run_job_request)
 
     #
     # Calls init on the CGM server and returns the response.
@@ -64,11 +59,6 @@ class RunMessageProcessor():
             await self.socket_client.write_error_async(errors)
             return False
         
-        # Rerport the init workers response.
-        response = InitWorkersResponse()
-        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        await self.socket_client.write_text_async(response)
-
         return True
         
     #
@@ -87,16 +77,7 @@ class RunMessageProcessor():
     #
     # Sends a run started message.
     #
-    async def _send_run_started_message(self, run_job_request):
+    async def _send_run_response_message(self, successful):
         self.run_errors = []
-        self.run_start_time = DateTimeHelper.get_date_time()
-        message = StartOfRunMessage(run_job_request.JobType, run_job_request.JobID)
-        await self.socket_client.write_text_async(message)
-
-    #
-    # Sends a run ended message.
-    #
-    async def _send_run_ended_message(self, run_job_request):
-        duration_seconds = DateTimeHelper.get_seconds_since_now(self.run_start_time)
-        message = EndOfRunMessage(run_job_request.JobType, run_job_request, duration_seconds)
+        message = RunCropGenResponse(successful)
         await self.socket_client.write_text_async(message)
