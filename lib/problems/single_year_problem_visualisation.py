@@ -112,24 +112,12 @@ class SingleYearProblemVisualisation(ProblemBase):
             self.run_job_request.JobType,
             self.run_job_request.JobID,
             self.run_job_request.Iterations,
-            self.current_iteration_id
+            self.current_iteration_id,
+            self.run_job_request.get_input_names(),
+            variable_values_for_population,
+            self.run_job_request.get_output_names(),
+            results
         )
-
-        output_index = 0
-        for name in self.run_job_request.get_input_names():
-            values = []
-            for output_values in variable_values_for_population:
-                values.append(output_values[output_index])
-            results_message.add_input(name, values)
-            output_index += 1
-
-        output_index = 0
-        for name in self.run_job_request.get_output_names():
-            values = []
-            for output_values in results:
-                values.append(output_values[output_index])
-            results_message.add_output(name, values)
-            output_index += 1
 
         self.current_iteration_id += 1
 
