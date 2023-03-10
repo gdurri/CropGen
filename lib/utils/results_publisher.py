@@ -17,7 +17,7 @@ class ResultsPublisher():
     def publish_results(self, results):
         data = results.to_json()
 
-        logging.info("Publishing results to Url: '%s'", self.url)
+        logging.info("Publishing results to: '%s'", self.url)
         logging.debug("Results: '%s'", data)
 
         response = requests.post(
@@ -26,8 +26,8 @@ class ResultsPublisher():
         )
 
         if not response.ok:
-            logging.error("Failed to publish results to Url: '%s'. Reason: '%s'", self.url, response.reason)
+            logging.error("Failed to publish results to: '%s'. Reason: '%s'", self.url, response.reason)
         else:
-            logging.info("Successfully published results to Url: '%s'", self.url)
+            logging.info("Successfully published results to: '%s'", self.url)
 
         return response

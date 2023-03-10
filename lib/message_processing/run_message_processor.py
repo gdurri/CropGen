@@ -6,7 +6,6 @@ from lib.models.cgm.init_workers_response import InitWorkersResponse
 from lib.models.end_of_run_message import EndOfRunMessage
 from lib.models.start_of_run_message import StartOfRunMessage
 from lib.problems.single_year_problem_visualisation import SingleYearProblemVisualisation
-#from lib.problems.multi_year_problem_visualisation import MultiYearProblemVisualisation
 from lib.utils.constants import Constants
 from lib.utils.date_time_helper import DateTimeHelper
 
@@ -81,7 +80,6 @@ class RunMessageProcessor():
         if cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR:
             return SingleYearProblemVisualisation(self.config, run_job_request)
         elif cleansed_job_type == Constants.SOCKET_MESSAGE_JOB_TYPE_MULTI_YEAR:
-            #return MultiYearProblemVisualisation(self.config, run_job_request)
             return None
         return None
     
