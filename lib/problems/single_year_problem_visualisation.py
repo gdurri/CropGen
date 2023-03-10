@@ -3,6 +3,7 @@ import logging
 import numpy as NumPy
 
 from lib.models.cgm.relay_apsim import RelayApsim
+from lib.models.results_message import ResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
@@ -23,6 +24,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     # Invokes the running of the problem.
     #
     async def run(self, socket_client):
+        self.current_iteration_id = 1
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
@@ -45,23 +47,23 @@ class SingleYearProblemVisualisation(ProblemBase):
             await super().report_run_errors(socket_client)
             return
 
-        # Variable values for non-dominated Individuals in the last generation
-        minimize_result_x = minimize_result.X
-        # Objective values for non-dominated Individuals in the last generation
-        minimize_result_f = minimize_result.F
+        # # Variable values for non-dominated Individuals in the last generation
+        # minimize_result_x = minimize_result.X
+        # # Objective values for non-dominated Individuals in the last generation
+        # minimize_result_f = minimize_result.F
 
-        # Everything ran successfully so continue processing and reporting.
-        total = list(zip(
-            minimize_result_x[:, 0], 
-            minimize_result_x[:, 1], 
-            minimize_result_f[:, 0], 
-            minimize_result_f[:, 1]
-        ))
+        # # Everything ran successfully so continue processing and reporting.
+        # total = list(zip(
+        #     minimize_result_x[:, 0], 
+        #     minimize_result_x[:, 1], 
+        #     minimize_result_f[:, 0], 
+        #     minimize_result_f[:, 1]
+        # ))
 
-        columns = super().get_combined_inputs_outputs()
-        opt_data_frame = super().construct_data_frame(total, columns)
+        # columns = super().get_combined_inputs_outputs()
+        # opt_data_frame = super().construct_data_frame(total, columns)
 
-        super().send_results(opt_data_frame)
+        # super().send_results(opt_data_frame)
     
     #
     # Iterate over each population and perform calcs.
@@ -73,7 +75,7 @@ class SingleYearProblemVisualisation(ProblemBase):
             return
 
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
-        self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values)
+        self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
 
     #
     # Evaluate fitness of the Individuals in the population
@@ -84,7 +86,8 @@ class SingleYearProblemVisualisation(ProblemBase):
     def _handle_evaluate_value_for_population(
         self,
         relay_apsim_request,
-        out_objective_values
+        out_objective_values,
+        variable_values_for_population
     ):
         # Initialise the out array to satisfy the algorithm.
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
@@ -105,4 +108,29 @@ class SingleYearProblemVisualisation(ProblemBase):
         if not results:
             return False
         
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(results)
+        results_message = ResultsMessage(
+            self.run_job_request.JobType,
+            self.run_job_request.JobID,
+            self.run_job_request.Iterations,
+            self.current_iteration_id
+        )
+
+        output_index = 0
+        for name in self.run_job_request.get_input_names():
+            values = []
+            for output_values in variable_values_for_population:
+                values.append(output_values[output_index])
+            results_message.add_input(name, values)
+            output_index += 1
+
+        output_index = 0
+        for name in self.run_job_request.get_output_names():
+            values = []
+            for output_values in results:
+                values.append(output_values[output_index])
+            results_message.add_output(name, values)
+            output_index += 1
+
+        self.current_iteration_id += 1
+
+        super().send_results(results_message)

@@ -21,6 +21,7 @@ class ProblemBase(Problem):
         self.config = config
         self.run_job_request = run_job_request
         self.run_errors = []
+        self.current_iteration_id = 1
 
         self.results_publisher = ResultsPublisher(run_job_request.ResultsUrl, config.results_publisher_timeout_seconds)
         self.cgm_server_client = CGMClientFactory().create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
@@ -90,9 +91,8 @@ class ProblemBase(Problem):
     #
     # Outputs all of the run data.
     #
-    def send_results(self, opt_data_frame):
-        message = ResultsMessage(self.run_job_request.JobType, self.run_job_request.JobID, opt_data_frame)
-        self.results_publisher.publish_results(message)
+    def send_results(self, results_message):
+        self.results_publisher.publish_results(results_message)
 
     #
     # Processes and returns the results, from the APSIM response object.

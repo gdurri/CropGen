@@ -12,11 +12,7 @@ class CGMClient:
     #
     # Constructor
     #
-    def __init__(self, 
-                 host, 
-                 port, 
-                 config
-    ):
+    def __init__(self, host, port, config):
         self.host = host
         self.port = port
         self.config = config
