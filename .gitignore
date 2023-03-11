@@ -4,4 +4,4 @@
 *.apsimx.bak
 __pycache__/
 /results/
-/cropgen.log
+/logs
