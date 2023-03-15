@@ -23,6 +23,7 @@ class CGMClient:
     def test_cgm_connection(self):
         try:
             socket_client = SocketClient(self.config)
+            socket_client.set_timeout(self.config.socket_timeout_test_connection_seconds)
             socket_client.connect(self.host, self.port)
         except Exception:
             return False

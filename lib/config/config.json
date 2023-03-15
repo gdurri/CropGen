@@ -8,6 +8,7 @@
     "socketDataEndianness": "big",
     "socketDataEncoding": "utf-8",
     "socketTimeoutSeconds": 120.0,
+    "socketTimeoutTestConnectionSeconds": 2.0,
     "webServerLogLevel" : "info",
     "resultsPublisherTimeoutSeconds": 10
 }

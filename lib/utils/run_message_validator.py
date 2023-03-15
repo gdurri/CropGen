@@ -69,7 +69,9 @@ class RunMessageValidator():
     def _validate_no_jobs_are_currently_running(self):
         running_job = self.server_state.get_running_job_id()
         if running_job != None:
-            self.errors.append(f"{Constants.CROP_GEN_IS_ALREADY_RUNNING_A_JOB}. Running Job: {running_job}.")
+            self.errors.append(
+                f"{Constants.CROP_GEN_IS_ALREADY_RUNNING_A_JOB}. Running Job: {running_job}."
+            )
             return False
         return True
 
@@ -111,8 +113,8 @@ class RunMessageValidator():
     #
     def _validate_cgm_server_connection(self):
         if not self.cgm_server_client.test_cgm_connection():
-            self.errors.extend(
-                f"{Constants.CGM_FAILED_TO_CONNECT_TO_CGM_SERVER} ({self.run_job_request.CGMServerHost}:{self.port}) - {self.run_job_request.CGMServerPort}"
+            self.errors.append(
+                f"{Constants.CGM_FAILED_TO_CONNECT_TO_CGM_SERVER} ({self.run_job_request.CGMServerHost}:{self.run_job_request.CGMServerPort})"
             )
             return False
         return True

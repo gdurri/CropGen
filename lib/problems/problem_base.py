@@ -1,10 +1,10 @@
 from pymoo.core.problem import Problem
 import logging
 import numpy as NumPy
-import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
+from lib.problems.apsim_output import ApsimOutput
 from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 
@@ -71,16 +71,6 @@ class ProblemBase(Problem):
         return columns
 
     #
-    # Constructs a data frame containing the input and output data
-    # using the input and output columns.
-    #
-    def construct_data_frame(self, data, columns):
-        return Pandas.DataFrame(
-            data,
-            columns=columns
-        )
-
-    #
     # Report the errors.
     #
     def report_run_errors(self):
@@ -107,9 +97,9 @@ class ProblemBase(Problem):
                 self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
                 return None
             
-            outputs = self._process_apsim_result(apsim_result)
-            if not outputs: return None
-            results.append(outputs)
+            apsim_output = self._process_apsim_result(apsim_result)
+            if not apsim_output: return None
+            results.append(apsim_output)
             
         return results
 
@@ -127,18 +117,21 @@ class ProblemBase(Problem):
         if expected_outputs_length != actual_outputs_length:
             self.run_errors.append(f'{Constants.APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED}. Expected: {expected_outputs_length} Actual: {actual_outputs_length}')
             return None
-
-        outputs = []
+        
+        apsim_output = ApsimOutput()
+        apsim_output.simulation_id = apsim_result.SimulationID
+        apsim_output.simulation_name = apsim_result.SimulationName
+        
         for output_index in range(0, actual_outputs_length):
-            apsim_output = apsim_result.Values[output_index]
+            output = apsim_result.Values[output_index]
             multiplier = self.run_job_request.Outputs[output_index].Multiplier
-            apsim_output_with_multiplier_applied = apsim_output * multiplier
-            outputs.append(apsim_output_with_multiplier_applied)
+            apsim_output_with_multiplier_applied = output * multiplier
+            apsim_output.outputs.append(apsim_output_with_multiplier_applied)
 
             logging.debug("ApsimOutput: %f. Applying multiplier: %d. New value: %f",
-                apsim_output,
+                output,
                 multiplier,
                 apsim_output_with_multiplier_applied
             )
 
-        return outputs
+        return apsim_output

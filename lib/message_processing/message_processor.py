@@ -62,6 +62,11 @@ class MessageProcessor():
         # Report back the job has been accepted and will be processed.
         await self._send_run_response_message(job_id)
 
+        # Record that a job is currently running on the server. This 
+        # will block other jobs running until this flag is cleared, 
+        # when the job completes, which could be caused by an error too.
+        self.server_state.set_running_job_id(job_id)
+
         # Now we know the request is valid, extract the run job request.
         threading.Thread(target=self.run_job, args=(
             run_message_validator.get_run_job_request(),
@@ -72,9 +77,6 @@ class MessageProcessor():
     # Runs the job
     #
     def run_job(self, run_job_request, cgm_server_client):
-
-        # Record that a job is currently running on the server.
-        self.server_state.set_running_job_id(run_job_request.JobID)
 
         # We are happy with the message format so ask our run message processor to 
         # run it.

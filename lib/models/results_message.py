@@ -19,9 +19,11 @@ class Output(Model):
     #
     # Constructor
     #
-    def __init__(self, name, values):        
+    def __init__(self, name, values, simulation_id, simulation_name):        
         self.Name = name
         self.Values = values
+        self.SimulationID = simulation_id
+        self.SimulationName = simulation_name
 
 #
 # The Results Message contains data information for clients.
@@ -70,9 +72,9 @@ class ResultsMessage(Model):
         for name in output_names:
             values = []
             for output_values in all_output_values:
-                values.append(output_values[index])
+                values.append(output_values.outputs[index])
 
-            outputs.append(Output(name, output_values))
+            outputs.append(Output(name, values, output_values.simulation_id, output_values.simulation_name))
             index += 1
             
         return outputs        
