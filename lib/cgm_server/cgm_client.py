@@ -16,6 +16,17 @@ class CGMClient:
         self.host = host
         self.port = port
         self.config = config
+
+    #
+    # Tests whether we can connect to the CGM server over our socket.
+    #
+    def test_cgm_connection(self):
+        try:
+            socket_client = SocketClient(self.config)
+            socket_client.connect(self.host, self.port)
+        except Exception:
+            return False
+        return True
     
     #
     # Handles constructing a new socket connection to the CGM, sending the

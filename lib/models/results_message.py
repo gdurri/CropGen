@@ -31,16 +31,19 @@ class ResultsMessage(Model):
     # Constructor
     #
     def __init__(
-            self, job_type, job_id, total_iterations, iteration_id, 
-            input_names, input_values, output_names,output_values
-        ):
+            self,
+            run_job_request,
+            iteration_id,
+            input_values,
+            output_values
+    ):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
-        self.JobType = job_type
-        self.JobID = job_id
-        self.TotalIterations = total_iterations
+        self.JobType = run_job_request.JobType
+        self.JobID = run_job_request.JobID
+        self.TotalIterations = run_job_request.Iterations
         self.IterationID = iteration_id
-        self.Inputs = self.create_inputs(input_names, input_values)
-        self.Outputs = self.create_outputs(output_names, output_values)
+        self.Inputs = self.create_inputs(run_job_request.get_input_names(), input_values)
+        self.Outputs = self.create_outputs(run_job_request.get_output_names(), output_values)
 
     #
     # Creates all of the inputs

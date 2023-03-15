@@ -7,8 +7,10 @@ class RunCropGenResponse(Model):
     #
     # Constructor
     #
-    def __init__(self, successful):
+    def __init__(self, job_id, successful, errors):
+        self.JobID = job_id
         self.Successful = successful
+        self.Errors = errors
 
     #
     # Returns the type name.

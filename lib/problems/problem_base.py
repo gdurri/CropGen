@@ -5,7 +5,6 @@ import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.models.results_message import ResultsMessage
 from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 
@@ -24,7 +23,7 @@ class ProblemBase(Problem):
         self.current_iteration_id = 1
 
         self.results_publisher = ResultsPublisher(run_job_request.ResultsUrl, config.results_publisher_timeout_seconds)
-        self.cgm_server_client = CGMClientFactory().create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
+        self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
         total_inputs = run_job_request.total_inputs()
         lower_bounds = self._construct_input_lower_bounds()
@@ -84,15 +83,9 @@ class ProblemBase(Problem):
     #
     # Report the errors.
     #
-    async def report_run_errors(self, websocket_client):
+    def report_run_errors(self):
         if self.run_errors:
-            await websocket_client.write_error_async(self.run_errors)
-
-    #
-    # Outputs all of the run data.
-    #
-    def send_results(self, results_message):
-        self.results_publisher.publish_results(results_message)
+            logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
 
     #
     # Processes and returns the results, from the APSIM response object.
@@ -141,6 +134,7 @@ class ProblemBase(Problem):
             multiplier = self.run_job_request.Outputs[output_index].Multiplier
             apsim_output_with_multiplier_applied = apsim_output * multiplier
             outputs.append(apsim_output_with_multiplier_applied)
+
             logging.debug("ApsimOutput: %f. Applying multiplier: %d. New value: %f",
                 apsim_output,
                 multiplier,

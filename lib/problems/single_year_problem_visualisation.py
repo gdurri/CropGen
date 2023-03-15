@@ -23,7 +23,7 @@ class SingleYearProblemVisualisation(ProblemBase):
     #
     # Invokes the running of the problem.
     #
-    async def run(self, socket_client):
+    def run(self):
         self.current_iteration_id = 1
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
 
@@ -44,7 +44,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         # Now that everything has been evaluated, check for any run errors and only
         # continue if there aren't any.
         if self.run_errors:
-            await super().report_run_errors(socket_client)
+            super().report_run_errors()
             return
     
     #
@@ -91,16 +91,12 @@ class SingleYearProblemVisualisation(ProblemBase):
             return False
         
         results_message = ResultsMessage(
-            self.run_job_request.JobType,
-            self.run_job_request.JobID,
-            self.run_job_request.Iterations,
-            self.current_iteration_id,
-            self.run_job_request.get_input_names(),
-            variable_values_for_population,
-            self.run_job_request.get_output_names(),
-            results
+            self.run_job_request, self.current_iteration_id,
+            variable_values_for_population, results
         )
 
+        # Increment our iteration ID.
         self.current_iteration_id += 1
 
-        super().send_results(results_message)
+        # Send out the results.
+        self.results_publisher.publish_results(results_message)
