@@ -26,14 +26,21 @@ class ProblemBase(Problem):
         self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
         total_inputs = run_job_request.total_inputs()
+        total_outputs = run_job_request.total_outputs()
         lower_bounds = self._construct_input_lower_bounds()
         upper_bounds = self._construct_input_upper_bounds()
 
-        logging.info(f"Constructing Problem with {total_inputs} inputs. Setting the lowerbounds to: {lower_bounds} and the upperbounds to: {upper_bounds}")
+        logging.info(
+            "Constructing Problem with %d inputs and %d outputs. Setting the lowerbounds to: %s and the upperbounds to: %s",
+            total_inputs,
+            total_outputs,
+            lower_bounds,
+            upper_bounds
+        )
 
         super().__init__(
             n_var = total_inputs,
-            n_obj = 2,
+            n_obj = total_outputs,
             xl = NumPy.array(lower_bounds),
             xu = NumPy.array(upper_bounds)
         )
