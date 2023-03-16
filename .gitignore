@@ -4,3 +4,4 @@
 *.apsimx.bak
 __pycache__/
 /results/
+/logs

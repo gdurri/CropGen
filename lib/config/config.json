@@ -1,9 +1,4 @@
 {
-    "cgmServerHost": "localhost",
-    "cgmServerHostDocker": "cgmserver",
-    "test_app_cgmServerHostDocker": "cgm-server-test-harness-app",
-    "real_app_cgmServerHostDocker": "cgmserver",
-    "cgmServerPort": 27746,
     "useMockCgmClient": false,
     "reverseMockedResults": true,
     "socketServerHost": "localhost",
@@ -13,5 +8,7 @@
     "socketDataEndianness": "big",
     "socketDataEncoding": "utf-8",
     "socketTimeoutSeconds": 120.0,
-    "webServerLogLevel" : "info"
+    "socketTimeoutTestConnectionSeconds": 2.0,
+    "webServerLogLevel" : "info",
+    "resultsPublisherTimeoutSeconds": 10
 }

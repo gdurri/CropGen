@@ -19,3 +19,18 @@ class JsonHelper():
         else:
             errors.append(f"No {attribute_name} specified")
         return value
+    
+    #
+    # Safely extracts the attribute if it exists, or 
+    # sets the value to the value_if_not_present (defaulted)
+    #
+    @staticmethod
+    def get_non_mandatory_attribute(
+        json, 
+        attribute_name, 
+        value_if_not_present
+    ):
+        value = value_if_not_present
+        if attribute_name in json:
+            value = json[attribute_name]
+        return value

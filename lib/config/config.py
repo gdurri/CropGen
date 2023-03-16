@@ -41,16 +41,16 @@ class Config:
     # Populates itself using the config JSON data.
     #
     def _populate_from_data(self, data):
-        self.cgm_server_host = self._get_config_setting(data, 'cgmServerHost')
-        self.cgm_server_port = self._get_config_setting(data, 'cgmServerPort', 9000)
         self.reverse_mocked_results = self._get_config_setting(data, 'reverseMockedResults', False)
         self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
         self.socket_data_num_bytes_buffer_size = self._get_config_setting(data, 'socketDataNumBytesBufferSize', 4)
         self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'big')        
         self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
-        self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 5)
+        self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 120.0)
+        self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
         self.web_server_log_level = self._get_config_setting(data, 'webServerLogLevel', 'info')
+        self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')
 
     #
     # Safely gets a config setting, taking into consideration docker

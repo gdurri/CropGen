@@ -5,42 +5,66 @@ import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.models.results_message import ResultsMessage
+from lib.problems.apsim_output import ApsimOutput
 from lib.utils.constants import Constants
+from lib.utils.results_publisher import ResultsPublisher
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
 #
 class ProblemBase(Problem):
-    NUMBER_OF_INEQUALITY_CONSTRAINTS_1 = 130.0
-    NUMBER_OF_INEQUALITY_CONSTRAINTS_2 = 0.0
-    NUMBER_OF_EQUALITY_CONSTRAINTS_1 = 190.0
-    NUMBER_OF_EQUALITY_CONSTRAINTS_2 = 0.0
-
     #
     # Constructor
     #
-    def __init__(self, JobType, config, run_job_request):
+    def __init__(self, config, run_job_request):
         # Member variables
-        self.JobType = JobType
         self.config = config
         self.run_job_request = run_job_request
-        # Use our factory to provide us with a job server client. This is responsible
-        # for returning a mock one depending on the configuration.
-        self.cgm_server_client = CGMClientFactory().create(self.config)
         self.run_errors = []
+        self.current_iteration_id = 1
+
+        self.results_publisher = ResultsPublisher(run_job_request.ResultsUrl, config.results_publisher_timeout_seconds)
+        self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
+        
+        total_inputs = run_job_request.total_inputs()
+        total_outputs = run_job_request.total_outputs()
+        lower_bounds = self._construct_input_lower_bounds()
+        upper_bounds = self._construct_input_upper_bounds()
+
+        logging.info(
+            "Constructing Problem with %d inputs and %d outputs. Setting the lowerbounds to: %s and the upperbounds to: %s",
+            total_inputs,
+            total_outputs,
+            lower_bounds,
+            upper_bounds
+        )
 
         super().__init__(
-            n_var = 2,
-            n_obj = 2,
-            xl = NumPy.array([
-                ProblemBase.NUMBER_OF_INEQUALITY_CONSTRAINTS_1,
-                ProblemBase.NUMBER_OF_INEQUALITY_CONSTRAINTS_2
-            ]),
-            xu = NumPy.array([
-                ProblemBase.NUMBER_OF_EQUALITY_CONSTRAINTS_1,
-                ProblemBase.NUMBER_OF_EQUALITY_CONSTRAINTS_2
-            ]))
+            n_var = total_inputs,
+            n_obj = total_outputs,
+            xl = NumPy.array(lower_bounds),
+            xu = NumPy.array(upper_bounds)
+        )
+
+    #
+    # Create the input lower bounds by using the values from the run job request
+    # input min values.
+    #
+    def _construct_input_lower_bounds(self):
+        input_lower_bounds = []
+        for input in self.run_job_request.Inputs:
+            input_lower_bounds.append(input.Min)
+        return input_lower_bounds
+    
+    #
+    # Create the input lower bounds by using the values from the run job request
+    # input min values.
+    #
+    def _construct_input_upper_bounds(self):
+        input_upper_bounds = []
+        for input in self.run_job_request.Inputs:
+            input_upper_bounds.append(input.Max)
+        return input_upper_bounds
 
     #
     # Constructs a data frame containing the input and output data
@@ -48,35 +72,25 @@ class ProblemBase(Problem):
     #
     def get_combined_inputs_outputs(self):
         columns = []
-        for input in self.run_job_request.Inputs:
+        for input in self.run_job_request.get_input_names():
             columns.append(input)
         for output in self.run_job_request.get_output_names():
             columns.append(output)
         return columns
-
+    
     #
     # Constructs a data frame containing the input and output data
     # using the input and output columns.
     #
     def construct_data_frame(self, data, columns):
-        return Pandas.DataFrame(
-            data,
-            columns=columns
-        )
+        return Pandas.DataFrame(data, columns=columns)
 
     #
     # Report the errors.
     #
-    async def report_run_errors(self, websocket_client):
+    def report_run_errors(self):
         if self.run_errors:
-            await websocket_client.write_error_async(self.run_errors)
-
-    #
-    # Outputs all of the run data.
-    #
-    async def send_results(self, opt_data_frame, websocket_client):
-        message = ResultsMessage(self.JobType, self.run_job_request.JobID, opt_data_frame)
-        await websocket_client.write_text_async(message)
+            logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
 
     #
     # Processes and returns the results, from the APSIM response object.
@@ -98,9 +112,9 @@ class ProblemBase(Problem):
                 self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
                 return None
             
-            outputs = self._process_apsim_result(apsim_result)
-            if not outputs: return None
-            results.append(outputs)
+            apsim_output = self._process_apsim_result(apsim_result)
+            if not apsim_output: return None
+            results.append(apsim_output)
             
         return results
 
@@ -118,13 +132,21 @@ class ProblemBase(Problem):
         if expected_outputs_length != actual_outputs_length:
             self.run_errors.append(f'{Constants.APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED}. Expected: {expected_outputs_length} Actual: {actual_outputs_length}')
             return None
-
-        outputs = []
+        
+        apsim_output = ApsimOutput()
+        apsim_output.simulation_id = apsim_result.SimulationID
+        apsim_output.simulation_name = apsim_result.SimulationName
+        
         for output_index in range(0, actual_outputs_length):
-            apsim_output = apsim_result.Values[output_index]
+            output = apsim_result.Values[output_index]
             multiplier = self.run_job_request.Outputs[output_index].Multiplier
-            apsim_output_with_multiplier_applied = apsim_output * multiplier
-            outputs.append(apsim_output_with_multiplier_applied)
-            logging.debug(f"ApsimOutput: {apsim_output}. Applying multiplier: *{multiplier}. New value: {apsim_output_with_multiplier_applied}")
+            apsim_output_with_multiplier_applied = output * multiplier
+            apsim_output.outputs.append(apsim_output_with_multiplier_applied)
 
-        return outputs
+            logging.debug("ApsimOutput: %f. Applying multiplier: %d. New value: %f",
+                output,
+                multiplier,
+                apsim_output_with_multiplier_applied
+            )
+
+        return apsim_output
