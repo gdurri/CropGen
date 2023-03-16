@@ -18,6 +18,7 @@ class MessageProcessor():
         self.config = config
         self.socket_client = socket_client
         self.server_state = server_state
+        self.run_job_sync = threading.Lock()
         self.run_message_processor = RunMessageProcessor(config)
 
     #
@@ -46,32 +47,34 @@ class MessageProcessor():
     # Processes a run message
     #
     async def _process_run_message(self, message):
-        run_message_validator = RunMessageValidator(self.config, self.server_state)
-        valid = run_message_validator.validate(message)
-        job_id = run_message_validator.get_job_id()
+        # We are trying to prevent multipl jobs running at the same time. 
+        # Lock our sync object whilst we perform any validation and ultimately
+        # submit our new job for processing. 
+        # This will prevent any new run job requests slipping through, in the time that
+        # we check for the presence of any running jobs and submitting a new job.
+        with self.run_job_sync:
+            run_message_validator = RunMessageValidator(self.config, self.server_state)
+            valid = run_message_validator.validate(message)
+            job_id = run_message_validator.get_job_id()
 
-        # If it's invalid, report the error and exit out of this.
-        if not valid:
-            await self._send_run_response_message(
-                job_id,
-                False,
-                run_message_validator.get_errors()
-            )
-            return
+            # If it's invalid, report the error and exit out of this.
+            if not valid:
+                await self._send_run_response_message(job_id, False, run_message_validator.get_errors())
+                return
 
-        # Report back the job has been accepted and will be processed.
-        await self._send_run_response_message(job_id)
+            # Report back the job has been accepted and will be processed.
+            await self._send_run_response_message(job_id)
 
-        # Record that a job is currently running on the server. This 
-        # will block other jobs running until this flag is cleared, 
-        # when the job completes, which could be caused by an error too.
-        self.server_state.set_running_job_id(job_id)
+            # Record that a job is currently running on the server. This 
+            # will block other jobs running until this flag is cleared, 
+            # when the job completes, which could be caused by an error too.
+            self.server_state.set_running_job_id(job_id)
 
-        # Now we know the request is valid, extract the run job request.
-        threading.Thread(target=self.run_job, args=(
-            run_message_validator.get_run_job_request(),
-            run_message_validator.get_cgm_server_client()
-        )).start()
+            # Now we know the request is valid, extract the run job request.
+            threading.Thread(target=self.run_job, args=(
+                run_message_validator.get_run_job_request(),
+                run_message_validator.get_cgm_server_client()
+            )).start()
 
     #
     # Runs the job

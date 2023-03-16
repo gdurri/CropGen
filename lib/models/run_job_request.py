@@ -35,7 +35,7 @@ class RunJobRequest(Model):
     # Constructor.
     #
     def __init__(self):
-        self.JobID = 0
+        self.JobID = ''
         self.JobType = ''
         self.CGMServerHost = ''
         self.CGMServerPort = 0
