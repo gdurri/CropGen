@@ -1,6 +1,7 @@
 from pymoo.core.problem import Problem
 import logging
 import numpy as NumPy
+import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
@@ -76,6 +77,13 @@ class ProblemBase(Problem):
         for output in self.run_job_request.get_output_names():
             columns.append(output)
         return columns
+    
+    #
+    # Constructs a data frame containing the input and output data
+    # using the input and output columns.
+    #
+    def construct_data_frame(self, data, columns):
+        return Pandas.DataFrame(data, columns=columns)
 
     #
     # Report the errors.

@@ -26,9 +26,10 @@ class Output(Model):
         self.SimulationName = simulation_name
 
 #
-# The Results Message contains data information for clients.
+# The Iteration Results Message contains the inputs and their correspoding 
+# outputs for one cgm iteration.
 #
-class ResultsMessage(Model):
+class IterationResultsMessage(Model):
     #
     # Constructor
     #

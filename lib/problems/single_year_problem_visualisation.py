@@ -3,7 +3,8 @@ import logging
 import numpy as NumPy
 
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.models.results_message import ResultsMessage
+from lib.models.iteration_results_message import IterationResultsMessage
+from lib.models.final_results_message import FinalResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
@@ -30,7 +31,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
         # TODO - Add self.run_job_request.Seed if it has been set...
-        minimize(
+        minimize_result = minimize(
             problem=self,
             algorithm=algorithm,
             termination=(
@@ -46,6 +47,27 @@ class SingleYearProblemVisualisation(ProblemBase):
         if self.run_errors:
             super().report_run_errors()
             return
+        
+        # Variable values for non-dominated Individuals in the last generation
+        minimize_result_x = minimize_result.X
+        # Objective values for non-dominated Individuals in the last generation
+        minimize_result_f = minimize_result.F
+
+        # Everything ran successfully so continue processing and reporting.
+        total = list(zip(
+            minimize_result_x[:, 0], 
+            minimize_result_x[:, 1], 
+            minimize_result_f[:, 0], 
+            minimize_result_f[:, 1]
+        ))
+
+        results_message = FinalResultsMessage(
+            self.run_job_request, 
+            super().construct_data_frame(total, super().get_combined_inputs_outputs())
+        )
+
+        # Send out the results.
+        self.results_publisher.publish_results(results_message)
     
     #
     # Iterate over each population and perform calcs.
@@ -85,14 +107,20 @@ class SingleYearProblemVisualisation(ProblemBase):
         
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        results = super()._process_apsim_response(response)
+        apsim_outputs = super()._process_apsim_response(response)
         
-        if not results:
+        if not apsim_outputs:
             return False
         
-        results_message = ResultsMessage(
+        raw_outputs = []
+        for apsim_output in apsim_outputs:
+            raw_outputs.append(apsim_output.outputs)
+
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(raw_outputs)
+        
+        results_message = IterationResultsMessage(
             self.run_job_request, self.current_iteration_id,
-            variable_values_for_population, results
+            variable_values_for_population, apsim_outputs
         )
 
         # Increment our iteration ID.
