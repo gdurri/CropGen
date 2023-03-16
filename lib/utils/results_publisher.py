@@ -1,6 +1,8 @@
 import logging
 import requests
 
+from lib.models.message_wrapper import MessageWrapper
+
 #
 # A class that is responsible for publishing the "Problem" results.
 #
@@ -16,7 +18,7 @@ class ResultsPublisher():
     # Convert and publish the results.
     #
     def publish_results(self, results):
-        data = results.to_json()
+        data = self._prepare_data_for_publish(results)
 
         logging.info("Publishing results to: '%s'", self.url)
         logging.debug("Results: '%s'", data)
@@ -37,3 +39,13 @@ class ResultsPublisher():
             logging.info("Successfully published results to: '%s'", self.url)
 
         return response
+    
+    #
+    # Prepares data ready to publish
+    #
+    def _prepare_data_for_publish(self, message):
+        message_wrapper = MessageWrapper()
+        message_wrapper.set_type_name(message.get_type_name())
+        message_wrapper.set_type_body(message.to_json())
+        data = message_wrapper.to_json()
+        return data
