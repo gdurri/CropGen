@@ -47,7 +47,7 @@ class MessageProcessor():
     # Processes a run message
     #
     async def _process_run_message(self, message):
-        # We are trying to prevent multipl jobs running at the same time. 
+        # We are trying to prevent multiple jobs running at the same time. 
         # Lock our sync object whilst we perform any validation and ultimately
         # submit our new job for processing. 
         # This will prevent any new run job requests slipping through, in the time that
