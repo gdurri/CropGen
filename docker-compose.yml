@@ -6,3 +6,10 @@ services:
     image: crop-gen
     ports:
       - 8000:8000
+    networks:
+      - q-network
+
+networks:
+  q-network:
+    name: custom_qnetwork
+    external: true
