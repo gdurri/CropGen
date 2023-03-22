@@ -39,7 +39,8 @@ class RunJobRequest(Model):
         self.JobType = ''
         self.CGMServerHost = ''
         self.CGMServerPort = 0
-        self.ResultsUrl = ''
+        self.IterationResultsUrl = ''
+        self.FinalResultsUrl = ''
         self.ApsimUrl = ''
         self.Iterations = 0
         self.Individuals = 0
@@ -89,7 +90,8 @@ class RunJobRequest(Model):
             self.JobType = JsonHelper.get_attribute(json_object, 'JobType', errors)
             self.CGMServerHost = JsonHelper.get_attribute(json_object, 'CGMServerHost', errors)
             self.CGMServerPort = JsonHelper.get_attribute(json_object, 'CGMServerPort', errors)
-            self.ResultsUrl = JsonHelper.get_attribute(json_object, 'ResultsUrl', errors)
+            self.IterationResultsUrl = JsonHelper.get_attribute(json_object, 'IterationResultsUrl', errors)
+            self.FinalResultsUrl = JsonHelper.get_attribute(json_object, 'FinalResultsUrl', errors)
             self.ApsimUrl = JsonHelper.get_attribute(json_object, 'ApsimUrl', errors)
             self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
             self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)

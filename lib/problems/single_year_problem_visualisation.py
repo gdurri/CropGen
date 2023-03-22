@@ -67,7 +67,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         )
 
         # Send out the results.
-        self.results_publisher.publish_results(results_message)
+        self.results_publisher.publish_final_results(results_message)
     
     #
     # Iterate over each population and perform calcs.
@@ -127,4 +127,4 @@ class SingleYearProblemVisualisation(ProblemBase):
         self.current_iteration_id += 1
 
         # Send out the results.
-        self.results_publisher.publish_results(results_message)
+        self.results_publisher.publish_iteration_results(results_message)

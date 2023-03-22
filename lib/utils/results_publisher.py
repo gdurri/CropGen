@@ -10,33 +10,55 @@ class ResultsPublisher():
     #
     # Constructor
     #    
-    def __init__(self, url, timeout):
-        self.url = url
+    def __init__(
+        self, 
+        iteration_results_url,
+        final_results_url, 
+        timeout
+    ):
+        self.iteration_results_url = iteration_results_url
+        self.final_results_url = final_results_url
         self.timeout = timeout
 
     #
-    # Convert and publish the results.
+    # Publish the iteration results.
     #
-    def publish_results(self, results):
+    def publish_iteration_results(self, results):
+        return self._publish_results(self.iteration_results_url, results)
+    
+    #
+    # Publish the final results.
+    #
+    def publish_final_results(self, results):
+        return self._publish_results(self.final_results_url, results)
+
+    #
+    # Publish the results.
+    #
+    def _publish_results(self, url, results):
         data = self._prepare_data_for_publish(results)
 
-        logging.info("Publishing results to: '%s'", self.url)
+        logging.info("Publishing results to: '%s'", url)
         logging.debug("Results: '%s'", data)
 
         try:
-            response = requests.post(
-                url=self.url, 
+            response = requests.put(
+                headers={
+                    'Content-type': 'application/json'
+                },
+                url=url, 
                 data=data,
-                timeout=self.timeout
+                timeout=self.timeout,
+                
             )
         except Exception:
             logging.exception("Failed to publish results")
             return None
         
         if not response.ok:
-            logging.error("Failed to publish results to: '%s'. Reason: '%s'", self.url, response.reason)
+            logging.error("Failed to publish results to: '%s'. Reason: '%s'", url, response.reason)
         else:
-            logging.info("Successfully published results to: '%s'", self.url)
+            logging.info("Successfully published results to: '%s'", url)
 
         return response
     

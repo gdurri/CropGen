@@ -23,7 +23,12 @@ class ProblemBase(Problem):
         self.run_errors = []
         self.current_iteration_id = 1
 
-        self.results_publisher = ResultsPublisher(run_job_request.ResultsUrl, config.results_publisher_timeout_seconds)
+        self.results_publisher = ResultsPublisher(
+            run_job_request.IterationResultsUrl,
+            run_job_request.FinalResultsUrl,
+            config.results_publisher_timeout_seconds
+        )
+
         self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
         total_inputs = run_job_request.total_inputs()
