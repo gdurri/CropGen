@@ -30,7 +30,6 @@ class SingleYearProblemVisualisation(ProblemBase):
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised
-        # TODO - Add self.run_job_request.Seed if it has been set...
         minimize_result = minimize(
             problem=self,
             algorithm=algorithm,
@@ -45,26 +44,10 @@ class SingleYearProblemVisualisation(ProblemBase):
         # Now that everything has been evaluated, check for any run errors and only
         # continue if there aren't any.
         if self.run_errors:
-            super().report_run_errors()
+            logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
             return
-        
-        # Variable values for non-dominated Individuals in the last generation
-        minimize_result_x = minimize_result.X
-        # Objective values for non-dominated Individuals in the last generation
-        minimize_result_f = minimize_result.F
 
-        # Everything ran successfully so continue processing and reporting.
-        total = list(zip(
-            minimize_result_x[:, 0], 
-            minimize_result_x[:, 1], 
-            minimize_result_f[:, 0], 
-            minimize_result_f[:, 1]
-        ))
-
-        results_message = FinalResultsMessage(
-            self.run_job_request, 
-            super().construct_data_frame(total, super().get_combined_inputs_outputs())
-        )
+        results_message = FinalResultsMessage(self.run_job_request, minimize_result)
 
         # Send out the results.
         self.results_publisher.publish_final_results(results_message)

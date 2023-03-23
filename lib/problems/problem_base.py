@@ -1,7 +1,6 @@
 from pymoo.core.problem import Problem
 import logging
 import numpy as NumPy
-import pandas as Pandas
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
@@ -83,20 +82,6 @@ class ProblemBase(Problem):
             columns.append(output)
         return columns
     
-    #
-    # Constructs a data frame containing the input and output data
-    # using the input and output columns.
-    #
-    def construct_data_frame(self, data, columns):
-        return Pandas.DataFrame(data, columns=columns)
-
-    #
-    # Report the errors.
-    #
-    def report_run_errors(self):
-        if self.run_errors:
-            logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
-
     #
     # Processes and returns the results, from the APSIM response object.
     #

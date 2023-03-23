@@ -45,13 +45,13 @@ class IterationResultsMessage(Model):
         self.JobID = run_job_request.JobID
         self.TotalIterations = run_job_request.Iterations
         self.IterationID = iteration_id
-        self.Inputs = self.create_inputs(run_job_request.get_input_names(), input_values)
-        self.Outputs = self.create_outputs(run_job_request.get_output_names(), output_values)
+        self.Inputs = self._extract_inputs(run_job_request.get_input_names(), input_values)
+        self.Outputs = self._extract_outputs(run_job_request.get_output_names(), output_values)
 
     #
     # Creates all of the inputs
     #
-    def create_inputs(self, input_names, all_input_values):
+    def _extract_inputs(self, input_names, all_input_values):
         inputs = []
         index = 0
         for name in input_names:
@@ -67,7 +67,7 @@ class IterationResultsMessage(Model):
     #
     # Creates all of the outputs
     #
-    def create_outputs(self, output_names, all_output_values):
+    def _extract_outputs(self, output_names, all_output_values):
         outputs = []
         index = 0
         for name in output_names:
@@ -78,7 +78,7 @@ class IterationResultsMessage(Model):
             outputs.append(Output(name, values, output_values.simulation_id, output_values.simulation_name))
             index += 1
             
-        return outputs        
+        return outputs
 
     #
     # Returns the type name.
