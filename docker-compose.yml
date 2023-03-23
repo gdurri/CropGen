@@ -3,7 +3,7 @@ version: '3'
 services:
   crop-gen-app:
     build: .
-    image: crop-gen
+    image: cropgen
     ports:
       - 32767:32767
     networks:
