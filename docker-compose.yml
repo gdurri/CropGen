@@ -5,7 +5,7 @@ services:
     build: .
     image: crop-gen
     ports:
-      - 8000:8000
+      - 32767:32767
     networks:
       - q-network
 
