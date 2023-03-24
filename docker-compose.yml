@@ -5,7 +5,7 @@ services:
     build: .
     image: cropgen
     ports:
-      - 32767:32767
+      - 27746:27746
     networks:
       - q-network
 
