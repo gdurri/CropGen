@@ -1,8 +1,9 @@
 import threading
+import logging
 
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run_crop_gen_response import RunCropGenResponse
-from lib.models.status_message  import StatusMessage
+from lib.models.status_response  import StatusResponse
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 
@@ -32,6 +33,8 @@ class MessageProcessor():
             return
         
         message_wrapper = read_message_data.message_wrapper
+
+        logging.info("Received '%s' message.", message_wrapper.TypeName)
 
         # It is valid so check how to process it by testing the TypeName
         type_name_lower = message_wrapper.TypeName.lower().strip()
@@ -95,5 +98,5 @@ class MessageProcessor():
     # used to determine whether a job is currently running.
     #
     async def _get_status(self):
-        message = StatusMessage(self.server_state.get_running_job_id())
+        message = Status(self.server_state.get_running_job_id())
         await self.socket_client.write_text_async(message)

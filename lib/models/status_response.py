@@ -3,7 +3,7 @@ from lib.models.model import Model
 #
 # End of run message for signalling that a run has completed.
 #
-class StatusMessage(Model):
+class StatusResponse(Model):
     #
     # Constructor
     #
