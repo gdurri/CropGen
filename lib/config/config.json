@@ -1,14 +1,17 @@
 {
-    "useMockCgmClient": false,
-    "socketServerHost": "localhost",
-    "socketServerHostDocker": "0.0.0.0",
+    "socketServerHost": "localhost",    
     "socketServerPort": 8000,
-    "socketServerPortDocker": 27746,
     "socketDataNumBytesBufferSize": 4,
     "socketDataEndianness": "big",
     "socketDataEncoding": "utf-8",
     "socketTimeoutSeconds": 120.0,
     "socketTimeoutTestConnectionSeconds": 2.0,
     "webServerLogLevel" : "info",
-    "resultsPublisherTimeoutSeconds": 10
+    "resultsPublisherTimeoutSeconds": 10,
+    "dockerOverridesGoHere": "______________________",
+    "socketServerHostDocker": "0.0.0.0",
+    "socketServerPortDocker": 27746,
+    "socketTimeoutSecondsDocker": 180.0,
+    "socketTimeoutTestConnectionSecondsDocker": 5.0,
+    "endOfDockerOverrides": "______________________"
 }
