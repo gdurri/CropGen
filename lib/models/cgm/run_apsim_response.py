@@ -39,11 +39,12 @@ class RunApsimResponse(Model):
 
          results = JsonHelper.get_attribute(json_object, 'Rows', errors)
 
-         # Iterate over all of the results
-         for result in results:
-             apsim_result = ApsimResult()
-             apsim_result.parse_from_json_object(result, errors)
-             apsim_results.append(apsim_result)
+         if results:
+            # Iterate over all of the results
+            for result in results:
+                apsim_result = ApsimResult()
+                apsim_result.parse_from_json_object(result, errors)
+                apsim_results.append(apsim_result)
 
          return apsim_results
     
