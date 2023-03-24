@@ -78,13 +78,15 @@ class MessageProcessor():
     # Runs the job
     #
     def run_job(self, run_job_request, cgm_server_client):
+        try:
+            # We are happy with the message format so ask our run message processor to 
+            # run it.
+            self.run_message_processor.process_run_message(run_job_request, cgm_server_client)
 
-        # We are happy with the message format so ask our run message processor to 
-        # run it.
-        self.run_message_processor.process_run_message(run_job_request, cgm_server_client)
-
-        # Now that we're done, clear the currently running job.
-        self.server_state.clear_running_job_id()
+            # Now that we're done, clear the currently running job.
+            self.server_state.clear_running_job_id()
+        except:
+            logging.exception("Exception - When running JobID: '%s'", run_job_request.JobID)
 
     #
     # Sends a run response message.
@@ -98,5 +100,5 @@ class MessageProcessor():
     # used to determine whether a job is currently running.
     #
     async def _get_status(self):
-        message = Status(self.server_state.get_running_job_id())
+        message = StatusResponse(self.server_state.get_running_job_id())
         await self.socket_client.write_text_async(message)
