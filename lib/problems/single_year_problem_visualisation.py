@@ -90,6 +90,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
+        logging.debug("Received RunApsimResponse: '%s'", response.to_json())
         apsim_outputs = super()._process_apsim_response(response)
         
         if not apsim_outputs:
