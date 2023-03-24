@@ -41,7 +41,6 @@ class Config:
     # Populates itself using the config JSON data.
     #
     def _populate_from_data(self, data):
-        self.reverse_mocked_results = self._get_config_setting(data, 'reverseMockedResults', False)
         self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
         self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
         self.socket_data_num_bytes_buffer_size = self._get_config_setting(data, 'socketDataNumBytesBufferSize', 4)
