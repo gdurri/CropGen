@@ -8,8 +8,8 @@ class StatusResponse(Model):
     # Constructor
     #
     def __init__(self, running_job):
-        self.IsRunningJob = running_job != None
-        self.RunningJob = running_job if running_job else 0
+        self.IsRunningJob = running_job != ''
+        self.RunningJob = running_job
 
     #
     # Returns the type name.
