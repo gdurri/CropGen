@@ -68,7 +68,7 @@ class RunMessageValidator():
     #
     def _validate_no_jobs_are_currently_running(self):
         running_job = self.server_state.get_running_job_id()
-        if running_job != None:
+        if running_job != '':
             self.errors.append(
                 f"{Constants.CROP_GEN_IS_ALREADY_RUNNING_A_JOB}. Running Job: {running_job}."
             )
