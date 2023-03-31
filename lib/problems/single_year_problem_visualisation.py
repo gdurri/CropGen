@@ -96,11 +96,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         if not apsim_outputs:
             return False
         
-        raw_outputs = []
-        for apsim_output in apsim_outputs:
-            raw_outputs.append(apsim_output.outputs)
-
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(raw_outputs)
+        super()._populate_outputs_for_algorithm(apsim_outputs, out_objective_values)
         
         results_message = IterationResultsMessage(
             self.run_job_request, self.current_iteration_id,

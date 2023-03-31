@@ -55,10 +55,23 @@ class FinalResultsMessage(Model):
         for output in job_request_outputs:
             results = []
             for result in minimize_result_f[:, id]:
-                results.append(result)
+                results.append(FinalResultsMessage.prepare_output_as_result(output, result))
             outputs.append(InputOutput(output.Name, results))
             id += 1
         return outputs
+    
+    #
+    # We can't use the result "as is". We need to firstly, check whether 
+    # we were maximising it. If we were, then we had to make it negative
+    # as that's the way that the minimise algo works. Then we need to apply
+    # the multiplier so that it is respecting the requested multiplier.
+    #
+    @staticmethod
+    def prepare_output_as_result(output, result):
+        if output.Maximise:
+            result = abs(result)
+        result = result * output.Multiplier
+        return result
 
     #
     # Returns the type name.

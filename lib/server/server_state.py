@@ -33,7 +33,7 @@ class ServerState():
     # Set the running job.
     #
     def set_running_job_id(self, job_id):
-        logging.info("Setting running job: %s", job_id)
+        logging.info("Setting running job: '%s'", job_id)
         with self.lock:
             self.running_job = job_id
 
@@ -41,5 +41,5 @@ class ServerState():
     # Clears the running job.
     #
     def clear_running_job_id(self):
-        logging.info("Clearing the current running job: %s", self.running_job)
+        logging.info("Clearing the current running job: '%s'", self.running_job)
         self.set_running_job_id('')

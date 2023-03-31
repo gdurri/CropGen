@@ -4,7 +4,7 @@ import numpy as NumPy
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.problems.apsim_output import ApsimOutput
+from lib.problems.apsim_output import ApsimOutput, OutputValue
 from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 
@@ -128,15 +128,25 @@ class ProblemBase(Problem):
         apsim_output.simulation_name = apsim_result.SimulationName
         
         for output_index in range(0, actual_outputs_length):
-            output = apsim_result.Values[output_index]
-            multiplier = self.run_job_request.Outputs[output_index].Multiplier
-            apsim_output_with_multiplier_applied = output * multiplier
-            apsim_output.outputs.append(apsim_output_with_multiplier_applied)
-
-            logging.debug("ApsimOutput: %f. Applying multiplier: %d. New value: %f",
-                output,
-                multiplier,
-                apsim_output_with_multiplier_applied
+            raw_apsim_output = apsim_result.Values[output_index]
+            request_output = self.run_job_request.Outputs[output_index]
+            apsim_output.outputs.append(
+                OutputValue(raw_apsim_output, request_output.Maximise, request_output.Multiplier)
             )
 
         return apsim_output
+
+    #
+    # Populates the outputs used by the algorithm.
+    #
+    def _populate_outputs_for_algorithm(self, apsim_outputs, out_objective_values):
+        
+        algorithm_outputs = []
+        for apsim_output in apsim_outputs:
+            outputs_for_algorithm = []
+            for output_value in apsim_output.outputs:
+                outputs_for_algorithm.append(output_value.get_output_value_for_algorithm())
+
+            algorithm_outputs.append(outputs_for_algorithm)
+
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(algorithm_outputs)

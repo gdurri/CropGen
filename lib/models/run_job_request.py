@@ -23,8 +23,9 @@ class Output(Model):
     #
     # Constructor
     #
-    def __init__(self, name, multiplier):        
+    def __init__(self, name, maximise, multiplier):        
         self.Name = name
+        self.Maximise = maximise
         self.Multiplier = multiplier
 
 #
@@ -132,10 +133,12 @@ class RunJobRequest(Model):
         outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
         for output_value in outputs:
             name = JsonHelper.get_attribute(output_value, 'Name', errors)
-            multiplier = JsonHelper.get_attribute(output_value, 'Multiplier', errors, 1)
+            maximise = JsonHelper.get_non_mandatory_attribute(output_value, 'Maximise', False)
+            multiplier = JsonHelper.get_non_mandatory_attribute(output_value, 'Multiplier', 1)
 
             parsed_outputs.append(Output(
                 name, 
+                maximise,
                 multiplier
             ))
             

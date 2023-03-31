@@ -9,7 +9,7 @@
     "webServerLogLevel" : "info",
     "resultsPublisherTimeoutSeconds": 10,
     
-    "dockerOverridesGoHere": "______________________",
+    "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",
     "socketServerPortDocker": 27746,
     "socketTimeoutSecondsDocker": 180.0,

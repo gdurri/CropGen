@@ -73,7 +73,7 @@ class IterationResultsMessage(Model):
         for name in output_names:
             values = []
             for output_values in all_output_values:
-                values.append(output_values.outputs[index])
+                values.append(output_values.outputs[index].get_output_value_for_results())
 
             outputs.append(Output(name, values, output_values.simulation_id, output_values.simulation_name))
             index += 1
