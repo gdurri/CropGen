@@ -3,8 +3,8 @@ import logging
 import numpy as NumPy
 
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.models.iteration_results_message import IterationResultsMessage
-from lib.models.final_results_message import FinalResultsMessage
+from lib.models.rest.iteration_results_message import IterationResultsMessage
+from lib.models.rest.final_results_message import FinalResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
 from lib.utils.algorithm_generator import AlgorithmGenerator
