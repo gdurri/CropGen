@@ -11,9 +11,9 @@ from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
 #
-# Represents a Single Year Problem
+# Represents a Problem Visualisation
 #
-class SingleYearProblemVisualisation(ProblemBase):
+class ProblemVisualisation(ProblemBase):
 
     #
     # Construct problem with the given dimensions and variable ranges
@@ -93,8 +93,7 @@ class SingleYearProblemVisualisation(ProblemBase):
         logging.debug("Received RunApsimResponse: '%s'", response.to_json())
         apsim_outputs = super()._process_apsim_response(response)
         
-        if not apsim_outputs:
-            return False
+        if not apsim_outputs: return False
         
         super()._populate_outputs_for_algorithm(apsim_outputs, out_objective_values)
         

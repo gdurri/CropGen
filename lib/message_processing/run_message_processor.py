@@ -1,7 +1,7 @@
 import logging
 
 from lib.models.cgm.init_workers import InitWorkers
-from lib.problems.problem_factory import ProblemFactory
+from lib.problems.problem_visualisation import ProblemVisualisation
 from lib.utils.date_time_helper import DateTimeHelper
 
 
@@ -25,8 +25,7 @@ class RunMessageProcessor():
             logging.error("Failed to initialise CGM server. Run message will not be processed.")
             return
 
-        # Next step is to try and create a "Problem" using the job type.
-        problem = ProblemFactory.create(self.config, run_job_request)
+        problem = ProblemVisualisation(self.config, run_job_request)
         
         # Now run the problem code.
         problem.run()

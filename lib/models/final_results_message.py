@@ -21,7 +21,6 @@ class FinalResultsMessage(Model):
     #
     def __init__(self, run_job_request, minimise_result):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
-        self.JobType = run_job_request.JobType
         self.JobID = run_job_request.JobID
         self.Inputs = self._extract_inputs(run_job_request.Inputs, minimise_result)
         self.Outputs = self._extract_outputs(run_job_request.Outputs, minimise_result)
@@ -56,7 +55,7 @@ class FinalResultsMessage(Model):
             results = []
             for result in minimize_result_f[:, id]:
                 results.append(FinalResultsMessage.prepare_output_as_result(output, result))
-            outputs.append(InputOutput(output.Name, results))
+            outputs.append(InputOutput(output.ApsimOutputName, results))
             id += 1
         return outputs
     

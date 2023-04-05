@@ -41,12 +41,11 @@ class IterationResultsMessage(Model):
             output_values
     ):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
-        self.JobType = run_job_request.JobType
         self.JobID = run_job_request.JobID
         self.TotalIterations = run_job_request.Iterations
         self.IterationID = iteration_id
         self.Inputs = self._extract_inputs(run_job_request.get_input_names(), input_values)
-        self.Outputs = self._extract_outputs(run_job_request.get_output_names(), output_values)
+        self.Outputs = self._extract_outputs(run_job_request.get_display_output_names(), output_values)
 
     #
     # Creates all of the inputs

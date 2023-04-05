@@ -45,4 +45,4 @@ a remote (Linux) VM.
 test
 test2
 
-To test the socket API you can use the SocketTestApp: https://github.com/QAAFI/SocketTest. This provides a default JSON file that can be used to run the SingleYear job. CropGen is designed to talk to the CGMServer (https://github.com/QAAFI/CGMServer) which in turn will run APSIM. If you want to run without APSIM you can also download and run the cgm_server_test_harness (https://github.com/QAAFI/cgm_server_test_harness). This provides a similar config file to CropGen which shows the port it will listen on by default etc.
+To test the socket API you can use the SocketTestApp: https://github.com/QAAFI/SocketTest. This provides a default JSON file that can be used to run the algorithm. CropGen is designed to talk to the CGMServer (https://github.com/QAAFI/CGMServer) which will in turn, run APSIM. If you want to run without APSIM you can also download and run the cgm_server_test_harness (https://github.com/QAAFI/cgm_server_test_harness). This provides a similar config file to CropGen.

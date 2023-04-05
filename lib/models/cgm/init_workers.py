@@ -12,7 +12,7 @@ class InitWorkers(Model):
         self.JobID = run_job_request.JobID
         self.Url = run_job_request.ApsimUrl
         self.InputTraits = run_job_request.get_input_names()
-        self.Outputs = run_job_request.get_output_names()
+        self.Outputs = run_job_request.get_apsim_output_names()
 
     #
     # Returns the type name.

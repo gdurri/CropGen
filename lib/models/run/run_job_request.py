@@ -2,31 +2,9 @@ from json.decoder import JSONDecodeError
 import json
 
 from lib.models.model import Model
+from lib.models.run.input import Input
+from lib.models.run.output import Output
 from lib.utils.json_helper import JsonHelper
-
-#
-# Represents the input
-#
-class Input(Model):
-    #
-    # Constructor
-    #
-    def __init__(self, name, min, max):        
-        self.Name = name
-        self.Min = min
-        self.Max = max
-
-#
-# Represents the output
-#
-class Output(Model):
-    #
-    # Constructor
-    #
-    def __init__(self, name, maximise, multiplier):        
-        self.Name = name
-        self.Maximise = maximise
-        self.Multiplier = multiplier
 
 #
 # Model that represents a run job request sent from the jobs server
@@ -37,7 +15,6 @@ class RunJobRequest(Model):
     #
     def __init__(self):
         self.JobID = ''
-        self.JobType = ''
         self.CGMServerHost = ''
         self.CGMServerPort = 0
         self.IterationResultsUrl = ''
@@ -59,7 +36,16 @@ class RunJobRequest(Model):
     # Simple helper for getting the total number of outputs defined
     #
     def total_outputs(self):
-        return len(self.Outputs)
+        total_outputs = 0
+        for output in self.Outputs:
+            total_aggregate_functions = len(output.AggregateFunctions)
+            # Aggregate functions essentially expand out the amount of outputs
+            # that we are handling.
+            if total_aggregate_functions > 0:
+                total_outputs += total_aggregate_functions
+            else:
+                total_outputs += 1
+        return total_outputs
     
     #
     # Extract the input names from the array of input objects.
@@ -71,12 +57,22 @@ class RunJobRequest(Model):
         return input_names
     
     #
-    # Extract the output names from the array of output objects.
+    # Extract the APSIM output names from the array of output objects.
     #
-    def get_output_names(self):
+    def get_apsim_output_names(self):
         output_names = []
         for output in self.Outputs:
-            output_names.append(output.Name)
+            output_names.append(output.ApsimOutputName)
+        return output_names
+    
+    #
+    # Extract the display output names from the array of output objects.
+    #
+    def get_display_output_names(self):
+        output_names = []
+        for output in self.Outputs:
+            for aggregate_function in output.AggregateFunctions:
+                output_names.append(aggregate_function.DisplayName)
         return output_names
 
     #
@@ -88,7 +84,6 @@ class RunJobRequest(Model):
         try:
             json_object = json.loads(message)
             self.JobID = JsonHelper.get_attribute(json_object, 'JobID', errors)
-            self.JobType = JsonHelper.get_attribute(json_object, 'JobType', errors)
             self.CGMServerHost = JsonHelper.get_attribute(json_object, 'CGMServerHost', errors)
             self.CGMServerPort = JsonHelper.get_attribute(json_object, 'CGMServerPort', errors)
             self.IterationResultsUrl = JsonHelper.get_attribute(json_object, 'IterationResultsUrl', errors)
@@ -97,53 +92,13 @@ class RunJobRequest(Model):
             self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
             self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
             self.Seed = JsonHelper.get_non_mandatory_attribute(json_object, 'Seed', None)
-            self.Inputs = RunJobRequest.parse_inputs(json_object, errors)
-            self.Outputs = RunJobRequest.parse_outputs(json_object, errors)
+            self.Inputs = Input.parse_inputs(json_object, errors)
+            self.Outputs = Output.parse_outputs(json_object, errors)
         except JSONDecodeError as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 
         return errors
     
-    #
-    # Parses the inputs
-    #
-    @staticmethod
-    def parse_inputs(json_object, errors):
-        parsed_outputs = [] 
-        inputs = JsonHelper.get_attribute(json_object, 'Inputs', errors)
-        for output_value in inputs:
-            name = JsonHelper.get_attribute(output_value, 'Name', errors)
-            min = JsonHelper.get_attribute(output_value, 'Min', errors)
-            max = JsonHelper.get_attribute(output_value, 'Max', errors)
-
-            parsed_outputs.append(Input(
-                name, 
-                min,
-                max
-            ))
-            
-        return parsed_outputs
-
-    #
-    # Parses the outputs
-    #
-    @staticmethod
-    def parse_outputs(json_object, errors):
-        parsed_outputs = [] 
-        outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
-        for output_value in outputs:
-            name = JsonHelper.get_attribute(output_value, 'Name', errors)
-            maximise = JsonHelper.get_non_mandatory_attribute(output_value, 'Maximise', False)
-            multiplier = JsonHelper.get_non_mandatory_attribute(output_value, 'Multiplier', 1)
-
-            parsed_outputs.append(Output(
-                name, 
-                maximise,
-                multiplier
-            ))
-            
-        return parsed_outputs
-
     #
     # Returns the type name.
     #

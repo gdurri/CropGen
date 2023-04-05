@@ -1,5 +1,5 @@
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
-from lib.models.run_job_request import RunJobRequest
+from lib.models.run.run_job_request import RunJobRequest
 from lib.utils.constants import Constants
 
 #
@@ -86,12 +86,6 @@ class RunMessageValidator():
             self.errors.extend(run_job_errors)
             return False
         
-        job_type = self.run_job_request.JobType
-
-        if not self._validate_job_type(job_type):
-            self.errors.append(f"{Constants.UNKNOWN_JOB_TYPE}: '{job_type}'.")
-            return False
-        
         self.cgm_server_client = CGMClientFactory.create(
             self.run_job_request.CGMServerHost, 
             self.run_job_request.CGMServerPort,
@@ -99,14 +93,6 @@ class RunMessageValidator():
         )
 
         return True
-    
-    #
-    # Determines whether this is a job type
-    #
-    def _validate_job_type(self, job_type):
-        if job_type.lower().strip() == Constants.SOCKET_MESSAGE_JOB_TYPE_SINGLE_YEAR:
-            return True
-        return False
 
     #
     # Tests the connection to the CGM server

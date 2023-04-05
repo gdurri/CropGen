@@ -2,7 +2,7 @@ import threading
 import logging
 
 from lib.message_processing.run_message_processor import RunMessageProcessor
-from lib.models.run_crop_gen_response import RunCropGenResponse
+from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status_response  import StatusResponse
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator

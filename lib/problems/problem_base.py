@@ -4,7 +4,8 @@ import numpy as NumPy
 
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.relay_apsim import RelayApsim
-from lib.problems.apsim_output import ApsimOutput, OutputValue
+from lib.problems.apsim_output import ApsimOutput
+from lib.problems.output_value import OutputValue
 from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 
@@ -78,7 +79,7 @@ class ProblemBase(Problem):
         columns = []
         for input in self.run_job_request.get_input_names():
             columns.append(input)
-        for output in self.run_job_request.get_output_names():
+        for output in self.run_job_request.get_apsim_output_names():
             columns.append(output)
         return columns
     
@@ -123,15 +124,13 @@ class ProblemBase(Problem):
             self.run_errors.append(f'{Constants.APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED}. Expected: {expected_outputs_length} Actual: {actual_outputs_length}')
             return None
         
-        apsim_output = ApsimOutput()
-        apsim_output.simulation_id = apsim_result.SimulationID
-        apsim_output.simulation_name = apsim_result.SimulationName
+        apsim_output = ApsimOutput(apsim_result.SimulationID, apsim_result.SimulationName)
         
         for output_index in range(0, actual_outputs_length):
             raw_apsim_output = apsim_result.Values[output_index]
             request_output = self.run_job_request.Outputs[output_index]
             apsim_output.outputs.append(
-                OutputValue(raw_apsim_output, request_output.Maximise, request_output.Multiplier)
+                OutputValue(raw_apsim_output, request_output)
             )
 
         return apsim_output
@@ -142,11 +141,20 @@ class ProblemBase(Problem):
     def _populate_outputs_for_algorithm(self, apsim_outputs, out_objective_values):
         
         algorithm_outputs = []
+
+        # Apsim Outputs will contain an output for each individual that CropGen sent to it.
+        # For example, if CropGen was supplied 5 individuals then Apsim Output will contain 
+        # 5 entries. Each entry will contain an array of outputs. This array will be sized
+        # based upon amount of outputs that were passed into the run job.
         for apsim_output in apsim_outputs:
             outputs_for_algorithm = []
+            # Iterate over all of the outputs for this specific individual.
             for output_value in apsim_output.outputs:
+                # Does this output relate to an output that contains aggregate functions?
+                aggregate_functions = output_value.output.AggregateFunctions
                 outputs_for_algorithm.append(output_value.get_output_value_for_algorithm())
 
             algorithm_outputs.append(outputs_for_algorithm)
 
+        # Feed the results back into the algorithm so that it can continue advancing...
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(algorithm_outputs)
