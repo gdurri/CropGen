@@ -126,7 +126,10 @@ class ProblemVisualisation(ProblemBase):
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)   
 
         # Populate the iteration results with the outputs from each individual.
-        iteration_results_message.add_outputs(all_results_outputs)
+        iteration_results_message.add_outputs(
+            self.run_job_request.get_display_output_names(),
+            all_results_outputs
+        )
 
         # Send out the results.
         self.results_publisher.publish_iteration_results(iteration_results_message)
