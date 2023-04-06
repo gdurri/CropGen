@@ -27,8 +27,8 @@ class ProblemBase(Problem):
 
         self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
-        total_inputs = run_job_request.total_inputs()
-        total_outputs = run_job_request.total_outputs()
+        total_inputs = run_job_request.get_total_inputs()
+        total_outputs = run_job_request.get_total_outputs()
         lower_bounds = self._construct_input_lower_bounds()
         upper_bounds = self._construct_input_upper_bounds()
 

@@ -14,6 +14,15 @@ class AggregateFunction(Model):
         self.Multiplier = multiplier
         self.CalcType = calc_type
         self.Params = params
+        
+    #
+    # Get the param in the specified index, or None if it doesn't exist
+    #
+    def get_param_by_index(self, index):
+        param = None
+        if len(self.Params) > index:
+            return self.Params[index]
+        return param
 
     #
     # Parses the aggregate functions.
@@ -26,10 +35,10 @@ class AggregateFunction(Model):
 
         parsed_calc_functions = [] 
         for aggregate_function in aggregate_functions:
-            display_name = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'DisplayName', '')
+            display_name = JsonHelper.get_attribute(aggregate_function, 'DisplayName', errors)
             maximise = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'Maximise', False)
             multiplier = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'Multiplier', 1)
-            calc_type = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'CalcType', '')
+            calc_type = JsonHelper.get_attribute(aggregate_function, 'CalcType', errors)
             params = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'Params', [])
 
             parsed_calc_functions.append(AggregateFunction(

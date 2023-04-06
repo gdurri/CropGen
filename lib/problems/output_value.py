@@ -21,6 +21,15 @@ class OutputValue():
         return self.raw_apsim_output
     
     #
+    # Gets the output value from the algorithm.
+    #
+    def get_output_value_from_algorithm(self):
+        result = self.raw_apsim_output
+        if self.output.Maximise:
+            result = abs(self.raw_apsim_output)
+        return result * self.output.Multiplier
+    
+    #
     # Gets the output value for use in results.
     #
     def get_output_value_for_results(self):

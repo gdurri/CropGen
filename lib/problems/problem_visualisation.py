@@ -7,7 +7,6 @@ from lib.models.rest.iteration_results_message import IterationResultsMessage
 from lib.models.rest.final_results_message import FinalResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
-from lib.problems.apsim_output import ApsimOutput
 from lib.problems.single_year_results_processor import SingleYearResultsProcessor
 from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
 from lib.utils.algorithm_generator import AlgorithmGenerator
@@ -143,7 +142,7 @@ class ProblemVisualisation(ProblemBase):
     #
     def _initialise_algorithm_array(self, out_objective_values):
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
-            [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
+            [self.run_job_request.Individuals, self.run_job_request.get_total_inputs()]
         )     
 
     #

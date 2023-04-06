@@ -29,13 +29,13 @@ class RunJobRequest(Model):
     #
     # Simple helper for getting the total number of Inputs defined
     #
-    def total_inputs(self):
+    def get_total_inputs(self):
         return len(self.Inputs)
 
     #
     # Simple helper for getting the total number of outputs defined
     #
-    def total_outputs(self):
+    def get_total_outputs(self):
         total_outputs = 0
         for output in self.Outputs:
             total_aggregate_functions = len(output.AggregateFunctions)
