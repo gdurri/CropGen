@@ -48,6 +48,15 @@ class RunJobRequest(Model):
         return total_outputs
     
     #
+    # Get the output in the specified index, or None if it doesn't exist
+    #
+    def get_output_by_index(self, index):
+        output = None
+        if len(self.Outputs) > index:
+            return self.Outputs[index]
+        return output
+    
+    #
     # Extract the input names from the array of input objects.
     #
     def get_input_names(self):
@@ -71,8 +80,11 @@ class RunJobRequest(Model):
     def get_display_output_names(self):
         output_names = []
         for output in self.Outputs:
-            for aggregate_function in output.AggregateFunctions:
-                output_names.append(aggregate_function.DisplayName)
+            if output.AggregateFunctions:
+                for aggregate_function in output.AggregateFunctions:
+                    output_names.append(aggregate_function.DisplayName)
+            else:
+                output_names.append(output.ApsimOutputName)
         return output_names
 
     #

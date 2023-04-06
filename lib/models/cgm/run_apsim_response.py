@@ -52,11 +52,12 @@ class RunApsimResponse(Model):
     # Searches for an APSIM result for the given individual, or returns None
     # if no APSIM result can be found for that individual.
     #
-    def get_apsim_result_for_individual(self, individual):
-        for apsim_result in self.Rows:
-            if apsim_result.ID == individual:
-              return apsim_result
-        return None
+    def get_apsim_results_for_individual(self, individual):
+        apsim_results = []
+        for row in self.Rows:
+            if row.ID == individual:
+              apsim_results.append(row)
+        return apsim_results
 
     #
     # Returns the type name.

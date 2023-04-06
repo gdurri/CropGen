@@ -7,6 +7,12 @@ class OutputValue():
         self.output = output
 
     #
+    # Gets the name of the output.
+    #
+    def get_output_name(self):
+        return self.output.ApsimOutputName
+
+    #
     # Gets the output value for use in the minimise algorithm.
     #
     def get_output_value_for_algorithm(self):

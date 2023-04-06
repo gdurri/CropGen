@@ -7,6 +7,9 @@ from lib.models.rest.iteration_results_message import IterationResultsMessage
 from lib.models.rest.final_results_message import FinalResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
+from lib.problems.apsim_output import ApsimOutput
+from lib.problems.single_year_results_processor import SingleYearResultsProcessor
+from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
@@ -20,7 +23,7 @@ class ProblemVisualisation(ProblemBase):
     #
     def __init__(self, config, run_job_request):
         super().__init__(config, run_job_request)
-    
+
     #
     # Invokes the running of the problem.
     #
@@ -34,7 +37,7 @@ class ProblemVisualisation(ProblemBase):
             problem=self,
             algorithm=algorithm,
             termination=(
-                Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS, 
+                Constants.MINIMIZE_CONSTRAINT_NUMBER_OF_GENERATIONS,
                 self.run_job_request.Iterations
             ),
             save_history=True,
@@ -51,7 +54,7 @@ class ProblemVisualisation(ProblemBase):
 
         # Send out the results.
         self.results_publisher.publish_final_results(results_message)
-    
+
     #
     # Iterate over each population and perform calcs.
     #
@@ -76,34 +79,84 @@ class ProblemVisualisation(ProblemBase):
         out_objective_values,
         variable_values_for_population
     ):
-        # Initialise the out array to satisfy the algorithm.
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
-            [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
+        self._initialise_algorithm_array(out_objective_values)
+
+        response = self._call_relay_apsim(relay_apsim_request)
+        if not response: return False
+
+        # Populate the iteration message with all of the data that we currently have.
+        iteration_results_message = IterationResultsMessage(
+            self.run_job_request, 
+            self.current_iteration_id,
+            variable_values_for_population
         )
 
-        read_message_data = self.cgm_server_client.call_cgm(relay_apsim_request)
-        errors = self.cgm_server_client.validate_cgm_call(read_message_data)
+        all_algorithm_outputs = []
+        all_results_outputs = []
 
-        if errors:
-            self.run_errors = errors
-            return False
-        
-        response = RunApsimResponse()
-        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        logging.debug("Received RunApsimResponse: '%s'", response.to_json())
-        apsim_outputs = super()._process_apsim_response(response)
-        
-        if not apsim_outputs: return False
-        
-        super()._populate_outputs_for_algorithm(apsim_outputs, out_objective_values)
-        
-        results_message = IterationResultsMessage(
-            self.run_job_request, self.current_iteration_id,
-            variable_values_for_population, apsim_outputs
-        )
+        # Iterate over all of the individuals.
+        for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
+
+            logging.info("Processing APSIM result for individual (%d of %d)", individual, self.run_job_request.Individuals)
+            results_for_individual = response.get_apsim_results_for_individual(individual)
+
+            # This shouldn't happen, but just in case..
+            if not results_for_individual:
+                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
+                return False
+
+            is_single_year_sim = len(results_for_individual) == 1
+
+            if is_single_year_sim:
+                SingleYearResultsProcessor.process_results(
+                    self.run_job_request,
+                    results_for_individual,
+                    all_algorithm_outputs,
+                    all_results_outputs
+                )
+            else:
+                MultiYearResultsProcessor.process_results(
+                    self.run_job_request,
+                    results_for_individual,
+                    all_algorithm_outputs,
+                    all_results_outputs
+                )
+
+        # Feed the results back into the algorithm so that it can continue advancing...
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)   
+
+        # Populate the iteration results with the outputs from each individual.
+        iteration_results_message.add_outputs(all_results_outputs)
+
+        # Send out the results.
+        self.results_publisher.publish_iteration_results(iteration_results_message)
 
         # Increment our iteration ID.
         self.current_iteration_id += 1
 
-        # Send out the results.
-        self.results_publisher.publish_iteration_results(results_message)
+    #
+    # This initialises the out array that has to be populated as part of the
+    # minimise algorithm.
+    #
+    def _initialise_algorithm_array(self, out_objective_values):
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+            [self.run_job_request.Individuals, self.run_job_request.total_inputs()]
+        )     
+
+    #
+    # Call APSIM and return the APSIM Response.
+    #
+    def _call_relay_apsim(self, relay_apsim_request):
+        # Call CGM which will in turn call APSIM.
+        read_message_data = self.cgm_server_client.call_cgm(relay_apsim_request)
+        self.run_errors = self.cgm_server_client.validate_cgm_call(read_message_data)
+
+        # If there were any errors then bail out (these errors are logged later on.)
+        if self.run_errors: return None
+
+        # Convert the raw socket data into a RunApsimResponse object.
+        response = RunApsimResponse()
+        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
+        logging.debug("Received RunApsimResponse: '%s'", response.to_json())
+
+        return response
