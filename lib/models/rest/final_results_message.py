@@ -20,11 +20,11 @@ class FinalResultsMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, run_job_request, minimise_result):
+    def __init__(self, run_job_request, minimise_result, is_multi_year):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
         self.JobID = run_job_request.JobID
         self.Inputs = self._extract_inputs(run_job_request.Inputs, minimise_result)
-        self.Outputs = self._extract_outputs(run_job_request.Outputs, minimise_result)
+        self.Outputs = self._extract_outputs(run_job_request.Outputs, minimise_result, is_multi_year)
 
     # Extracts all of the inputs from the minimise result
     #
@@ -46,7 +46,7 @@ class FinalResultsMessage(Model):
     #
     # Extracts all of the outputs from the minimise result
     #    
-    def _extract_outputs(self, job_request_outputs, minimize_result):
+    def _extract_outputs(self, job_request_outputs, minimize_result, is_multi_year):
         # Objective values for non-dominated Individuals in the last generation
         minimize_result_f = minimize_result.F
         
@@ -55,7 +55,12 @@ class FinalResultsMessage(Model):
         for output in job_request_outputs:
             results = []
             for result in minimize_result_f[:, id]:
-                output_value = OutputValue(result, output)
+                output_value = OutputValue(
+                    result, 
+                    output.ApsimOutputName, 
+                    output.Maximise, 
+                    output.Multiplier
+                )
                 results.append(output_value.get_output_value_from_algorithm())
             outputs.append(InputOutput(output.ApsimOutputName, results))
             id += 1

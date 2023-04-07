@@ -49,7 +49,11 @@ class ProblemVisualisation(ProblemBase):
             logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
             return
 
-        results_message = FinalResultsMessage(self.run_job_request, minimize_result)
+        results_message = FinalResultsMessage(
+            self.run_job_request, 
+            minimize_result,
+            self.is_multi_year
+        )
 
         # Send out the results.
         self.results_publisher.publish_final_results(results_message)
@@ -65,7 +69,7 @@ class ProblemVisualisation(ProblemBase):
 
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
-
+        
     #
     # Evaluate fitness of the Individuals in the population
     # Parameters:
@@ -104,17 +108,17 @@ class ProblemVisualisation(ProblemBase):
                 self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
                 return False
 
-            is_single_year_sim = len(results_for_individual) == 1
+            self.is_multi_year = len(results_for_individual) > 1
 
-            if is_single_year_sim:
-                SingleYearResultsProcessor.process_results(
+            if self.is_multi_year:
+                MultiYearResultsProcessor.process_results(
                     self.run_job_request,
                     results_for_individual,
                     all_algorithm_outputs,
                     all_results_outputs
                 )
             else:
-                MultiYearResultsProcessor.process_results(
+                SingleYearResultsProcessor.process_results(
                     self.run_job_request,
                     results_for_individual,
                     all_algorithm_outputs,

@@ -28,7 +28,13 @@ class SingleYearResultsProcessor():
             raw_apsim_output = apsim_result.Values[output_index]
             request_output = run_job_request.get_output_by_index(output_index)
             if not request_output: continue
-            output_value = OutputValue(raw_apsim_output, request_output)
+
+            output_value = OutputValue(
+                raw_apsim_output, 
+                request_output.ApsimOutputName, 
+                request_output.Maximise, 
+                request_output.Multiplier
+            )
             algorithm_outputs.append(output_value.get_output_value_for_algorithm())
             apsim_output.outputs.append(output_value)
 
