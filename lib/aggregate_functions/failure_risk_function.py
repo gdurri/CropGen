@@ -63,14 +63,3 @@ class FailureRiskFunction:
             if result_value == value:
                 return True
         return False
-
-    #
-    # Calculate the mean.
-    #
-    def _calculate_mean(self, results_for_individual):
-        display_name = aggregate_function.DisplayName
-        maximise = aggregate_function.Maximise
-        multiplier = aggregate_function.Multiplier
-        calc_type = aggregate_function.CalcType
-        params = aggregate_function.Params
-        return None

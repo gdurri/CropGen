@@ -1,5 +1,4 @@
 from lib.utils.constants import Constants
-from lib.problems.apsim_output import ApsimOutput
 from lib.aggregate_functions.failure_risk_function import FailureRiskFunction
 from lib.aggregate_functions.mean_function import MeanFunction
 
@@ -24,6 +23,6 @@ class AggregateFunctionCalculator:
         if calc_type == Constants.TYPE_FAILURE_RISK:
             output_value = FailureRiskFunction.calculate(self.aggregate_function, results_for_individual)
         elif calc_type == Constants.TYPE_MEAN:
-            output_value = MeanFunction.calculate(self.aggregate_function, results_for_individual)
+            output_value = MeanFunction.calculate(results_for_individual)
 
         return output_value

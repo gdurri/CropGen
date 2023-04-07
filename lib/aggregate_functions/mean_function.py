@@ -6,7 +6,7 @@ class MeanFunction:
     # Calculate the failure risk.
     #
     @staticmethod
-    def calculate(aggregate_function, results_for_individual):
+    def calculate(results_for_individual):
 
         # Need to calculate the sum of our data set that is within the specified value.
         total = 0

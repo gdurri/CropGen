@@ -82,11 +82,11 @@ class MessageProcessor():
             # We are happy with the message format so ask our run message processor to 
             # run it.
             self.run_message_processor.process_run_message(run_job_request, cgm_server_client)
-
-            # Now that we're done, clear the currently running job.
-            self.server_state.clear_running_job_id()
         except:
             logging.exception("Exception - When running JobID: '%s'", run_job_request.JobID)
+        finally:
+            # Now that we're done, clear the currently running job.
+            self.server_state.clear_running_job_id()
 
     #
     # Sends a run response message.
