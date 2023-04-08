@@ -22,11 +22,14 @@ class CGMClient:
     #
     def test_cgm_connection(self):
         try:
+            logging.info("Testing CGM Connection")
             socket_client = SocketClient(self.config)
             socket_client.set_timeout(self.config.socket_timeout_test_connection_seconds)
             socket_client.connect(self.host, self.port)
         except Exception:
+            logging.error("CGM Connection NOT OK")
             return False
+        logging.info("CGM Connection OK")
         return True
     
     #
@@ -36,13 +39,16 @@ class CGMClient:
     def call_cgm(self, message):
         errors = []
         try:
-            logging.debug("Calling CGM with message: %s", message.to_json())
+            logging.info("Calling CGM with message: '%s'", message.get_type_name())
+            logging.debug("Message data: %s", message.to_json())
 
             socket_client = SocketClient(self.config)
             socket_client.connect(self.host, self.port)
             socket_client.write_text(message)
             socket_client.set_timeout(self.config.socket_timeout_seconds)
-            return socket_client.read_text()
+            data =  socket_client.read_text()
+            logging.debug("Received response from: %s request", message.get_type_name())
+            return data
         except Exception as exception:
             error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
             logging.error(error)

@@ -1,3 +1,5 @@
+import logging
+
 from lib.socket.socket_client_base import SocketClientBase
 from lib.models.error_message import ErrorMessage
 
@@ -41,6 +43,7 @@ class SocketClientAsync (SocketClientBase):
         # Convert it to an integer and then use this to read the message itself
         # with the known size.
         message_size_bytes = int.from_bytes(message_size_byte_array, self.config.socket_data_endianness)
+        logging.info("%s - Received message size: '%d' bytes", __class__.__name__, message_size_bytes)
         message_data = await self.reader.readexactly(message_size_bytes)
-
+        logging.debug("Socket data message received")
         return super().create_message_wrapper(message_data)

@@ -52,7 +52,8 @@ class ProblemVisualisation(ProblemBase):
         results_message = FinalResultsMessage(
             self.run_job_request, 
             minimize_result,
-            self.is_multi_year
+            self.is_multi_year,
+            self.processed_aggregated_outputs
         )
 
         # Send out the results.
@@ -62,7 +63,7 @@ class ProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
-        logging.info("Handling evaluation with %d values.", len(variable_values_for_population))
+        logging.info("Handling evaluation with %d individuals.", len(variable_values_for_population))
 
         if self.run_errors:
             return
@@ -100,7 +101,9 @@ class ProblemVisualisation(ProblemBase):
         # Iterate over all of the individuals.
         for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
 
-            logging.info("Processing APSIM result for individual (%d of %d)", individual, self.run_job_request.Individuals)
+            first_iteration_and_first_individual = self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX
+
+            logging.info("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
             results_for_individual = response.get_apsim_results_for_individual(individual)
 
             # This shouldn't happen, but just in case..
@@ -108,10 +111,12 @@ class ProblemVisualisation(ProblemBase):
                 self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
                 return False
 
-            self.is_multi_year = len(results_for_individual) > 1
+            # The first time through we capture whether this is a multi or single year sim.
+            if first_iteration_and_first_individual:
+                self.is_multi_year = len(results_for_individual) > 1
 
             if self.is_multi_year:
-                MultiYearResultsProcessor.process_results(
+                self.processed_aggregated_outputs = MultiYearResultsProcessor.process_results(
                     self.run_job_request,
                     results_for_individual,
                     all_algorithm_outputs,

@@ -19,6 +19,7 @@ class ProblemBase(Problem):
         self.run_errors = []
         self.current_iteration_id = 1
         self.is_multi_year = False
+        self.processed_aggregated_outputs = []
 
         self.results_publisher = ResultsPublisher(
             run_job_request.IterationResultsUrl,

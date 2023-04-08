@@ -20,11 +20,14 @@ class FinalResultsMessage(Model):
     #
     # Constructor
     #
-    def __init__(self, run_job_request, minimise_result, is_multi_year):
+    def __init__(self, run_job_request, minimise_result, is_multi_year, processed_aggregated_outputs):
         self.DateTime = DateTimeHelper.get_date_time_now_str()
         self.JobID = run_job_request.JobID
         self.Inputs = self._extract_inputs(run_job_request.Inputs, minimise_result)
-        self.Outputs = self._extract_outputs(run_job_request.Outputs, minimise_result, is_multi_year)
+        if is_multi_year: 
+            self.Outputs = self._extract_outputs_multi_year_sim(processed_aggregated_outputs, minimise_result)
+        else:
+            self.Outputs = self._extract_outputs_single_year_sim(run_job_request.Outputs, minimise_result)
 
     # Extracts all of the inputs from the minimise result
     #
@@ -46,7 +49,7 @@ class FinalResultsMessage(Model):
     #
     # Extracts all of the outputs from the minimise result
     #    
-    def _extract_outputs(self, job_request_outputs, minimize_result, is_multi_year):
+    def _extract_outputs_single_year_sim(self, job_request_outputs, minimize_result):
         # Objective values for non-dominated Individuals in the last generation
         minimize_result_f = minimize_result.F
         
@@ -63,6 +66,29 @@ class FinalResultsMessage(Model):
                 )
                 results.append(output_value.get_output_value_from_algorithm())
             outputs.append(InputOutput(output.ApsimOutputName, results))
+            id += 1
+        return outputs
+    
+    #
+    # Extracts all of the outputs from the minimise result
+    #    
+    def _extract_outputs_multi_year_sim(self, processed_aggregated_outputs, minimize_result):
+        # Objective values for non-dominated Individuals in the last generation
+        minimize_result_f = minimize_result.F
+        
+        outputs = []
+        id = 0
+        for output in processed_aggregated_outputs:
+            results = []
+            for result in minimize_result_f[:, id]:
+                output_value = OutputValue(
+                    result, 
+                    output.DisplayName, 
+                    output.Maximise, 
+                    output.Multiplier
+                )
+                results.append(output_value.get_output_value_from_algorithm())
+            outputs.append(InputOutput(output.DisplayName, results))
             id += 1
         return outputs
     

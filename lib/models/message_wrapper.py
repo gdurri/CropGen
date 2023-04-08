@@ -1,5 +1,6 @@
-from json.decoder import JSONDecodeError
+import logging
 import json
+from json.decoder import JSONDecodeError
 
 from lib.models.model import Model
 from lib.utils.json_helper import JsonHelper
@@ -34,6 +35,9 @@ class MessageWrapper(Model):
             self.TypeName = JsonHelper.get_attribute(json_object, 'TypeName', errors)
             self.TypeBody = JsonHelper.get_attribute(json_object, 'TypeBody', errors)
         except JSONDecodeError as error:
+            logging.error("Error parsing JSON")
+            logging.error("'%s'", message)
+
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
         return errors
 

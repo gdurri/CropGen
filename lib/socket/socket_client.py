@@ -1,3 +1,4 @@
+import logging
 import socket
 
 from lib.socket.socket_client_base import SocketClientBase
@@ -53,6 +54,23 @@ class SocketClient (SocketClientBase):
         # Convert it to an integer and then use this to read the message itself
         # with the known size.
         message_size_bytes = int.from_bytes(message_size_byte_array, self.config.socket_data_endianness)
-        message_data = self.socket.recv(message_size_bytes)
-
+        logging.info("%s - Received message size: '%d' bytes", __class__.__name__, message_size_bytes)
+        message_data = self.read_data(message_size_bytes)
         return super().create_message_wrapper(message_data)
+
+    #
+    # Reads the data
+    #
+    def read_data(self, message_size_bytes):
+        # Initialise our buffer
+        message_data = bytearray(message_size_bytes)
+        # Now iterate calling receive each time until we've read all of the data.
+        pos = 0
+        max_msg_size = 1000
+        while pos < message_size_bytes:
+            read_data = self.socket.recv(max_msg_size)
+            message_data[pos: pos + max_msg_size] = read_data
+            pos += len(read_data)
+
+        logging.info("%s - Finished reading message size: '%d' bytes, buffer pos: '%d'", __class__.__name__, message_size_bytes, pos)
+        return message_data

@@ -20,6 +20,8 @@ class MultiYearResultsProcessor():
     ):
         assert(len(results_for_individual) > 1)
         
+        output_aggregate_functions_processed = []
+
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
 
@@ -32,6 +34,7 @@ class MultiYearResultsProcessor():
             if not request_output: continue
 
             for aggregate_function in request_output.AggregateFunctions:
+                output_aggregate_functions_processed.append(aggregate_function)
                 aggregate_function_calculator = AggregateFunctionCalculator(aggregate_function)
                 raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual)
                 output_value = OutputValue(
@@ -46,3 +49,4 @@ class MultiYearResultsProcessor():
 
         all_algorithm_outputs.append(algorithm_outputs)
         all_results_outputs.append(apsim_output)
+        return output_aggregate_functions_processed
