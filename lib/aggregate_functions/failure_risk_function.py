@@ -60,6 +60,6 @@ class FailureRiskFunction:
             if result_value == value:
                 return True
         if operator == Constants.FAILURE_RISK_PARAM_NOT_EQUAL:
-            if result_value == value:
+            if result_value != value:
                 return True
         return False
