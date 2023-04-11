@@ -11,7 +11,7 @@ class FailureRiskFunction:
     def calculate(aggregate_function, results_for_individual):
 
         operator = aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_OPERATOR)
-        value = aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_VALUE)
+        value = float(aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_VALUE))
 
         if not operator: raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No operator at index: {Constants.FAILURE_RISK_PARAM_OPERATOR}")
         if not value: raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No value at index: {Constants.FAILURE_RISK_PARAM_VALUE}")
