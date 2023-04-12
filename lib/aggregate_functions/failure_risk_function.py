@@ -10,7 +10,7 @@ class FailureRiskFunction:
     # Calculate the failure risk.
     #
     @staticmethod
-    def calculate(aggregate_function, results_for_individual):
+    def calculate(aggregate_function, results_for_individual, apsim_output_index):
         
         operator = aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_OPERATOR)
         value = float(aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_VALUE))
@@ -30,12 +30,11 @@ class FailureRiskFunction:
 
         # Need to calculate the sum of our data set that is within the specified value.
         sum_within_operator_and_value = 0
-        for result in results_for_individual:
-            for result_value in result.Values:
-                if FailureRiskFunction._test_failure_risk_result_in_range(result_value, operator, value):
-                    sum_within_operator_and_value += 1
+        for apsim_result in results_for_individual:
+            if FailureRiskFunction._test_failure_risk_result_in_range(apsim_result.Values[apsim_output_index], operator, value):
+                sum_within_operator_and_value += 1
         result = sum_within_operator_and_value / total_results_for_individuals
-        logging.info("Result: '%f'", result)
+        logging.info("Result: '%f'. Values within range test: '%d'", result, sum_within_operator_and_value)
 
         return result
     
@@ -59,23 +58,20 @@ class FailureRiskFunction:
     @staticmethod
     def _test_failure_risk_result_in_range(result_value, operator, value):
         if operator == Constants.FAILURE_RISK_PARAM_LESS_THAN:
-            if result_value < value:
-                return True
-        if operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL:
-            if result_value <= value:
-                return True
-        if operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN:
-            if result_value > value:
-                return True
-        if operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL:
-            if result_value >= value:
-                return True
-        if operator == Constants.FAILURE_RISK_PARAM_EQUAL:
-            if result_value == value:
-                return True
-        if operator == Constants.FAILURE_RISK_PARAM_NOT_EQUAL:
-            if result_value != value:
-                return True
+            return result_value < value
+        elif operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL:
+            return result_value <= value
+        elif operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN:
+            return result_value > value
+        elif operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL:
+            return result_value >= value
+        elif operator == Constants.FAILURE_RISK_PARAM_EQUAL:
+            return result_value == value
+        elif operator == Constants.FAILURE_RISK_PARAM_NOT_EQUAL:
+            return result_value != value
+        else: 
+            logging.error("Unknown operator '%s'", operator)
+
         return False
     
     #

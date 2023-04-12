@@ -8,19 +8,18 @@ class MeanFunction:
     # Calculate the mean.
     #
     @staticmethod
-    def calculate(results_for_individual):
+    def calculate(results_for_individual, apsim_output_index):
 
         total_results_for_individuals = len(results_for_individual)
 
         logging.info("Calling %s for: '%d' individuals.", __class__.__name__, total_results_for_individuals)
 
-        # Need to calculate the sum of our data set that is within the specified value.
+        # Need to calculate the sum of our data to obtain the mean.
         total = 0
-        for result in results_for_individual:
-            for result_value in result.Values:
-                total += result_value
+        for apsim_result in results_for_individual:
+            total += apsim_result.Values[apsim_output_index]
 
         result = total / total_results_for_individuals
-        logging.info("Result: '%f'", result)
+        logging.info("Result: '%f' (Total %f)", result, total)
         
         return result

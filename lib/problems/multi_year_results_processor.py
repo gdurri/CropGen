@@ -34,10 +34,14 @@ class MultiYearResultsProcessor():
             # If there is no output for this then just skip and move onto the next one.
             if not request_output: continue
 
+            # This is a hack to get round the fact that the CGM server always returns
+            # 2 outputs regardless of what we send to CGM
+            apsim_output_index = MultiYearResultsProcessor.get_output_index_according_to_output_name(request_output, output_index)
+
             for aggregate_function in request_output.AggregateFunctions:
                 output_aggregate_functions_processed.append(aggregate_function)
                 aggregate_function_calculator = AggregateFunctionCalculator(aggregate_function)
-                raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual)
+                raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual, apsim_output_index)
                 output_value = OutputValue(
                     raw_output_value, 
                     aggregate_function.DisplayName, 
@@ -52,3 +56,17 @@ class MultiYearResultsProcessor():
         all_results_outputs.append(apsim_output)
 
         return output_aggregate_functions_processed
+    
+    #
+    # This is a hack to get round the fact that the CGM server always returns
+    # 2 outputs regardless of what we send to CGM
+    #
+    @staticmethod
+    def get_output_index_according_to_output_name(request_output, output_index):
+        apsim_output_name = request_output.ApsimOutputName.lower().strip()
+        if apsim_output_name == 'wateruse':
+            return 0
+        elif apsim_output_name == 'yield':
+            return 1
+        return output_index
+        

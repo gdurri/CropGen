@@ -16,13 +16,13 @@ class AggregateFunctionCalculator:
     # Calculate the output value using the passed in values
     # for an individual and the specified calc type.
     #
-    def calculate_output_value(self, results_for_individual):
+    def calculate_output_value(self, results_for_individual, apsim_output_index):
         calc_type = self.aggregate_function.CalcType.lower().strip()
         output_value = None
 
         if calc_type == Constants.TYPE_FAILURE_RISK:
-            output_value = FailureRiskFunction.calculate(self.aggregate_function, results_for_individual)
+            output_value = FailureRiskFunction.calculate(self.aggregate_function, results_for_individual, apsim_output_index)
         elif calc_type == Constants.TYPE_MEAN:
-            output_value = MeanFunction.calculate(results_for_individual)
+            output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
 
         return output_value
