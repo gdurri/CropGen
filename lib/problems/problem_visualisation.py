@@ -110,7 +110,7 @@ class ProblemVisualisation(ProblemBase):
 
             # This shouldn't happen, but just in case..
             if not results_for_individual:
-                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}')
+                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json()}')
                 return False
 
             # The first time through we capture whether this is a multi or single year sim.
