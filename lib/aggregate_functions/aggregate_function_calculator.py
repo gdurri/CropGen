@@ -1,3 +1,5 @@
+import logging
+
 from lib.utils.constants import Constants
 from lib.aggregate_functions.failure_risk_function import FailureRiskFunction
 from lib.aggregate_functions.mean_function import MeanFunction
@@ -24,5 +26,7 @@ class AggregateFunctionCalculator:
             output_value = FailureRiskFunction.calculate(self.aggregate_function, results_for_individual, apsim_output_index)
         elif calc_type == Constants.TYPE_MEAN:
             output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
+        else:
+            logging.error("Unknown Aggregate Function calc_type supplied: %s", output_value)
 
         return output_value
