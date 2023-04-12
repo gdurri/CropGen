@@ -3,7 +3,7 @@ import logging
 from lib.models.cgm.init_workers import InitWorkers
 from lib.problems.problem_visualisation import ProblemVisualisation
 from lib.utils.date_time_helper import DateTimeHelper
-
+from lib.utils.constants import Constants
 
 class RunMessageProcessor():
     #
@@ -22,13 +22,16 @@ class RunMessageProcessor():
         logging.debug("Run job request: %s", run_job_request.to_json())        
 
         if not self._init_cgm(run_job_request, cgm_server_client):
-            logging.error("Failed to initialise CGM server. Run message will not be processed.")
+            logging.error("Failed to initialise %s. Run message will not be processed.", Constants.CGM_SERVER)
             return
 
         problem = ProblemVisualisation(self.config, run_job_request)
         
         # Now run the problem code.
         problem.run()
+
+        # Log out how many seconds the problem took to run.
+        logging.info("Problem run finished. Time taken: '%s' seconds", DateTimeHelper.get_seconds_since_now(self.run_start_time))
 
     #
     # Calls init on the CGM server and returns the response.

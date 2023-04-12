@@ -38,12 +38,6 @@ class RunMessageValidator():
     #
     # Gets the errors
     #
-    def get_cgm_server_client(self):
-        return self.cgm_server_client
-    
-    #
-    # Gets the errors
-    #
     def get_errors(self):
         return self.errors
 

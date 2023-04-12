@@ -7,7 +7,7 @@
     "socketTimeoutSeconds": 120.0,
     "socketTimeoutTestConnectionSeconds": 2.0,
     "webServerLogLevel" : "info",
-    "resultsPublisherTimeoutSeconds": 10,
+    "resultsPublisherTimeoutSeconds": 5,
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",

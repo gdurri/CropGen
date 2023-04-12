@@ -33,7 +33,7 @@ class AggregateFunction(Model):
         if aggregate_functions == None:
             return []
 
-        parsed_calc_functions = [] 
+        parsed_aggregate_functions = [] 
         for aggregate_function in aggregate_functions:
             display_name = JsonHelper.get_attribute(aggregate_function, 'DisplayName', errors)
             maximise = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'Maximise', False)
@@ -41,7 +41,7 @@ class AggregateFunction(Model):
             calc_type = JsonHelper.get_attribute(aggregate_function, 'CalcType', errors)
             params = JsonHelper.get_non_mandatory_attribute(aggregate_function, 'Params', [])
 
-            parsed_calc_functions.append(AggregateFunction(
+            parsed_aggregate_functions.append(AggregateFunction(
                 display_name,
                 maximise,
                 multiplier,
@@ -49,7 +49,7 @@ class AggregateFunction(Model):
                 params
             ))
             
-        return parsed_calc_functions
+        return parsed_aggregate_functions
 
     #
     # Returns the type name.

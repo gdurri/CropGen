@@ -74,9 +74,11 @@ class ProblemVisualisation(ProblemBase):
     #
     # Evaluate fitness of the Individuals in the population
     # Parameters:
+    # - relay_apsim_request: This is the request that is sent to the CGM server. It contains all of the values from the population.
     # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
     # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
     # and 'G' key for constraints
+    #
     def _handle_evaluate_value_for_population(
         self,
         relay_apsim_request,

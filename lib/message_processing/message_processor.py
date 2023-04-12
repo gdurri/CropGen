@@ -85,7 +85,8 @@ class MessageProcessor():
         except:
             logging.exception("Exception - When running JobID: '%s'", run_job_request.JobID)
         finally:
-            # Now that we're done, clear the currently running job.
+            # Now that we're done, clear the currently running job. This needs to happen
+            # regardless of any exceptions etc.
             self.server_state.clear_running_job_id()
 
     #
