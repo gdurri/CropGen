@@ -1,4 +1,4 @@
-from lib.models.model import Model
+from lib.models.common.model import Model
 
 #
 # A WGP Server request object.

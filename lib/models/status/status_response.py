@@ -1,4 +1,4 @@
-from lib.models.model import Model
+from lib.models.common.model import Model
 
 #
 # End of run message for signalling that a run has completed.

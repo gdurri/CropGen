@@ -1,4 +1,4 @@
-from lib.models.model import Model
+from lib.models.common.model import Model
 from lib.models.run.aggregate_function import AggregateFunction
 from lib.utils.json_helper import JsonHelper
 

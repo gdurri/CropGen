@@ -1,7 +1,7 @@
 import logging
 
 from lib.socket.socket_client_base import SocketClientBase
-from lib.models.error_message import ErrorMessage
+from lib.models.run.error_message import ErrorMessage
 
 #
 # An async socket client.

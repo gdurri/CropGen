@@ -1,7 +1,7 @@
 from json.decoder import JSONDecodeError
 import json
 
-from lib.models.model import Model
+from lib.models.common.model import Model
 from lib.utils.json_helper import JsonHelper
 
 #

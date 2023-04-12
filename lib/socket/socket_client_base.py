@@ -1,4 +1,4 @@
-from lib.models.message_wrapper import MessageWrapper
+from lib.models.common.message_wrapper import MessageWrapper
 
 class ReadMessageData:
     def __init__(self, errors, message_wrapper, is_disconnect_message = False):

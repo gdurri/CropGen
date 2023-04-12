@@ -1,4 +1,4 @@
-from lib.models.model import Model
+from lib.models.common.model import Model
 
 #
 # The Run response message. Used to signal that a run has started and whether it is successful.

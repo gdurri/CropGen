@@ -2,7 +2,7 @@ import logging
 import json
 from json.decoder import JSONDecodeError
 
-from lib.models.model import Model
+from lib.models.common.model import Model
 from lib.utils.json_helper import JsonHelper
 
 #

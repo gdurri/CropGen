@@ -1,4 +1,4 @@
-from lib.models.model import Model
+from lib.models.common.model import Model
 
 #
 # Represents the initialise message request that is sent to the CGM server.
