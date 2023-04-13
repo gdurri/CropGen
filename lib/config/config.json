@@ -6,7 +6,7 @@
     "socketDataEncoding": "utf-8",
     "socketTimeoutSeconds": 120.0,
     "socketTimeoutTestConnectionSeconds": 2.0,
-    "webServerLogLevel" : "info",
+    "socketReceiveBufferSize" : 1024,
     "resultsPublisherTimeoutSeconds": 5,
     
     "dockerOverrides": "______________________",

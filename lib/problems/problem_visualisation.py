@@ -103,8 +103,6 @@ class ProblemVisualisation(ProblemBase):
         # Iterate over all of the individuals.
         for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
 
-            first_iteration_and_first_individual = self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX
-
             logging.info("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
             results_for_individual = response.get_apsim_results_for_individual(individual)
 
@@ -114,8 +112,12 @@ class ProblemVisualisation(ProblemBase):
                 return False
 
             # The first time through we capture whether this is a multi or single year sim.
-            if first_iteration_and_first_individual:
-                self.is_multi_year = len(results_for_individual) > 1
+            if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
+                if len(results_for_individual) > 1:
+                    self.is_multi_year = True
+                    logging.info("%s is running a multi year simulation.", Constants.APPLICATION_NAME)
+                else:
+                    logging.info("%s is running a single year simulation.", Constants.APPLICATION_NAME)
 
             if self.is_multi_year:
                 self.processed_aggregated_outputs = MultiYearResultsProcessor.process_results(

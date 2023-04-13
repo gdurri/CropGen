@@ -65,12 +65,17 @@ class SocketClient (SocketClientBase):
         # Initialise our buffer
         message_data = bytearray(message_size_bytes)
         # Now iterate calling receive each time until we've read all of the data.
-        pos = 0
-        max_msg_size = 1000
-        while pos < message_size_bytes:
-            read_data = self.socket.recv(max_msg_size)
-            message_data[pos: pos + max_msg_size] = read_data
-            pos += len(read_data)
+        buffer_pos = 0
+        while buffer_pos < message_size_bytes:
+            read_data = self.socket.recv(self.config.socket_receive_buffer_size)
+            read_data_length = len(read_data)
+            message_data[buffer_pos: buffer_pos + read_data_length] = read_data
+            buffer_pos += read_data_length
 
-        logging.info("%s - Finished reading message size: '%d' bytes, buffer pos: '%d'", __class__.__name__, message_size_bytes, pos)
+        logging.debug("%s - Finished reading message. Message Size Bytes: '%d' Buffer Pos: '%d'", 
+            __class__.__name__, 
+            message_size_bytes, 
+            buffer_pos
+        )
+
         return message_data

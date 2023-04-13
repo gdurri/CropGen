@@ -1,3 +1,5 @@
+import logging
+
 from lib.problems.output_value import OutputValue
 from lib.problems.apsim_output import ApsimOutput
 
@@ -27,6 +29,8 @@ class SingleYearResultsProcessor():
         for output_index in range(0, total_outputs):
             raw_apsim_output = apsim_result.Values[output_index]
             request_output = run_job_request.get_output_by_index(output_index)
+            
+            # If there is no output for this then just skip and move onto the next one.
             if not request_output: continue
 
             output_value = OutputValue(

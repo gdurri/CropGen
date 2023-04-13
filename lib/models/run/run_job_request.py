@@ -23,6 +23,7 @@ class RunJobRequest(Model):
         self.Iterations = 0
         self.Individuals = 0
         self.Seed = 1
+        self.ReportName = ''
         self.Inputs = []
         self.Outputs = []
 
@@ -104,6 +105,7 @@ class RunJobRequest(Model):
             self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
             self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
             self.Seed = JsonHelper.get_non_mandatory_attribute(json_object, 'Seed', None)
+            self.ReportName = JsonHelper.get_attribute(json_object, 'ReportName', errors)
             self.Inputs = Input.parse_inputs(json_object, errors)
             self.Outputs = Output.parse_outputs(json_object, errors)
         except JSONDecodeError as error:

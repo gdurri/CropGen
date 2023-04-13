@@ -34,7 +34,11 @@ class FailureRiskFunction:
             if FailureRiskFunction._test_failure_risk_result_in_range(apsim_result.Values[apsim_output_index], operator, value):
                 sum_within_operator_and_value += 1
         result = sum_within_operator_and_value / total_results_for_individuals
-        logging.info("Result: '%f'. Values within range test: '%d'", result, sum_within_operator_and_value)
+        logging.info("Result: '%f' (%d/%d).", 
+            result, 
+            sum_within_operator_and_value,
+            total_results_for_individuals
+        )
 
         return result
     

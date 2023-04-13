@@ -11,6 +11,7 @@ class InitWorkers(Model):
     def __init__(self, run_job_request):
         self.JobID = run_job_request.JobID
         self.Url = run_job_request.ApsimUrl
+        self.ReportName = run_job_request.ReportName
         self.InputTraits = run_job_request.get_input_names()
         self.Outputs = run_job_request.get_apsim_output_names()
 
