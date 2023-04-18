@@ -21,7 +21,6 @@ class EmptyResultsProcessor():
         all_results_outputs
     ):
         assert(len(results_for_individual) == 1)
-        assert(len(results_for_individual[0].Values) == 0)
         
         output_aggregate_functions_processed = []
 
