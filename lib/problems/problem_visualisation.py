@@ -9,6 +9,7 @@ from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
 from lib.problems.single_year_results_processor import SingleYearResultsProcessor
 from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
+from lib.problems.empty_results_processor import EmptyResultsProcessor
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
@@ -117,13 +118,16 @@ class ProblemVisualisation(ProblemBase):
 
             # The first time through we capture whether this is a multi or single year sim.
             if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
-                if len(results_for_individual) > 1:
-                    self.is_multi_year = True
-                    logging.info("%s is running a multi year simulation.", Constants.APPLICATION_NAME)
-                else:
-                    logging.info("%s is running a single year simulation.", Constants.APPLICATION_NAME)
+                self._set_is_multi_year(results_for_individual)
 
-            if self.is_multi_year:
+            if not ProblemVisualisation._get_contains_results(results_for_individual):
+                self.processed_aggregated_outputs = EmptyResultsProcessor.process_results(
+                    self.run_job_request,
+                    results_for_individual,
+                    all_algorithm_outputs,
+                    all_results_outputs
+                )
+            elif self.is_multi_year:
                 self.processed_aggregated_outputs = MultiYearResultsProcessor.process_results(
                     self.run_job_request,
                     results_for_individual,
@@ -152,6 +156,28 @@ class ProblemVisualisation(ProblemBase):
 
         # Increment our iteration ID.
         self.current_iteration_id += 1
+
+    #
+    # Tests whether the results actually contain any results.
+    #
+    @staticmethod
+    def _get_contains_results(results_for_individual):
+        return len(results_for_individual) > 0 and \
+            results_for_individual[0] and \
+            results_for_individual[0].SimulationID != '-1' and \
+            results_for_individual[0].SimulationName != 'unknown' and \
+            len(results_for_individual[0].Values) > 0
+    
+    #
+    # Sets the is multi year flag.
+    #
+    def _set_is_multi_year(self, results_for_individual):
+        if len(results_for_individual) > 1:
+            self.is_multi_year = True
+            logging.info("%s is running a multi year simulation.", Constants.APPLICATION_NAME)
+        else:
+            self.is_multi_year = False
+            logging.info("%s is running a single year simulation.", Constants.APPLICATION_NAME)
 
     #
     # This initialises the out array that has to be populated as part of the
