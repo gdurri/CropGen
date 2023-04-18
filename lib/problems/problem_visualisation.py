@@ -63,10 +63,14 @@ class ProblemVisualisation(ProblemBase):
     # Iterate over each population and perform calcs.
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
-        logging.info("Handling evaluation with %d individuals.", len(variable_values_for_population))
-
         if self.run_errors:
             return
+        
+        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
+            self.current_iteration_id, 
+            self.run_job_request.Iterations,
+            len(variable_values_for_population)
+        )
 
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
