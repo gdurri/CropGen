@@ -43,3 +43,6 @@ class Constants():
     UNKNOWN_TYPE_NAME = 'Unknown TypeName'
     AGGREGATE_FUNCTION_ERROR = 'Cannot perform aggregate function.'
     FAILURE_RISK_AGGREGATE_FUNCTION_ERROR = f"{AGGREGATE_FUNCTION_ERROR} - Type: '{TYPE_FAILURE_RISK}'"
+
+    INVALID_SIMULATION_ID = '-1'
+    INVALID_SIMULATION_NAME = 'unknown'

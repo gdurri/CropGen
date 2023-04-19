@@ -121,25 +121,16 @@ class ProblemVisualisation(ProblemBase):
                 self._set_is_multi_year(results_for_individual)
 
             if not ProblemVisualisation._get_contains_results(results_for_individual):
-                self.processed_aggregated_outputs = EmptyResultsProcessor.process_results(
-                    self.run_job_request,
-                    results_for_individual,
-                    all_algorithm_outputs,
-                    all_results_outputs
+                EmptyResultsProcessor.process_results(
+                    individual, self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
                 )
             elif self.is_multi_year:
-                self.processed_aggregated_outputs = MultiYearResultsProcessor.process_results(
-                    self.run_job_request,
-                    results_for_individual,
-                    all_algorithm_outputs,
-                    all_results_outputs
+                MultiYearResultsProcessor.process_results(
+                    self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
                 )
             else:
                 SingleYearResultsProcessor.process_results(
-                    self.run_job_request,
-                    results_for_individual,
-                    all_algorithm_outputs,
-                    all_results_outputs
+                    self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
                 )
 
         # Feed the results back into the algorithm so that it can continue advancing...
@@ -164,20 +155,28 @@ class ProblemVisualisation(ProblemBase):
     def _get_contains_results(results_for_individual):
         return len(results_for_individual) > 0 and \
             results_for_individual[0] and \
-            results_for_individual[0].SimulationID != '-1' and \
-            results_for_individual[0].SimulationName != 'unknown' and \
+            results_for_individual[0].SimulationID != Constants.INVALID_SIMULATION_ID and \
+            results_for_individual[0].SimulationName != Constants.INVALID_SIMULATION_NAME and \
             len(results_for_individual[0].Values) > 0
     
     #
-    # Sets the is multi year flag.
+    # Sets the is multi year flag and extract any aggregate functions if it is a multi year sim.
     #
     def _set_is_multi_year(self, results_for_individual):
         if len(results_for_individual) > 1:
-            self.is_multi_year = True
             logging.info("%s is running a multi year simulation.", Constants.APPLICATION_NAME)
+            self.is_multi_year = True
+            self.processed_aggregated_outputs = []
+            
+            for output_index in range(0, self.run_job_request.get_total_outputs()):
+                request_output = self.run_job_request.get_output_by_index(output_index)
+                # If there is no output for this then just skip and move onto the next one.
+                if not request_output: continue
+                for aggregate_function in request_output.AggregateFunctions:
+                    self.processed_aggregated_outputs.append(aggregate_function)
         else:
-            self.is_multi_year = False
             logging.info("%s is running a single year simulation.", Constants.APPLICATION_NAME)
+            self.is_multi_year = False            
 
     #
     # This initialises the out array that has to be populated as part of the
