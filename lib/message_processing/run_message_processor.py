@@ -43,5 +43,8 @@ class RunMessageProcessor():
         read_message_data = cgm_server_client.call_cgm(init_workers_request)
         errors = cgm_server_client.validate_cgm_call(read_message_data)
 
-        if errors: return False
+        if errors: 
+            logging.error(errors)
+            return False
+        
         return True

@@ -65,6 +65,7 @@ class CGMClient:
         if not read_message_data:
             errors.append(Constants.CGM_SERVER_NO_DATA_READ)
 
+        # This is to handle any exceptions thrown from the Python code.
         if read_message_data.errors:
             return read_message_data.errors
         
@@ -72,5 +73,9 @@ class CGMClient:
            not read_message_data.message_wrapper.TypeName or \
            not read_message_data.message_wrapper.TypeBody:
             errors.append(Constants.CGM_SERVER_INVALID_RESPONSE)
+
+        # This is to handle an error response.
+        if read_message_data.message_wrapper.TypeName == Constants.CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE:
+            errors.append(f'{Constants.CGM_SERVER_ERROR_RESPONSE}: {read_message_data.message_wrapper.TypeBody}')
         
         return errors

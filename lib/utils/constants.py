@@ -35,6 +35,8 @@ class Constants():
     CGM_SERVER_NO_RESPONSE = f'No response from {CGM_SERVER}'
     CGM_SERVER_NO_RESPONSE_NO_EVALUATE = f"{CGM_SERVER_NO_RESPONSE}. Cannot handle evaluate"
     CGM_SERVER_INVALID_RESPONSE = f"Invalid data returned from {CGM_SERVER}"
+    CGM_SERVER_ERROR_RESPONSE = f"Error response from {CGM_SERVER}"
+    CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE = 'ExceptionResponse'
     UNKNOWN_JOB_TYPE = 'Unknown run JobType'
     APSIM_RESULTS_NOT_EQUAL_TO_INDIVIDUALS = "Total APSIM results doesn't match the total requested individuals"
     NO_APSIM_RESULT_FOR_INDIVIDUALS = "Couldn't find an APSIM result for a given individual."

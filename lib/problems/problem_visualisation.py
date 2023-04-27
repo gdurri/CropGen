@@ -196,7 +196,9 @@ class ProblemVisualisation(ProblemBase):
         self.run_errors = self.cgm_server_client.validate_cgm_call(read_message_data)
 
         # If there were any errors then bail out (these errors are logged later on.)
-        if self.run_errors: return None
+        if self.run_errors: 
+            logging.error(self.run_errors)
+            return None
 
         # Convert the raw socket data into a RunApsimResponse object.
         response = RunApsimResponse()
