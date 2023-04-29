@@ -2,7 +2,7 @@ import logging.config
 import os.path
 
 # Create the logs directory for our logger to log to.
-root_directory = os.path.join(os.path.dirname(__file__), "..\\..\\logs")
+root_directory = os.path.join(os.path.dirname(__file__), "..", "..", "logs")
 if not os.path.exists(root_directory):
     os.makedirs(root_directory)
 
