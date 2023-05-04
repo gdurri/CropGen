@@ -49,6 +49,7 @@ class Config:
         self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 120.0)
         self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
         self.socket_receive_buffer_size = self._get_config_setting(data, 'socketReceiveBufferSize', 1024)
+        self.delete_logs_on_startup = self._get_config_setting(data, 'deleteLogsOnStartup', False)
         self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')
 
     #

@@ -6,7 +6,7 @@
 import asyncio
 import logging
 
-from lib.logging import set_logger_config
+from lib.logging.logger_config import LoggerConfig
 from lib.server.socket_server import SocketServer
 from lib.server.server_state import ServerState
 from lib.config.config import Config
@@ -23,6 +23,9 @@ def client_connected_cb(client_reader, client_writer):
 if __name__ == "__main__":
 
     try:
+        logger_config = LoggerConfig(config)
+        logger_config.setup_logger()
+
         logging.debug("Started CropGen application")
         logging.info("Service Config: %s", config.to_json())
 
