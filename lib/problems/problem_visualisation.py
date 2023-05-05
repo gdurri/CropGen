@@ -52,7 +52,8 @@ class ProblemVisualisation(ProblemBase):
 
         results_message = FinalResultsMessage(
             self.run_job_request, 
-            minimize_result,
+            minimize_result.X,
+            minimize_result.F,
             self.is_multi_year,
             self.processed_aggregated_outputs
         )
@@ -90,17 +91,13 @@ class ProblemVisualisation(ProblemBase):
         out_objective_values,
         variable_values_for_population
     ):
-        self._initialise_algorithm_array(out_objective_values)
+        #self._initialise_algorithm_array(out_objective_values)
 
         response = self._call_relay_apsim(relay_apsim_request)
         if not response: return False
 
         # Populate the iteration message with all of the data that we currently have.
-        iteration_results_message = IterationResultsMessage(
-            self.run_job_request, 
-            self.current_iteration_id,
-            variable_values_for_population
-        )
+        iteration_results_message = IterationResultsMessage(self.run_job_request, self.current_iteration_id, variable_values_for_population)
 
         all_algorithm_outputs = []
         all_results_outputs = []
@@ -137,10 +134,7 @@ class ProblemVisualisation(ProblemBase):
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)   
 
         # Populate the iteration results with the outputs from each individual.
-        iteration_results_message.add_outputs(
-            self.run_job_request.get_display_output_names(),
-            all_results_outputs
-        )
+        iteration_results_message.add_outputs(self.run_job_request.get_display_output_names(), all_results_outputs)
 
         # Send out the results.
         self.results_publisher.publish_iteration_results(iteration_results_message)
@@ -176,7 +170,7 @@ class ProblemVisualisation(ProblemBase):
                     self.processed_aggregated_outputs.append(aggregate_function)
         else:
             logging.info("%s is running a single year simulation.", Constants.APPLICATION_NAME)
-            self.is_multi_year = False            
+            self.is_multi_year = False
 
     #
     # This initialises the out array that has to be populated as part of the
