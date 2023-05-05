@@ -4,13 +4,11 @@ import numpy as NumPy
 
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.models.rest.iteration_results_message import IterationResultsMessage
-from lib.models.rest.final_results_message import FinalResultsMessage
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.problems.problem_base import ProblemBase
 from lib.problems.single_year_results_processor import SingleYearResultsProcessor
 from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
 from lib.problems.empty_results_processor import EmptyResultsProcessor
-from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
 #

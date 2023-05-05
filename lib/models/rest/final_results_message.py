@@ -74,15 +74,12 @@ class FinalResultsMessage(Model):
     #
     # Extracts all of the outputs from the minimise result
     #    
-    def _extract_outputs_multi_year_sim(self, processed_aggregated_outputs, minimize_result):
-        # Objective values for non-dominated Individuals in the last generation
-        minimize_result_f = minimize_result.F
-        
+    def _extract_outputs_multi_year_sim(self, processed_aggregated_outputs, objective_values_non_dominated_individuals):
         outputs = []
         id = 0
         for output in processed_aggregated_outputs:
             results = []
-            for result in minimize_result_f[:, id]:
+            for result in objective_values_non_dominated_individuals[:, id]:
                 output_value = OutputValue(
                     result, 
                     output.DisplayName, 
