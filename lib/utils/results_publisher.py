@@ -36,7 +36,7 @@ class ResultsPublisher():
     def _publish_results(self, url, results):
         json = results.to_json()
         logging.info("Publishing results to: '%s'", url)
-        logging.debug("Results: '%s'", json)
+        logging.debug("Results: '%s'", results.to_json(True))
 
         try:
             response = requests.put(

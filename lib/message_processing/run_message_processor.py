@@ -19,7 +19,7 @@ class RunMessageProcessor():
     #
     def process_run_message(self, run_job_request, cgm_server_client):        
         logging.info("Processing run job request for JobID: %s", run_job_request.JobID)        
-        logging.debug("Run job request: %s", run_job_request.to_json())        
+        logging.debug("Run job request: %s", run_job_request.to_json(True))        
 
         if not self._init_cgm(run_job_request, cgm_server_client):
             logging.error("Failed to initialise %s. Run message will not be processed.", Constants.CGM_SERVER)

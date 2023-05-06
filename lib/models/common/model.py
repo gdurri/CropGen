@@ -7,12 +7,15 @@ class Model:
     #
     # Serialises itself to JSON.
     #
-    def to_json(self):
+    def to_json(self, pretty_print=False):
+        indent = None
+        if pretty_print: indent = 4        
         json_str = json.dumps(
             self, 
             default = lambda
             obj: obj.__dict__,
-            separators=(',', ':')
+            separators=(',', ':'),
+            indent=indent
         )
 
         return json_str
