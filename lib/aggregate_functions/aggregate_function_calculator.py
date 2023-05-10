@@ -27,6 +27,6 @@ class AggregateFunctionCalculator:
         elif calc_type == Constants.TYPE_MEAN:
             output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
         else:
-            logging.error("Unknown Aggregate Function calc_type supplied: %s", output_value)
+            logging.error("Unknown Aggregate Function calc_type supplied: %s", calc_type)
 
         return output_value
