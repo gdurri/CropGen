@@ -70,7 +70,7 @@ class Problem(ProblemBase):
 
             # This shouldn't happen, but just in case..
             if not results_for_individual:
-                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json(True)}')
+                self.run_errors.append(f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json(self.config.pretty_print_json_in_logs)}')
                 return False
 
             # The first time through we capture whether this is a multi or single year sim.
@@ -91,7 +91,7 @@ class Problem(ProblemBase):
                 )
 
         # Feed the results back into the algorithm so that it can continue advancing...
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)   
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)
 
         # Populate the iteration results with the outputs from each individual.
         iteration_results_message.add_outputs(self.run_job_request.get_display_output_names(), all_results_outputs)
@@ -157,6 +157,6 @@ class Problem(ProblemBase):
         # Convert the raw socket data into a RunApsimResponse object.
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        logging.debug("Received RunApsimResponse: '%s'", response.to_json(True))
+        logging.debug("Received RunApsimResponse: '%s'", response.to_json(self.config.pretty_print_json_in_logs))
 
         return response

@@ -27,7 +27,7 @@ if __name__ == "__main__":
         logger_config.setup_logger()
 
         logging.debug("Started CropGen application")
-        logging.info("Service Config: %s", config.to_json())
+        logging.info("Service Config: %s", config.to_json(config.pretty_print_json_in_logs))
 
         loop = asyncio.get_event_loop()
         server_coro = asyncio.start_server(

@@ -40,7 +40,7 @@ class CGMClient:
         errors = []
         try:
             logging.info("Calling CGM with message: '%s'", message.get_type_name())
-            logging.debug("Message data: %s", message.to_json(True))
+            logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
 
             socket_client = SocketClient(self.config)
             socket_client.connect(self.host, self.port)

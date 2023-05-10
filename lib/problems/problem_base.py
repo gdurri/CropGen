@@ -24,7 +24,7 @@ class ProblemBase(Problem):
         self.results_publisher = ResultsPublisher(
             run_job_request.IterationResultsUrl,
             run_job_request.FinalResultsUrl,
-            config.results_publisher_timeout_seconds
+            config
         )
 
         self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)

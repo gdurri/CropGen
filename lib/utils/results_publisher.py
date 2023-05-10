@@ -12,11 +12,11 @@ class ResultsPublisher():
         self, 
         iteration_results_url,
         final_results_url, 
-        timeout
+        config
     ):
         self.iteration_results_url = iteration_results_url
         self.final_results_url = final_results_url
-        self.timeout = timeout
+        self.config = config
 
     #
     # Publish the iteration results.
@@ -36,17 +36,17 @@ class ResultsPublisher():
     def _publish_results(self, url, results):
         json = results.to_json()
         logging.info("Publishing results to: '%s'", url)
-        logging.debug("Results: '%s'", results.to_json(True))
+        logging.debug("Results: '%s'", results.to_json(self.config.pretty_print_json_in_logs))
 
         try:
             response = requests.put(
                 headers={'Content-type': 'application/json'},
                 url=url, 
                 data=json,
-                timeout=self.timeout
+                timeout=self.config.results_publisher_timeout_seconds
             )
         except Exception:
-            logging.exception("Failed to publish results")
+            logging.exception(f"Failed to publish results to {url}")
             return None
         
         if response.ok:

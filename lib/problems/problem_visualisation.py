@@ -36,7 +36,7 @@ class ProblemVisualisation():
                 self.run_job_request.Iterations
             ),
             save_history=True,
-            verbose=True
+            verbose=False
         )
 
         # Now that everything has been evaluated, check for any run errors and only
