@@ -1,10 +1,12 @@
 import json
 import os
 
+from lib.models.common.model import Model
+
 #
 # The config for this application.
 #
-class Config:
+class Config(Model):
     # The environment variable that is created only when running in docker.
     RUNNING_IN_DOCKER_ENV = 'RUNNING_IN_DOCKER'
 
@@ -14,22 +16,6 @@ class Config:
     def __init__(self):
         self.is_running_in_docker = self._is_running_in_docker()
         self._populate_from_data(self._parse())
-
-    #
-    # Serialises itself to JSON.
-    #
-    def to_json(self, pretty_print=False):
-        indent = None
-        if pretty_print: indent = 4        
-        json_str = json.dumps(
-            self, 
-            default = lambda
-            obj: obj.__dict__,
-            separators=(',', ':'),
-            indent=indent
-        )
-
-        return json_str
 
     #
     # Parses the config JSON file and stores it in memory.
