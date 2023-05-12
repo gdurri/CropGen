@@ -28,6 +28,5 @@ class AggregateFunctionCalculator:
             output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
         else:
             logging.error("Unknown Aggregate Function calc_type supplied: %s", calc_type)
-            assert(False)
 
         return output_value
