@@ -34,11 +34,8 @@ class FailureRiskFunction:
             if FailureRiskFunction._test_failure_risk_result_in_range(apsim_result.Values[apsim_output_index], operator, value):
                 sum_within_operator_and_value += 1
         result = sum_within_operator_and_value / total_results_for_individuals
-        logging.info("Result: '%f' (%d/%d).", 
-            result, 
-            sum_within_operator_and_value,
-            total_results_for_individuals
-        )
+
+        logging.info("Result: '%f' (%d/%d).", result, sum_within_operator_and_value,total_results_for_individuals)
 
         return result
     
@@ -49,7 +46,7 @@ class FailureRiskFunction:
     def _is_supported_operator(operator):
         return (
             operator == Constants.FAILURE_RISK_PARAM_LESS_THAN or
-            operator == Constants.FAILURE_RISK_PARAM_LESS_EQUAL or 
+            operator == Constants.FAILURE_RISK_PARAM_LESS_THAN_EQUAL or 
             operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN or 
             operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL or 
             operator == Constants.FAILURE_RISK_PARAM_EQUAL or 
@@ -63,7 +60,7 @@ class FailureRiskFunction:
     def _test_failure_risk_result_in_range(result_value, operator, value):
         if operator == Constants.FAILURE_RISK_PARAM_LESS_THAN:
             return result_value < value
-        elif operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN_EQUAL:
+        elif operator == Constants.FAILURE_RISK_PARAM_LESS_THAN_EQUAL:
             return result_value <= value
         elif operator == Constants.FAILURE_RISK_PARAM_GREATER_THAN:
             return result_value > value
