@@ -26,6 +26,7 @@ class Problem(ProblemBase):
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
         if self.run_errors:
+            self._initialise_algorithm_array(out_objective_values)
             return
         
         logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
@@ -51,8 +52,6 @@ class Problem(ProblemBase):
         out_objective_values,
         variable_values_for_population
     ):
-        self._initialise_algorithm_array(out_objective_values)
-
         response = self._call_relay_apsim(relay_apsim_request)
         if not response: return False
 
