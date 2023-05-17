@@ -16,5 +16,6 @@
     "socketServerPortDocker": 27746,
     "socketTimeoutSecondsDocker": 1800.0,
     "socketTimeoutTestConnectionSecondsDocker": 5.0,
+    "prettyPrintJsonInLogsDocker": false,
     "endOfDockerOverrides": "______________________"
 }
