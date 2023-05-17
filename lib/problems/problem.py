@@ -29,7 +29,7 @@ class Problem(ProblemBase):
             self._initialise_algorithm_array(out_objective_values)
             return
         
-        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
+        logging.debug("Processing APSIM iteration (%d of %d) with %d individuals", 
             self.current_iteration_id, 
             self.run_job_request.Iterations,
             len(variable_values_for_population)
@@ -64,7 +64,7 @@ class Problem(ProblemBase):
         # Iterate over all of the individuals.
         for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
 
-            logging.info("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
+            logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
             results_for_individual = response.get_apsim_results_for_individual(individual)
 
             # This shouldn't happen, but just in case..
