@@ -42,7 +42,7 @@ class ProblemVisualisation():
         # Now that everything has been evaluated, check for any run errors and only
         # continue if there aren't any.
         if problem.run_errors:
-            logging.error(f'Problem did not run successfully - Errors: {self.run_errors}')
+            logging.error(f'Problem did not run successfully - Errors: {problem.run_errors}')
             return
         
         # Variable values for non-dominated individuals in the last generation
