@@ -15,9 +15,12 @@ class FailureRiskFunction:
         operator = aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_OPERATOR)
         value = float(aggregate_function.get_param_by_index(Constants.FAILURE_RISK_PARAM_VALUE))
 
-        if not operator: raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No operator at index: {Constants.FAILURE_RISK_PARAM_OPERATOR}")
-        if not value: raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No value at index: {Constants.FAILURE_RISK_PARAM_VALUE}")
-        if not FailureRiskFunction._is_supported_operator(operator): raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. Unknown operator: '{operator}'")
+        if operator == None: 
+            raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No operator at index: {Constants.FAILURE_RISK_PARAM_OPERATOR}")
+        if value == None: 
+            raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. No value at index: {Constants.FAILURE_RISK_PARAM_VALUE}")
+        if not FailureRiskFunction._is_supported_operator(operator): 
+            raise Exception(f"{Constants.FAILURE_RISK_AGGREGATE_FUNCTION_ERROR}. Unknown operator: '{operator}'")
 
         total_results_for_individuals = len(results_for_individual)
 
