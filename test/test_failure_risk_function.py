@@ -60,11 +60,5 @@ class FailureRiskFunctionTests(TestBase):
         # Assert
         self.assertEqual(actual, expected, f"operator: {operator} param: {param} apsim_output_index: {apsim_output_index} expected: {expected} actual: {actual}")
 
-    @staticmethod
-    def create_apsim_result(values):
-        apsim_result = ApsimResult()
-        apsim_result.Values = values
-        return apsim_result
-
 if __name__ == "__main__":
     unittest.main()

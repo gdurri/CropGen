@@ -3,8 +3,6 @@ import logging
 from lib.problems.output_value import OutputValue
 from lib.problems.apsim_output import ApsimOutput
 
-from lib.aggregate_functions.aggregate_function_calculator import AggregateFunctionCalculator
-
 #
 # Helper for processing the single year results.
 #

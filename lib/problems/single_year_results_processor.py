@@ -1,5 +1,3 @@
-import logging
-
 from lib.problems.output_value import OutputValue
 from lib.problems.apsim_output import ApsimOutput
 
