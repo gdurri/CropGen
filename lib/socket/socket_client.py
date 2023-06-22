@@ -26,7 +26,9 @@ class SocketClient (SocketClientBase):
     # Sets the timeout
     #
     def set_timeout(self, timeout_seconds):
-        self.socket.settimeout(timeout_seconds)
+        # Only apply the timeout if one has been configured and it is greater than the default of 0.
+        if timeout_seconds > 0:
+            self.socket.settimeout(timeout_seconds)
 
     #
     # Writes data

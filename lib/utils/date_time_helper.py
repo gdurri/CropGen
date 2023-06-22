@@ -20,11 +20,37 @@ class DateTimeHelper():
     # Gets the seconds since now and the start time provided.
     #
     @staticmethod
-    def get_seconds_since_now(start_date_time):
+    def get_elapsed_seconds_since(start_date_time):
         end_date_time = DateTimeHelper.get_date_time()
         delta = end_date_time - start_date_time
         return delta.total_seconds()
-
+    
+    #
+    # Gets the time since now as a time string.
+    #
+    @staticmethod
+    def get_elapsed_time_since(start_date_time):
+        return DateTimeHelper.seconds_to_hhmmss_ms(
+            DateTimeHelper.get_elapsed_seconds_since(start_date_time)
+        )
+    
+    #
+    # convert seconds to hh:mm:ss
+    #
+    @staticmethod
+    def seconds_to_hhmmss_ms(seconds):
+        # Calculate the hours, minutes, and remaining seconds
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        seconds = int(seconds % 60)
+        
+        # Extract milliseconds
+        milliseconds = int((seconds % 1) * 1000)
+        
+        # Create a formatted time string
+        time_string = '{:02d}:{:02d}:{:02d}.{:03d}'.format(hours, minutes, seconds, milliseconds)
+        
+        return time_string
     #
     # Gets now as a date (no time) string.
     #

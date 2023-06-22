@@ -31,7 +31,7 @@ class RunMessageProcessor():
         problem.run()
 
         # Log out how many seconds the problem took to run.
-        logging.info("Problem run finished. Time taken: '%s' seconds", DateTimeHelper.get_seconds_since_now(self.run_start_time))
+        logging.info("Problem run finished. Time taken: '%s' seconds", DateTimeHelper.get_elapsed_time_since(self.run_start_time))
 
     #
     # Calls init on the CGM server and returns the response.

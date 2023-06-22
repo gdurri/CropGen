@@ -37,7 +37,7 @@ class Config(Model):
         self.socket_data_num_bytes_buffer_size = self._get_config_setting(data, 'socketDataNumBytesBufferSize', 4)
         self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'big')        
         self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
-        self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 120.0)
+        self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 0.0)
         self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
         self.socket_receive_buffer_size = self._get_config_setting(data, 'socketReceiveBufferSize', 1024)
         self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')

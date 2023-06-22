@@ -3,6 +3,7 @@ import logging
 from lib.utils.constants import Constants
 from lib.socket.socket_client import SocketClient
 from lib.socket.socket_client_base import ReadMessageData
+from lib.utils.date_time_helper import DateTimeHelper
 
 #
 # The real CGM Client
@@ -42,12 +43,13 @@ class CGMClient:
             logging.info("Calling CGM with message: '%s'", message.get_type_name())
             logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
 
+            request_start_time = DateTimeHelper.get_date_time()
             socket_client = SocketClient(self.config)
             socket_client.connect(self.host, self.port)
             socket_client.write_text(message)
             socket_client.set_timeout(self.config.socket_timeout_seconds)
             data =  socket_client.read_text()
-            logging.debug("Received response from: %s request", message.get_type_name())
+            logging.debug("Received response from: %s request. Time taken: %s", message.get_type_name(), DateTimeHelper.get_elapsed_time_since(request_start_time))
             return data
         except Exception as exception:
             error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"

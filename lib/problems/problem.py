@@ -9,6 +9,7 @@ from lib.problems.single_year_results_processor import SingleYearResultsProcesso
 from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
 from lib.problems.empty_results_processor import EmptyResultsProcessor
 from lib.utils.constants import Constants
+from lib.utils.date_time_helper import DateTimeHelper
 
 #
 # Represents a Problem
@@ -28,23 +29,28 @@ class Problem(ProblemBase):
         if self.run_errors:
             self._initialise_algorithm_array(out_objective_values)
             return
-        
+
         logging.debug("Processing APSIM iteration (%d of %d) with %d individuals", 
             self.current_iteration_id, 
             self.run_job_request.Iterations,
             len(variable_values_for_population)
         )
 
+        start_time = DateTimeHelper.get_date_time()
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
         
+        logging.debug("Finished processing APSIM iteration: %d. Time taken: %s",  self.current_iteration_id, DateTimeHelper.get_elapsed_time_since(start_time))
+
+        # Increment our iteration ID.
+        self.current_iteration_id += 1
+
     #
     # Evaluate fitness of the Individuals in the population
     # Parameters:
     # - relay_apsim_request: This is the request that is sent to the CGM server. It contains all of the values from the population.
+    # - out_objective_values(dict): The dictionary to write the objective values out to. 'F' key for objectives and 'G' key for constraints
     # - variable_values_for_population(list): The variable values (in lists) for each individual in the population
-    # - out(dict): The dictionary to write the objective values out to. 'F' key for objectives
-    # and 'G' key for constraints
     #
     def _handle_evaluate_value_for_population(
         self,
@@ -64,7 +70,6 @@ class Problem(ProblemBase):
         # Iterate over all of the individuals.
         for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
 
-            logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
             results_for_individual = response.get_apsim_results_for_individual(individual)
 
             # This shouldn't happen, but just in case..
@@ -76,18 +81,16 @@ class Problem(ProblemBase):
             if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
                 self._set_is_multi_year(results_for_individual)
 
+            logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
+
             if not Problem._get_contains_results(results_for_individual):
-                EmptyResultsProcessor.process_results(
-                    individual, self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
-                )
+                EmptyResultsProcessor.process_results(individual, self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
+
             elif self.is_multi_year:
-                MultiYearResultsProcessor.process_results(
-                    self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
-                )
+                MultiYearResultsProcessor.process_results(self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
+
             else:
-                SingleYearResultsProcessor.process_results(
-                    self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs
-                )
+                SingleYearResultsProcessor.process_results(self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
         # Feed the results back into the algorithm so that it can continue advancing...
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)
@@ -97,9 +100,6 @@ class Problem(ProblemBase):
 
         # Send out the results.
         self.results_publisher.publish_iteration_results(iteration_results_message)
-
-        # Increment our iteration ID.
-        self.current_iteration_id += 1
 
     #
     # Tests whether the results actually contain any results.

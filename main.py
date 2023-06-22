@@ -33,8 +33,7 @@ if __name__ == "__main__":
         server_coro = asyncio.start_server(
             client_connected_cb,
             host=config.socket_server_host,
-            port=config.socket_server_port,
-            loop=loop,
+            port=config.socket_server_port
         )
 
         server = loop.run_until_complete(server_coro)
