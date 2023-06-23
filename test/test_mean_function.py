@@ -2,7 +2,7 @@ import unittest
 
 from parameterized import parameterized
 from test.test_base import TestBase
-from test.apsim_result_helper import ApsimResultHelper
+from test.helpers.apsim_result_helper import ApsimResultHelper
 from lib.aggregate_functions.mean_function import MeanFunction
 
 class MeanFunctionTests(TestBase):

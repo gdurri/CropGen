@@ -2,8 +2,8 @@ import unittest
 
 from parameterized import parameterized
 from test.test_base import TestBase
-from test.test_aggregate_function import TestAggregateFunction
-from test.apsim_result_helper import ApsimResultHelper
+from test.helpers.test_aggregate_function import TestAggregateFunction
+from test.helpers.apsim_result_helper import ApsimResultHelper
 from lib.aggregate_functions.failure_risk_function import FailureRiskFunction
 
 class FailureRiskFunctionTests(TestBase):
@@ -47,6 +47,28 @@ class FailureRiskFunctionTests(TestBase):
 
         # Assert
         self.assertEqual(actual, expected, f"operator: {operator} param: {param} apsim_output_index: {apsim_output_index} expected: {expected} actual: {actual}")
+
+    @parameterized.expand([
+        (None,  "10"),
+        ("<<", "-1"),
+        (">>", "101"),
+        ("<", None)
+    ])
+    def test_calculate_throws(self, high_low, percentage):
+        # Arrange
+
+        # Create a list of random numbers.
+        result_values = [112, 125, 9, 72, 170, 146, 157]
+
+        results_for_individual = ApsimResultHelper.create_results_for_individual(
+            result_values, 0
+        )
+
+        aggregate_function = TestAggregateFunction([high_low, percentage])
+
+        # Act & Assert
+        self.assertRaises(Exception, FailureRiskFunction.calculate, aggregate_function, results_for_individual, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

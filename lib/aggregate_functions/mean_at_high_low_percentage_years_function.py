@@ -35,14 +35,15 @@ class MeanAtHighLowPercentageYears:
 
         # Create a sorted list for these values.
         sorted_list = MeanAtHighLowPercentageYears._extract_years_of_interest(results_for_individual, apsim_output_index, high_low, percentage, total_years, round_up_years)
+        sorted_list_length = len(sorted_list)
+        result = 0
 
-        total = 0
-        for value in sorted_list:
-            total += value
-        
-        result = total / len(sorted_list)
+        if sorted_list_length > 0:
+            for value in sorted_list: 
+                result += value
+            result = result / sorted_list_length
 
-        logging.info("Result: '%f' total: '%d' total years: %d.", result, total, total_years)
+        logging.info("Result: '%f' total: '%d' total years: %d years in %d calculation: %d.", result, result, total_years, percentage, sorted_list_length)
 
         return result
     
@@ -62,7 +63,7 @@ class MeanAtHighLowPercentageYears:
     @staticmethod
     def _is_supported_percentage(percentage):
         return (
-            percentage >= 0.0 or
+            percentage >= 0.0 and
             percentage <= 100.0
         )
     
@@ -85,7 +86,7 @@ class MeanAtHighLowPercentageYears:
             sorted_list = sorted_list[0:years]
         elif high_low == Constants.MEAN_AT_PARAM_HIGHEST:
             sorted_list = sorted_list[-years:]
-        else:
-            logging.error("Unknown high_low '%s'", high_low)
+        # else:
+        #     logging.error("Unknown high_low '%s'", high_low)
         
         return sorted_list
