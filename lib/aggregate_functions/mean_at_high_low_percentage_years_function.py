@@ -86,7 +86,7 @@ class MeanAtHighLowPercentageYears:
             sorted_list = sorted_list[0:years]
         elif high_low == Constants.MEAN_AT_PARAM_HIGHEST:
             sorted_list = sorted_list[-years:]
-        # else:
-        #     logging.error("Unknown high_low '%s'", high_low)
+        else:
+            logging.error("Unknown high_low '%s'", high_low)
         
         return sorted_list
