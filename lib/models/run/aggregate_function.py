@@ -18,10 +18,12 @@ class AggregateFunction(Model):
     #
     # Get the param in the specified index, or None if it doesn't exist
     #
-    def get_param_by_index(self, index):
+    def get_param_by_index(self, index, convert_to_lower=True):
         param = None
         if len(self.Params) > index:
-            return self.Params[index]
+            param = self.Params[index]
+            if convert_to_lower == True:
+                param = param.lower().strip()
         return param
 
     #
