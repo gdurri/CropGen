@@ -11,7 +11,6 @@ class RunMessageProcessor():
     #
     def __init__(self, config):
         self.config = config
-        self.run_start_time = DateTimeHelper.get_date_time()
         self.cgm_server_client = None
 
     #
@@ -20,6 +19,8 @@ class RunMessageProcessor():
     def process_run_message(self, run_job_request, cgm_server_client):        
         logging.info("Processing run job request for JobID: %s", run_job_request.JobID)        
         logging.debug("Run job request: %s", run_job_request.to_json(self.config.pretty_print_json_in_logs))
+
+        run_start_time = DateTimeHelper.get_date_time()
 
         if not self._init_cgm(run_job_request, cgm_server_client):
             logging.error("Failed to initialise %s. Run message will not be processed.", Constants.CGM_SERVER)
@@ -31,7 +32,12 @@ class RunMessageProcessor():
         problem.run()
 
         # Log out how many seconds the problem took to run.
-        logging.info("Problem run finished. Time taken: '%s' seconds", DateTimeHelper.get_elapsed_time_since(self.run_start_time))
+        logging.info("Problem run finished. Time taken: '%s' seconds. JobID: '%s', Iterations: '%d', Individuals: '%d'", 
+            DateTimeHelper.get_elapsed_time_since(run_start_time),
+            run_job_request.JobID,
+            run_job_request.Iterations,
+            run_job_request.Individuals
+        )
 
     #
     # Calls init on the CGM server and returns the response.

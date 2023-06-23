@@ -12,6 +12,14 @@
             "program": "main.py",
             "console": "integratedTerminal",
             "args": [""]
+        },
+        {
+            "name": "RunTests",
+            "type": "python",
+            "request": "launch",
+            "program": "run_tests.py",
+            "console": "integratedTerminal",
+            "args": [""]
         }
     ]
 }

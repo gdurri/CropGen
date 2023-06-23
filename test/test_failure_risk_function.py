@@ -2,21 +2,9 @@ import unittest
 
 from parameterized import parameterized
 from test.test_base import TestBase
+from test.test_aggregate_function import TestAggregateFunction
 from test.apsim_result_helper import ApsimResultHelper
 from lib.aggregate_functions.failure_risk_function import FailureRiskFunction
-
-class TestAggregateFunction(TestBase):
-    def __init__(self, values):
-        self.values = values
-    
-    def get_param_by_index(self, index):
-        param = None
-        if len(self.values) > index:
-            return self.values[index]
-        else:
-            super().log_to_console(f"TestAggregateFunction: No value at index: {index}")
-        return param
-
 
 class FailureRiskFunctionTests(TestBase):
 

@@ -30,7 +30,7 @@ class Problem(ProblemBase):
             self._initialise_algorithm_array(out_objective_values)
             return
 
-        logging.debug("Processing APSIM iteration (%d of %d) with %d individuals", 
+        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
             self.current_iteration_id, 
             self.run_job_request.Iterations,
             len(variable_values_for_population)
@@ -39,8 +39,13 @@ class Problem(ProblemBase):
         start_time = DateTimeHelper.get_date_time()
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
-        
-        logging.debug("Finished processing APSIM iteration: %d. Time taken: %s",  self.current_iteration_id, DateTimeHelper.get_elapsed_time_since(start_time))
+
+        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)        
+        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated time remaining: %s",  
+            self.current_iteration_id, 
+            DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
+            DateTimeHelper.seconds_to_hhmmss_ms((self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration)
+        )
 
         # Increment our iteration ID.
         self.current_iteration_id += 1

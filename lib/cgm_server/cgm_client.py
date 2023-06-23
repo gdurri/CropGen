@@ -49,7 +49,7 @@ class CGMClient:
             socket_client.write_text(message)
             socket_client.set_timeout(self.config.socket_timeout_seconds)
             data =  socket_client.read_text()
-            logging.debug("Received response from: %s request. Time taken: %s", message.get_type_name(), DateTimeHelper.get_elapsed_time_since(request_start_time))
+            logging.info("Received response from: %s request. Time taken: %s", message.get_type_name(), DateTimeHelper.get_elapsed_time_since(request_start_time))
             return data
         except Exception as exception:
             error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"

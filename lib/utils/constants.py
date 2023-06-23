@@ -17,6 +17,7 @@ class Constants():
     # Calc functions
     TYPE_FAILURE_RISK = 'failurerisk'
     TYPE_MEAN = 'mean'
+    TYPE_MEAN_AT_HIGH_LOW_PERCENTAGE_YEARS = 'meanathighlowpercentageyears'
 
     FAILURE_RISK_PARAM_OPERATOR = 0
     FAILURE_RISK_PARAM_VALUE = 1
@@ -27,6 +28,11 @@ class Constants():
     FAILURE_RISK_PARAM_GREATER_THAN_EQUAL = '>='
     FAILURE_RISK_PARAM_EQUAL = '=='
     FAILURE_RISK_PARAM_NOT_EQUAL = '!='
+
+    MEAN_AT_PARAM_HIGH_LOW = 0
+    MEAN_AT_PARAM_PERCENT = 1
+    MEAN_AT_PARAM_HIGHEST = 'highest'
+    MEAN_AT_PARAM_LOWEST = 'lowest'
 
     # Error messages    
     CGM_SERVER_NO_DATA_READ = f'No data read from {CGM_SERVER}'
@@ -45,6 +51,7 @@ class Constants():
     UNKNOWN_TYPE_NAME = 'Unknown TypeName'
     AGGREGATE_FUNCTION_ERROR = 'Cannot perform aggregate function.'
     FAILURE_RISK_AGGREGATE_FUNCTION_ERROR = f"{AGGREGATE_FUNCTION_ERROR} - Type: '{TYPE_FAILURE_RISK}'"
+    MEAN_AT_AGGREGATE_FUNCTION_ERROR = f"{AGGREGATE_FUNCTION_ERROR} - Type: '{TYPE_MEAN_AT_HIGH_LOW_PERCENTAGE_YEARS}'"
 
     INVALID_SIMULATION_ID = '-1'
     INVALID_SIMULATION_NAME = 'unknown'

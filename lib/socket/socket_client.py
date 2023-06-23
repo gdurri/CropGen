@@ -74,10 +74,6 @@ class SocketClient (SocketClientBase):
             message_data[buffer_pos: buffer_pos + read_data_length] = read_data
             buffer_pos += read_data_length
 
-        logging.debug("%s - Finished reading message. Message Size Bytes: '%d' Buffer Pos: '%d'", 
-            __class__.__name__, 
-            message_size_bytes, 
-            buffer_pos
-        )
+        logging.debug("%s - Finished reading message. Message Size Bytes: '%d'", __class__.__name__, message_size_bytes)
 
         return message_data
