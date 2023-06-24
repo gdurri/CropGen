@@ -40,11 +40,14 @@ class Problem(ProblemBase):
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
 
-        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)        
-        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated time remaining: %s",  
+        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
+        estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
+
+        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated time remaining: %s. Estimated finish date time: %s",  
             self.current_iteration_id, 
             DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
-            DateTimeHelper.seconds_to_hhmmss_ms((self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration)
+            DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining),
+            DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)
         )
 
         # Increment our iteration ID.

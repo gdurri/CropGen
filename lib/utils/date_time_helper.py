@@ -51,6 +51,17 @@ class DateTimeHelper():
         time_string = '{:02d}:{:02d}:{:02d}.{:03d}'.format(hours, minutes, seconds, milliseconds)
         
         return time_string
+    
+    #
+    # Adds the seconds to the current date time and return a formatted string.
+    #
+    @staticmethod
+    def add_seconds_to_datetime_now(seconds):
+        now = datetime.datetime.now()
+        new_datetime = now + datetime.timedelta(seconds=seconds)
+        formatted_datetime = new_datetime.strftime("%Y-%m-%d %H:%M:%S:%f")
+        return formatted_datetime
+
     #
     # Gets now as a date (no time) string.
     #
