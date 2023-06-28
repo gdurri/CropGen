@@ -93,13 +93,13 @@ class Problem(ProblemBase):
             logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
 
             if not Problem._get_contains_results(results_for_individual):
-                EmptyResultsProcessor.process_results(individual, self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
+                EmptyResultsProcessor.process_results(individual, self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
             elif self.is_multi_year:
-                MultiYearResultsProcessor.process_results(self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
+                MultiYearResultsProcessor.process_results(self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
             else:
-                SingleYearResultsProcessor.process_results(self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
+                SingleYearResultsProcessor.process_results(self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
         # Feed the results back into the algorithm so that it can continue advancing...
         out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = np.array(all_algorithm_outputs)

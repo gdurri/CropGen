@@ -82,9 +82,6 @@ class FinalResultsMessage(Model):
         id = 0
         for output in processed_aggregated_outputs:            
             results = []
-            
-            if not output.Optimise: continue
-
             for result in objective_values_non_dominated_individuals[:, id]:
                 output_value = OutputValue(
                     result, 

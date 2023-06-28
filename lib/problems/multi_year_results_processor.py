@@ -14,6 +14,7 @@ class MultiYearResultsProcessor():
     @staticmethod
     def process_results(
         run_job_request,
+        config, 
         results_for_individual,
         all_algorithm_outputs,
         all_results_outputs
@@ -33,7 +34,7 @@ class MultiYearResultsProcessor():
             if not request_output or not request_output.Optimise: continue
 
             for aggregate_function in request_output.AggregateFunctions:
-                aggregate_function_calculator = AggregateFunctionCalculator(aggregate_function)
+                aggregate_function_calculator = AggregateFunctionCalculator(config, aggregate_function)
                 raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual, output_index)
                 output_value = OutputValue(
                     raw_output_value, 

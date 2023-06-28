@@ -12,7 +12,8 @@ class AggregateFunctionCalculator:
     #
     # Constructor
     #
-    def __init__(self, aggregate_function):
+    def __init__(self, config, aggregate_function):
+        self.config = config
         self.aggregate_function = aggregate_function
 
     #
@@ -28,7 +29,7 @@ class AggregateFunctionCalculator:
         elif calc_type == Constants.TYPE_MEAN:
             output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
         elif calc_type == Constants.TYPE_MEAN_AT_HIGH_LOW_PERCENTAGE_YEARS:
-            output_value = MeanAtHighLowPercentageYears.calculate(self.aggregate_function, results_for_individual, apsim_output_index, True)
+            output_value = MeanAtHighLowPercentageYears.calculate(self.aggregate_function, results_for_individual, apsim_output_index, self.config.round_up_years_in_mean_calculation)
         else:
             logging.error("Unknown Aggregate Function calc_type supplied: %s", calc_type)
 
