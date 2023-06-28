@@ -49,6 +49,22 @@ class RunJobRequest(Model):
         return total_outputs
     
     #
+    # Simple helper for getting the total number of outputs that have been defined as optimisable 
+    #
+    def get_total_outputs_for_optimisation(self):
+        total_outputs = 0
+        for output in self.Outputs:
+            if output.Optimise:
+                total_aggregate_functions = len(output.AggregateFunctions)
+                # Aggregate functions essentially expand out the amount of outputs
+                # that we are handling.
+                if total_aggregate_functions > 0:
+                    total_outputs += total_aggregate_functions
+                else:
+                    total_outputs += 1
+        return total_outputs
+    
+    #
     # Get the output in the specified index, or None if it doesn't exist
     #
     def get_output_by_index(self, index):
@@ -81,11 +97,12 @@ class RunJobRequest(Model):
     def get_display_output_names(self):
         output_names = []
         for output in self.Outputs:
-            if output.AggregateFunctions:
-                for aggregate_function in output.AggregateFunctions:
-                    output_names.append(aggregate_function.DisplayName)
-            else:
-                output_names.append(output.ApsimOutputName)
+            if output.Optimise:
+                if output.AggregateFunctions:
+                    for aggregate_function in output.AggregateFunctions:
+                        output_names.append(aggregate_function.DisplayName)
+                else:
+                    output_names.append(output.ApsimOutputName)
         return output_names
 
     #

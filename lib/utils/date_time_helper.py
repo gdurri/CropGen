@@ -1,3 +1,4 @@
+from tzlocal import get_localzone
 import datetime
 
 #
@@ -57,9 +58,11 @@ class DateTimeHelper():
     #
     @staticmethod
     def add_seconds_to_datetime_now(seconds):
-        now = datetime.datetime.now()
+        local_timezone = get_localzone()
+        now = datetime.datetime.now(local_timezone)
         new_datetime = now + datetime.timedelta(seconds=seconds)
-        formatted_datetime = new_datetime.strftime("%Y-%m-%d %H:%M:%S:%f")
+        # Get the current datetime with timezone
+        formatted_datetime = new_datetime.strftime("%Y-%m-%d %H:%M:%S:%f %Z%z")
         return formatted_datetime
 
     #

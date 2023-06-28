@@ -30,7 +30,7 @@ class ProblemBase(Problem):
         self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
         total_inputs = run_job_request.get_total_inputs()
-        total_outputs = run_job_request.get_total_outputs()
+        total_outputs = run_job_request.get_total_outputs_for_optimisation()
         lower_bounds = self._construct_input_lower_bounds()
         upper_bounds = self._construct_input_upper_bounds()
 
@@ -68,16 +68,3 @@ class ProblemBase(Problem):
         for input in self.run_job_request.Inputs:
             input_upper_bounds.append(input.Max)
         return input_upper_bounds
-
-    #
-    # Constructs a data frame containing the input and output data
-    # using the input and output columns.
-    #
-    def get_combined_inputs_outputs(self):
-        columns = []
-        for input in self.run_job_request.get_input_names():
-            columns.append(input)
-        for output in self.run_job_request.get_apsim_output_names():
-            columns.append(output)
-        return columns
-    

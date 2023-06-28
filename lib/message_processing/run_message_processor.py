@@ -1,6 +1,7 @@
 import logging
 
 from lib.models.cgm.init_workers import InitWorkers
+from lib.models.cgm.init_workers_response import InitWorkersResponse
 from lib.problems.problem_visualisation import ProblemVisualisation
 from lib.utils.date_time_helper import DateTimeHelper
 from lib.utils.constants import Constants
@@ -31,8 +32,8 @@ class RunMessageProcessor():
         # Now run the problem code.
         problem.run()
 
-        # Log out how many seconds the problem took to run.
-        logging.info("Problem run finished. Time taken: '%s' seconds. JobID: '%s', Iterations: '%d', Individuals: '%d'", 
+        # Log out how long the problem took to run.
+        logging.info("Problem run finished. Time taken: '%s'. JobID: '%s', Iterations: '%d', Individuals: '%d'", 
             DateTimeHelper.get_elapsed_time_since(run_start_time),
             run_job_request.JobID,
             run_job_request.Iterations,
@@ -52,5 +53,10 @@ class RunMessageProcessor():
         if errors: 
             logging.error(errors)
             return False
+        
+        # Convert the raw socket data into a RunApsimResponse object.
+        response = InitWorkersResponse()
+        response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
+        logging.debug("Received InitWorkersResponse: '%s'", response.to_json(self.config.pretty_print_json_in_logs))
         
         return True

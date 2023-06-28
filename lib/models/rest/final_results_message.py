@@ -59,6 +59,9 @@ class FinalResultsMessage(Model):
         id = 0
         for output in job_request_outputs:
             results = []
+
+            if not output.Optimise: continue
+
             for result in objective_values_non_dominated_individuals[:, id]:
                 output_value = OutputValue(
                     result, 
@@ -77,8 +80,11 @@ class FinalResultsMessage(Model):
     def _extract_outputs_multi_year_sim(self, processed_aggregated_outputs, objective_values_non_dominated_individuals):
         outputs = []
         id = 0
-        for output in processed_aggregated_outputs:
+        for output in processed_aggregated_outputs:            
             results = []
+            
+            if not output.Optimise: continue
+
             for result in objective_values_non_dominated_individuals[:, id]:
                 output_value = OutputValue(
                     result, 

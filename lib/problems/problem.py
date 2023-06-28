@@ -1,5 +1,5 @@
 import logging
-import numpy as NumPy
+import numpy as np
 
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.models.rest.iteration_results_message import IterationResultsMessage
@@ -37,17 +37,18 @@ class Problem(ProblemBase):
         )
 
         start_time = DateTimeHelper.get_date_time()
+
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
         self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
 
         seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
         estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
 
-        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated time remaining: %s. Estimated finish date time: %s",  
+        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated finish date time: %s (%s)",  
             self.current_iteration_id, 
             DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
-            DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining),
-            DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)
+            DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining),
+            DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)
         )
 
         # Increment our iteration ID.
@@ -101,7 +102,7 @@ class Problem(ProblemBase):
                 SingleYearResultsProcessor.process_results(self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
         # Feed the results back into the algorithm so that it can continue advancing...
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.array(all_algorithm_outputs)
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = np.array(all_algorithm_outputs)
 
         # Populate the iteration results with the outputs from each individual.
         iteration_results_message.add_outputs(self.run_job_request.get_display_output_names(), all_results_outputs)
@@ -131,8 +132,10 @@ class Problem(ProblemBase):
             
             for output_index in range(0, self.run_job_request.get_total_outputs()):
                 request_output = self.run_job_request.get_output_by_index(output_index)
-                # If there is no output for this then just skip and move onto the next one.
-                if not request_output: continue
+                
+                # If there is no output or we're not optimising this output, then just skip and move onto the next one.
+                if not request_output or not request_output.Optimise: continue
+
                 for aggregate_function in request_output.AggregateFunctions:
                     self.processed_aggregated_outputs.append(aggregate_function)
         else:
@@ -144,7 +147,7 @@ class Problem(ProblemBase):
     # minimise algorithm.
     #
     def _initialise_algorithm_array(self, out_objective_values):
-        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = NumPy.empty(
+        out_objective_values[Constants.OBJECTIVE_VALUES_ARRAY_INDEX] = np.empty(
             [self.run_job_request.Individuals, self.run_job_request.get_total_inputs()]
         )     
 
