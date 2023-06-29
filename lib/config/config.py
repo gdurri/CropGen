@@ -44,6 +44,7 @@ class Config(Model):
         self.pretty_print_json_in_logs = self._get_config_setting(data, 'prettyPrintJsonInLogs', False)        
         self.delete_logs_on_startup = self._get_config_setting(data, 'deleteLogsOnStartup', False)
         self.round_up_years_in_mean_calculation = self._get_config_setting(data, 'roundUpYearsInMeanCalculation', False)
+        self.minimum_required_cgm_workers = self._get_config_setting(data, 'minimumRequiredCGMWorkers', 1)
         
 
     #

@@ -9,6 +9,7 @@
     "resultsPublisherTimeoutSeconds": 5,
     "prettyPrintJsonInLogs": true,
     "roundUpYearsInMeanCalculation": true,
+    "minimumRequiredCGMWorkers": 1,
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",

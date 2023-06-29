@@ -40,12 +40,14 @@ class Constants():
     CGM_FAILED_TO_CONNECT_TO_CGM_SERVER = f'Failed to connect to {CGM_SERVER}'
     CGM_SERVER_NO_RESPONSE = f'No response from {CGM_SERVER}'
     CGM_SERVER_NO_RESPONSE_NO_EVALUATE = f"{CGM_SERVER_NO_RESPONSE}. Cannot handle evaluate"
+    CGM_SERVER_INSUFFICIENT_WORKERS_AVAILABLE = f'{CGM_SERVER} - Insufficient "TotalWorkers" available to run job'
     CGM_SERVER_INVALID_RESPONSE = f"Invalid data returned from {CGM_SERVER}"
     CGM_SERVER_ERROR_RESPONSE = f"Error response from {CGM_SERVER}"
     CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE = 'ExceptionResponse'
     UNKNOWN_JOB_TYPE = 'Unknown run JobType'
     APSIM_RESULTS_NOT_EQUAL_TO_INDIVIDUALS = "Total APSIM results doesn't match the total requested individuals"
     NO_APSIM_RESULT_FOR_INDIVIDUALS = "Couldn't find an APSIM result for a given individual."
+    NO_APSIM_RESULTS = "No results have been returned from APSIM."
     APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED = "Total APSIM outputs doesn't match the total requested outputs"
     CROP_GEN_IS_ALREADY_RUNNING_A_JOB = 'Cannot run CropGen because it is busy running a job'
     UNKNOWN_TYPE_NAME = 'Unknown TypeName'

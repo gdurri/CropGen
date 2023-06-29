@@ -24,7 +24,7 @@ class FailureRiskFunction:
 
         total_results_for_individuals = len(results_for_individual)
 
-        logging.info("Calling %s for: '%d' individuals. Using operator: '%s' and value: '%f'",
+        logging.debug("Calling %s for: '%d' individuals. Using operator: '%s' and value: '%f'",
             __class__.__name__, 
             total_results_for_individuals,
             operator,

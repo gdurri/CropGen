@@ -39,7 +39,9 @@ class Problem(ProblemBase):
         start_time = DateTimeHelper.get_date_time()
 
         relay_apsim_request = RelayApsim(self.run_job_request, variable_values_for_population)
-        self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population)
+        if not self._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
+            self._initialise_algorithm_array(out_objective_values)
+            return
 
         seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
         estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
@@ -92,7 +94,7 @@ class Problem(ProblemBase):
 
             logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
 
-            if not Problem._get_contains_results(results_for_individual):
+            if not Problem._get_contains_results_for_individual(results_for_individual):
                 EmptyResultsProcessor.process_results(individual, self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
             elif self.is_multi_year:
@@ -110,16 +112,29 @@ class Problem(ProblemBase):
         # Send out the results.
         self.results_publisher.publish_iteration_results(iteration_results_message)
 
+        return True
+
     #
     # Tests whether the results actually contain any results.
     #
     @staticmethod
-    def _get_contains_results(results_for_individual):
+    def _get_contains_results_for_individual(results_for_individual):
         return len(results_for_individual) > 0 and \
             results_for_individual[0] and \
             results_for_individual[0].SimulationID != Constants.INVALID_SIMULATION_ID and \
             results_for_individual[0].SimulationName != Constants.INVALID_SIMULATION_NAME and \
             len(results_for_individual[0].Values) > 0
+    
+    #
+    # Tests whether the results actually contain any results.
+    #
+    @staticmethod
+    def _get_contains_results(run_apsim_response):
+        return len(run_apsim_response.Rows) > 0 and \
+            run_apsim_response.Rows[0] and \
+            run_apsim_response.Rows[0].SimulationID != Constants.INVALID_SIMULATION_ID and \
+            run_apsim_response.Rows[0].SimulationName != Constants.INVALID_SIMULATION_NAME and \
+            len(run_apsim_response.Rows[0].Values) > 0
     
     #
     # Sets the is multi year flag and extract any aggregate functions if it is a multi year sim.
@@ -168,5 +183,11 @@ class Problem(ProblemBase):
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
         logging.debug("Received RunApsimResponse: '%s'", response.to_json(self.config.pretty_print_json_in_logs))
+
+        if not Problem._get_contains_results(response):
+            error = Constants.NO_APSIM_RESULTS
+            self.run_errors.append(error)
+            logging.error(error)
+            return None
 
         return response

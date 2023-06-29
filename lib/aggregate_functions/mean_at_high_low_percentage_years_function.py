@@ -26,11 +26,12 @@ class MeanAtHighLowPercentageYears:
 
         total_years = len(results_for_individual)
 
-        logging.info("Calling %s for: '%d' individuals. Using high/low: '%s' and percentage: '%f'",
+        logging.debug("Calling %s for: '%d' individuals. Using high/low: '%s', percentage: '%f' and round up years: %s",
             __class__.__name__, 
             total_years,
             high_low,
-            percentage
+            percentage,
+            str(round_up_years)
         )
 
         # Create a sorted list for these values.

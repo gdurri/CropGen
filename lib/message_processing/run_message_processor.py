@@ -58,5 +58,9 @@ class RunMessageProcessor():
         response = InitWorkersResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
         logging.debug("Received InitWorkersResponse: '%s'", response.to_json(self.config.pretty_print_json_in_logs))
+
+        if response.TotalWorkers < self.config.minimum_required_cgm_workers:
+            logging.error(f"{Constants.CGM_SERVER_INSUFFICIENT_WORKERS_AVAILABLE}. Available {response.TotalWorkers}. Minimum: {self.config.minimum_required_cgm_workers}")
+            return False
         
         return True

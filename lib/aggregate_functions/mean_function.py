@@ -12,7 +12,7 @@ class MeanFunction:
 
         total_results_for_individuals = len(results_for_individual)
 
-        logging.info("Calling %s for: '%d' individuals.", __class__.__name__, total_results_for_individuals)
+        logging.debug("Calling %s for: '%d' individuals.", __class__.__name__, total_results_for_individuals)
 
         if total_results_for_individuals == 0:
             return 0
