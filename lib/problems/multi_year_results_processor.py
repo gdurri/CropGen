@@ -8,7 +8,7 @@ from lib.aggregate_functions.aggregate_function_calculator import AggregateFunct
 #
 class MultiYearResultsProcessor():
     
-        #
+    #
     # Handles the results for a single year sim.
     #
     @staticmethod
@@ -23,9 +23,8 @@ class MultiYearResultsProcessor():
 
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
-
-        first_result = results_for_individual[0]
-        apsim_output = ApsimOutput(first_result.SimulationID, first_result.SimulationName)
+        
+        apsim_output = MultiYearResultsProcessor._create_apsim_output(results_for_individual)
 
         for output_index in range(0, total_outputs):
             request_output = run_job_request.get_output_by_index(output_index)
@@ -48,3 +47,23 @@ class MultiYearResultsProcessor():
 
         all_algorithm_outputs.append(algorithm_outputs)
         all_results_outputs.append(apsim_output)
+
+    #
+    # Creates an APSIM output, using the simulation id and name from the results.
+    #
+    @staticmethod
+    def _create_apsim_output(results_for_individual):
+
+        first_result = results_for_individual[0]
+
+        simulation_id = first_result.SimulationID
+        simulation_name = first_result.SimulationName
+
+        # Determine if there are multiple simulations and if so, assign the simulation ID to 0 and the name to MultiSim.
+        for result in results_for_individual:
+            if result.SimulationID != simulation_id:
+                simulation_id = "0"
+                simulation_name = "Multi Simulation"
+                break
+
+        return ApsimOutput(simulation_id, simulation_name)

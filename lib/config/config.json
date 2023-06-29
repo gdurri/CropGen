@@ -8,6 +8,7 @@
     "socketReceiveBufferSize" : 1024,
     "resultsPublisherTimeoutSeconds": 5,
     "prettyPrintJsonInLogs": true,
+    "deleteLogsOnStartup": true,
     "roundUpYearsInMeanCalculation": true,
     "minimumRequiredCGMWorkers": 1,
     
