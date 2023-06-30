@@ -1,13 +1,12 @@
-from enum import Enum
+from enum import IntEnum
 
 from lib.models.common.model import Model
 from lib.models.run.aggregate_function import AggregateFunction
 from lib.utils.json_helper import JsonHelper
 
-class ApsimOutputType(Enum):
+class ApsimOutputType(IntEnum):
     General = 0
     Season = 1
-    Clock = 2
 
 #
 # Represents an output that is sent as part of a run job request.
@@ -33,7 +32,7 @@ class Output(Model):
         outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
         for output_value in outputs:
             apsim_output_name = JsonHelper.get_attribute(output_value, 'ApsimOutputName', errors)
-            apsim_output_type = JsonHelper.get_non_mandatory_attribute(output_value, 'ApsimOutputType', 0)
+            apsim_output_type = JsonHelper.get_non_mandatory_attribute(output_value, 'ApsimOutputType', ApsimOutputType.General)
             optimise = JsonHelper.get_non_mandatory_attribute(output_value, 'Optimise', True)
             maximise = JsonHelper.get_non_mandatory_attribute(output_value, 'Maximise', False)
             multiplier = JsonHelper.get_non_mandatory_attribute(output_value, 'Multiplier', 1)

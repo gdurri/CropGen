@@ -4,6 +4,7 @@ import json
 from lib.models.common.model import Model
 from lib.models.run.input import Input
 from lib.models.run.output import Output
+from lib.models.run.environment_type import EnvironmentType
 from lib.utils.json_helper import JsonHelper
 
 #
@@ -125,6 +126,7 @@ class RunJobRequest(Model):
             self.ReportName = JsonHelper.get_attribute(json_object, 'ReportName', errors)
             self.Inputs = Input.parse_inputs(json_object, errors)
             self.Outputs = Output.parse_outputs(json_object, errors)
+            self.EnvironmentTypes = EnvironmentType.parse(json_object, errors)
         except JSONDecodeError as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 
