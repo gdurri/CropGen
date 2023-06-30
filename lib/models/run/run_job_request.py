@@ -105,7 +105,31 @@ class RunJobRequest(Model):
                 else:
                     output_names.append(output.ApsimOutputName)
         return output_names
-
+    
+    #
+    # Gets the list of simulations to be ran.
+    #
+    def get_simulations_and_seasons_to_run(self):
+        simulations = {}
+        for env_type in self.EnvironmentTypes:
+            simulation_name = env_type.SimulationName
+            season = env_type.Season
+            if simulation_name in simulations:
+                simulations[simulation_name].append(season)
+            else:
+                simulations[simulation_name] = [season]
+        return simulations
+    
+    #
+    # Gets the list of simulations to be ran.
+    #
+    def get_simulations_to_run(self):
+        simulations = []
+        for env_type in self.EnvironmentTypes:
+            simulation_name = env_type.SimulationName
+            if simulation_name not in simulations:
+                simulations.append(simulation_name)
+        return simulations
     #
     # Parses the JSON data into this class.
     #

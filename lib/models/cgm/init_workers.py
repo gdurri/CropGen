@@ -14,6 +14,7 @@ class InitWorkers(Model):
         self.ReportName = run_job_request.ReportName
         self.InputTraits = run_job_request.get_input_names()
         self.Outputs = run_job_request.get_apsim_output_names()
+        self.SimulationNamesToRun = run_job_request.get_simulations_to_run()
 
     #
     # Returns the type name.

@@ -5,5 +5,5 @@
 __pycache__/
 /results/
 /logs
-/lib/utility_scripts/data/.*
-/lib/utility_scripts/output/.*
+/lib/utility_scripts/data
+/lib/utility_scripts/output

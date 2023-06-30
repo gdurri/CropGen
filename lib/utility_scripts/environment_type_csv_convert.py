@@ -1,3 +1,4 @@
+import os
 import csv
 import json
 import sys
@@ -21,14 +22,17 @@ def csv_to_json(csv_file, json_file):
 if __name__ == '__main__':
 
     # Example usage:
-    # python environment_type_csv_convert.py data\\Dalby_ET1.csv output\\env_types.json
+    # python environment_type_csv_convert.py data\\Dalby_ET1.csv
 
-    if len(sys.argv) != 3:
-        print("Usage: python script.py <csv_file> <json_file>")
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <csv_file>")
         sys.exit(1)
 
     csv_file = sys.argv[1]
-    json_file = sys.argv[2]
+    csv_filename = os.path.basename(csv_file)
+    json_file = os.path.splitext(csv_filename)[0] + '.json'
+
+    if not json_file.startswith('output/'):
+        json_file = 'output/' + json_file
+
     csv_to_json(csv_file, json_file)
-
-
