@@ -4,10 +4,10 @@ import csv
 import json
 import sys
 
-# Cleanses the string to ensure it only has alpha numeric characters and a comma.
+# Cleanses the string to ensure it only has recognised characters
 def cleanse_string(s):
     # Define the set of characters you want to allow in the CSV file
-    allowed_characters = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,")
+    allowed_characters = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789, _-")
     
     # Filter out any characters not present in the allowed set
     filtered_string = ''.join(filter(allowed_characters.__contains__, s))
