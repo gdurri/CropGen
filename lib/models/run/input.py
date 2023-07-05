@@ -18,8 +18,12 @@ class Input(Model):
     #
     @staticmethod
     def parse_inputs(json_object, errors):
-        parsed_inputs = [] 
         inputs = JsonHelper.get_attribute(json_object, 'Inputs', errors)
+
+        if not inputs:
+            return []
+        
+        parsed_inputs = [] 
         for output_value in inputs:
             name = JsonHelper.get_attribute(output_value, 'Name', errors)
             min = JsonHelper.get_attribute(output_value, 'Min', errors)

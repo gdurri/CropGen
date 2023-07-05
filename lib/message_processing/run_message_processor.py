@@ -1,5 +1,6 @@
 import logging
 
+from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.init_workers import InitWorkers
 from lib.models.cgm.init_workers_response import InitWorkersResponse
 from lib.problems.problem_visualisation import ProblemVisualisation
@@ -30,7 +31,7 @@ class RunMessageProcessor():
         problem = ProblemVisualisation(self.config, run_job_request)
         
         # Now run the problem code.
-        problem.run()
+        problem.run(CGMClientFactory)
 
         # Log out how long the problem took to run.
         logging.info("Problem run finished. Time taken: '%s'. JobID: '%s', Iterations: '%d', Individuals: '%d'", 

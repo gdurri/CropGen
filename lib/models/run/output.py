@@ -28,8 +28,12 @@ class Output(Model):
     #
     @staticmethod
     def parse_outputs(json_object, errors):
-        parsed_outputs = [] 
         outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
+
+        if not outputs:
+            return []
+
+        parsed_outputs = [] 
         for output_value in outputs:
             apsim_output_name = JsonHelper.get_attribute(output_value, 'ApsimOutputName', errors)
             apsim_output_type = JsonHelper.get_non_mandatory_attribute(output_value, 'ApsimOutputType', ApsimOutputType.General)

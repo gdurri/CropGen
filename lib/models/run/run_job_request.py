@@ -151,7 +151,7 @@ class RunJobRequest(Model):
             self.Inputs = Input.parse_inputs(json_object, errors)
             self.Outputs = Output.parse_outputs(json_object, errors)
             self.EnvironmentTypes = EnvironmentType.parse(json_object, errors)
-        except JSONDecodeError as error:
+        except Exception as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 
         return errors

@@ -2,7 +2,6 @@ from pymoo.core.problem import Problem
 import logging
 import numpy as NumPy
 
-from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.utils.results_publisher import ResultsPublisher
 
 #
@@ -12,7 +11,7 @@ class ProblemBase(Problem):
     #
     # Constructor
     #
-    def __init__(self, config, run_job_request):
+    def __init__(self, config, run_job_request, cgm_client_factory):
         # Member variables
         self.config = config
         self.run_job_request = run_job_request
@@ -27,7 +26,7 @@ class ProblemBase(Problem):
             config
         )
 
-        self.cgm_server_client = CGMClientFactory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
+        self.cgm_server_client = cgm_client_factory.create(run_job_request.CGMServerHost, run_job_request.CGMServerPort, config)
         
         total_inputs = run_job_request.get_total_inputs()
         total_outputs = run_job_request.get_total_outputs_for_optimisation()

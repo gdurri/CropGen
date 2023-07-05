@@ -44,12 +44,12 @@ class RunMessageValidator():
     #
     # Validate
     #
-    def validate(self, message):
+    def validate(self, message, cgm_client_factory):
         self.errors.clear()
         if not self._validate_no_jobs_are_currently_running(): 
             return False
         
-        if not self._validate_run_job_request(message):
+        if not self._validate_run_job_request(cgm_client_factory, message):
             return False
         
         if not self._validate_cgm_server_connection():
@@ -72,7 +72,7 @@ class RunMessageValidator():
     #
     # Constructs a run job request and adds any errors if they exist.
     #
-    def _validate_run_job_request(self, message):
+    def _validate_run_job_request(self, cgm_client_factory, message):
         # Construct a Run Job Request, using the JSON body.
         self.run_job_request = RunJobRequest()
         run_job_errors = self.run_job_request.parse_from_json_string(message)
@@ -80,7 +80,7 @@ class RunMessageValidator():
             self.errors.extend(run_job_errors)
             return False
         
-        self.cgm_server_client = CGMClientFactory.create(
+        self.cgm_server_client = cgm_client_factory.create(
             self.run_job_request.CGMServerHost, 
             self.run_job_request.CGMServerPort,
             self.config

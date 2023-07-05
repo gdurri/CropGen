@@ -1,6 +1,7 @@
 import threading
 import logging
 
+from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
@@ -52,7 +53,7 @@ class MessageProcessor():
     #
     async def _process_run_message(self, message):
         run_message_validator = RunMessageValidator(self.config, self.server_state)
-        valid = run_message_validator.validate(message)
+        valid = run_message_validator.validate(message, CGMClientFactory)
         job_id = run_message_validator.get_job_id()
 
         # If it's invalid, report the error and exit out of this.

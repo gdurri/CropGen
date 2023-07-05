@@ -21,10 +21,10 @@ class ProblemVisualisation():
     #
     # Invokes the running of the problem.
     #
-    def run(self):
+    def run(self, cgm_client_factory):
         self.current_iteration_id = 1
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
-        problem = Problem(self.config, self.run_job_request) 
+        problem = Problem(self.config, self.run_job_request, cgm_client_factory) 
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised

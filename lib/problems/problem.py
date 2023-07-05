@@ -19,8 +19,8 @@ class Problem(ProblemBase):
     #
     # Construct problem with the given dimensions and variable ranges
     #
-    def __init__(self, config, run_job_request):
-        super().__init__(config, run_job_request)
+    def __init__(self, config, run_job_request, cgm_client_factory):
+        super().__init__(config, run_job_request, cgm_client_factory)
 
     #
     # Iterate over each population and perform calcs.
