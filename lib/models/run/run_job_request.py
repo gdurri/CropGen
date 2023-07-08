@@ -1,10 +1,11 @@
 from json.decoder import JSONDecodeError
 import json
+import logging
 
 from lib.models.common.model import Model
 from lib.models.run.input import Input
 from lib.models.run.output import Output
-from lib.models.run.environment_type import EnvironmentType
+from lib.models.run.environment_typing.simulation import Simulation
 from lib.utils.json_helper import JsonHelper
 
 #
@@ -27,6 +28,51 @@ class RunJobRequest(Model):
         self.ReportName = ''
         self.Inputs = []
         self.Outputs = []
+        self.EnvironmentTypes = []
+
+    #
+    # Parses the JSON data into this class.
+    #
+    def parse_from_json_string(self, message):
+        errors = []
+
+        try:
+            json_object = json.loads(message)
+            self.JobID = JsonHelper.get_attribute(json_object, 'JobID', errors)
+            self.CGMServerHost = JsonHelper.get_attribute(json_object, 'CGMServerHost', errors)
+            self.CGMServerPort = JsonHelper.get_attribute(json_object, 'CGMServerPort', errors)
+            self.IterationResultsUrl = JsonHelper.get_attribute(json_object, 'IterationResultsUrl', errors)
+            self.FinalResultsUrl = JsonHelper.get_attribute(json_object, 'FinalResultsUrl', errors)
+            self.ApsimUrl = JsonHelper.get_attribute(json_object, 'ApsimUrl', errors)
+            self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
+            self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
+            self.Seed = JsonHelper.get_non_mandatory_attribute(json_object, 'Seed', None)
+            self.ReportName = JsonHelper.get_attribute(json_object, 'ReportName', errors)
+            self.Inputs = Input.parse_inputs(json_object, errors)
+            self.Outputs = Output.parse_outputs(json_object, errors)
+            self.EnvironmentTypes = RunJobRequest.parse_environment_types(json_object, errors)
+            self.APSIMSimulationClockStartDate = JsonHelper.get_non_mandatory_attribute(json_object, 'APSIMSimulationClockStartDate', None)
+        except Exception as error:
+            errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
+
+        return errors
+    
+    #
+    # Helper function to parse the environment types.
+    #
+    @staticmethod
+    def parse_environment_types(json_object, errors):
+        environment_types = JsonHelper.get_non_mandatory_attribute(json_object, 'EnvironmentTypes', [])
+
+        if not environment_types: return []
+        
+        parsed_env_types = []
+
+        for environment_type_value in environment_types:
+            simulation = JsonHelper.get_attribute(environment_type_value, 'Simulation', errors)
+            parsed_env_types.append(Simulation.parse(simulation, errors))
+            
+        return parsed_env_types
 
     #
     # Simple helper for getting the total number of Inputs defined
@@ -112,7 +158,7 @@ class RunJobRequest(Model):
     def get_simulations_and_seasons_to_run(self):
         simulations = {}
         for env_type in self.EnvironmentTypes:
-            simulation_name = env_type.SimulationName
+            simulation_name = env_type.Name
             season = env_type.Season
             if simulation_name in simulations:
                 simulations[simulation_name].append(season)
@@ -126,35 +172,30 @@ class RunJobRequest(Model):
     def get_simulations_to_run(self):
         simulations = []
         for env_type in self.EnvironmentTypes:
-            simulation_name = env_type.SimulationName
+            simulation_name = env_type.Name
             if simulation_name not in simulations:
                 simulations.append(simulation_name)
         return simulations
+    
     #
-    # Parses the JSON data into this class.
+    # Get a collection of system property names that we want to override.
     #
-    def parse_from_json_string(self, message):
-        errors = []
+    def get_system_property_names(self, config):
+        if not self.get_is_environment_typing_run():
+            return []
+        
+        # If we have some environment types then we want to manipulate the clock start and end date (year only)
+        # so that we can run specific simulations, for specific years. If this is the case, add the APSIM 
+        return [
+            config.apsim_clock_start_date_year_input_name,
+            config.apsim_clock_end_date_year_input_name
+        ]
 
-        try:
-            json_object = json.loads(message)
-            self.JobID = JsonHelper.get_attribute(json_object, 'JobID', errors)
-            self.CGMServerHost = JsonHelper.get_attribute(json_object, 'CGMServerHost', errors)
-            self.CGMServerPort = JsonHelper.get_attribute(json_object, 'CGMServerPort', errors)
-            self.IterationResultsUrl = JsonHelper.get_attribute(json_object, 'IterationResultsUrl', errors)
-            self.FinalResultsUrl = JsonHelper.get_attribute(json_object, 'FinalResultsUrl', errors)
-            self.ApsimUrl = JsonHelper.get_attribute(json_object, 'ApsimUrl', errors)
-            self.Iterations = JsonHelper.get_attribute(json_object, 'Iterations', errors)
-            self.Individuals = JsonHelper.get_attribute(json_object, 'Individuals', errors)
-            self.Seed = JsonHelper.get_non_mandatory_attribute(json_object, 'Seed', None)
-            self.ReportName = JsonHelper.get_attribute(json_object, 'ReportName', errors)
-            self.Inputs = Input.parse_inputs(json_object, errors)
-            self.Outputs = Output.parse_outputs(json_object, errors)
-            self.EnvironmentTypes = EnvironmentType.parse(json_object, errors)
-        except Exception as error:
-            errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
-
-        return errors
+    #
+    # Determines if this is an environment typing run.
+    #
+    def get_is_environment_typing_run(self):
+        return len(self.EnvironmentTypes) > 0
     
     #
     # Returns the type name.

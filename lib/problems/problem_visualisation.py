@@ -2,7 +2,7 @@ from pymoo.optimize import minimize
 import logging
 
 from lib.models.rest.final_results_message import FinalResultsMessage
-from lib.problems.problem import Problem
+from lib.problems.problem_factory import ProblemFactory
 from lib.utils.algorithm_generator import AlgorithmGenerator
 from lib.utils.constants import Constants
 
@@ -21,10 +21,10 @@ class ProblemVisualisation():
     #
     # Invokes the running of the problem.
     #
-    def run(self, cgm_client_factory):
+    def run(self, cgm_server_client):
         self.current_iteration_id = 1
         algorithm = AlgorithmGenerator.create_nsga2_algorithm(self.run_job_request.Individuals)
-        problem = Problem(self.config, self.run_job_request, cgm_client_factory) 
+        problem = ProblemFactory.create(self.config, self.run_job_request, cgm_server_client)
 
         # Run the optimisation algorithm on the defined problem. Note: framework only performs minimisation,
         # so problems must be framed such that each objective is minimised

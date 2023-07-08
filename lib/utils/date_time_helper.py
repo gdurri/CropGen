@@ -1,5 +1,5 @@
 from tzlocal import get_localzone
-import datetime
+from datetime import datetime
 
 #
 # Simple date time helper class
@@ -8,6 +8,7 @@ class DateTimeHelper():
     # Constants
     DATE_FORMAT = '%Y-%m-%d'
     TIME_FORMAT = '%H.%M.%S'
+    APSIM_CLOCK_DATE_FORMAT = "%d/%m/%Y"
     DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
     #
@@ -15,7 +16,27 @@ class DateTimeHelper():
     #
     @staticmethod
     def get_date_time():
-        return datetime.datetime.now()
+        return datetime.now()
+    
+    #
+    # Creates a date time from a given string
+    #
+    @staticmethod
+    def get_date_from_str(date_time_str, date_format=DATE_FORMAT):
+        return datetime.strptime(date_time_str, date_format)
+    
+    #
+    # returns a date time with only the year replaced
+    #
+    @staticmethod
+    def update_date_time_year(date_time, year):
+        return date_time.replace(year=year)
+    
+    #
+    # Converts a date to a string in the given format.
+    #
+    def date_to_str(date, date_format=DATE_FORMAT):
+        return date.strftime(date_format)
 
     #
     # Gets the seconds since now and the start time provided.
@@ -59,7 +80,7 @@ class DateTimeHelper():
     @staticmethod
     def add_seconds_to_datetime_now(seconds):
         local_timezone = get_localzone()
-        now = datetime.datetime.now(local_timezone)
+        now = datetime.now(local_timezone)
         new_datetime = now + datetime.timedelta(seconds=seconds)
         # Get the current datetime with timezone
         formatted_datetime = new_datetime.strftime("%Y-%m-%d %H:%M:%S:%f %Z%z")
@@ -91,4 +112,4 @@ class DateTimeHelper():
     #
     @staticmethod
     def _get_now_str(format):
-        return datetime.datetime.now().strftime(format)
+        return datetime.now().strftime(format)

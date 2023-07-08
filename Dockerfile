@@ -8,10 +8,7 @@ WORKDIR /crop-gen
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-# Remove the "logs" directory if it exists
-RUN if [ -d "logs" ]; then rm -rf logs; fi
-
-# Copy all of our app files
+# Copy all of our app files (see .dockerignore for files/directories that should be ignored)
 COPY . .
 
 # Setup environment variables

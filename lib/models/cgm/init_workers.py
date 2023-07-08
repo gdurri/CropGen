@@ -8,13 +8,14 @@ class InitWorkers(Model):
     #
     # Constructor
     #
-    def __init__(self, run_job_request):
+    def __init__(self, run_job_request, config):
         self.JobID = run_job_request.JobID
         self.Url = run_job_request.ApsimUrl
         self.ReportName = run_job_request.ReportName
         self.InputTraits = run_job_request.get_input_names()
+        self.SystemPropertyNames = run_job_request.get_system_property_names(config)
         self.Outputs = run_job_request.get_apsim_output_names()
-        self.SimulationNamesToRun = run_job_request.get_simulations_to_run()
+        self.SimulationNamesToLoad = run_job_request.get_simulations_to_run()
 
     #
     # Returns the type name.

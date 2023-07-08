@@ -30,8 +30,8 @@ class RunMessageProcessor():
 
         problem = ProblemVisualisation(self.config, run_job_request)
         
-        # Now run the problem code.
-        problem.run(CGMClientFactory)
+        # Now run the problem code, pass in the CGM factory class for 
+        problem.run(cgm_server_client)
 
         # Log out how long the problem took to run.
         logging.info("Problem run finished. Time taken: '%s'. JobID: '%s', Iterations: '%d', Individuals: '%d'", 
@@ -47,7 +47,7 @@ class RunMessageProcessor():
     def _init_cgm(self, run_job_request, cgm_server_client):
 
         # Create an init workers request, using the contents of the run_job_request.
-        init_workers_request = InitWorkers(run_job_request)
+        init_workers_request = InitWorkers(run_job_request, self.config)
         read_message_data = cgm_server_client.call_cgm(init_workers_request)
         errors = cgm_server_client.validate_cgm_call(read_message_data)
 

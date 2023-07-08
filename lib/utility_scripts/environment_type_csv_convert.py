@@ -14,7 +14,6 @@ def cleanse_string(s):
     
     return filtered_string
 
-
 # Parses the CSV and turns it into a JSON array of objects.
 def csv_to_json(csv_file, json_file):
     data = {"EnvironmentTypes": []}
@@ -22,12 +21,39 @@ def csv_to_json(csv_file, json_file):
     with open(csv_file, 'r') as file:
         reader = csv.DictReader((cleanse_string(line) for line in file))
         for row in reader:
-            environment_type = {
-                "SimulationName": row['SimulationName'],
-                "Season": int(row['Season']),
-                "EnvironmentType": int(row['EnvType'])
-            }
-            data['EnvironmentTypes'].append(environment_type)
+            simulation_name = row['SimulationName']
+            season = int(row['Season'])
+            environment_type = int(row['EnvType'])
+
+            # Check if the simulation already exists in the JSON
+            simulation = next((s for s in data['EnvironmentTypes'] if s['Simulation']['Name'] == simulation_name), None)
+            if simulation is None:
+                # Create a new simulation entry with the first environment object
+                simulation = {
+                    "Simulation": {
+                        "Name": simulation_name,
+                        "Environments": [
+                            {
+                                "Type": environment_type,
+                                "Seasons": [season]
+                            }
+                        ]
+                    }
+                }
+                data['EnvironmentTypes'].append(simulation)
+            else:
+                # Check if the environment type already exists for the simulation
+                existing_env_type = next((env for env in simulation['Simulation']['Environments'] if env['Type'] == environment_type), None)
+                if existing_env_type is None:
+                    # Create a new environment object for the environment type
+                    environment = {
+                        "Type": environment_type,
+                        "Seasons": [season]
+                    }
+                    simulation['Simulation']['Environments'].append(environment)
+                else:
+                    # Add season to existing environment object
+                    existing_env_type['Seasons'].append(season)
 
     with open(json_file, 'w') as file:
         json.dump(data, file, indent=4)
