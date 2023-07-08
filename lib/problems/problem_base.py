@@ -139,7 +139,7 @@ class ProblemBase(Problem):
         out_objective_values,
         variable_values_for_population
     ):
-        response = super()._call_relay_apsim(relay_apsim_request)
+        response = self._call_relay_apsim(relay_apsim_request)
         if not response: return False
 
         # Populate the iteration message with all of the data that we currently have.
@@ -160,11 +160,11 @@ class ProblemBase(Problem):
 
             # The first time through we capture whether this is a multi or single year sim.
             if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
-                super()._set_is_multi_year(results_for_individual)
+                self._set_is_multi_year(results_for_individual)
 
             logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
 
-            if not super()._get_contains_results_for_individual(results_for_individual):
+            if not self._get_contains_results_for_individual(results_for_individual):
                 EmptyResultsProcessor.process_results(individual, self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
             elif self.is_multi_year:

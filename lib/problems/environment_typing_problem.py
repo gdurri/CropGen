@@ -40,8 +40,10 @@ class EnvironmentTypingProblem(ProblemBase):
                 self.run_job_request, 
                 variable_values_for_population, 
                 environment_type, 
-                APSIMSeasonDateGenerator(self.run_job_request.APSIMSimulationClockStartDate), 
-                self.config
+                APSIMSeasonDateGenerator(
+                    self.config,
+                    self.run_job_request.APSIMSimulationClockStartDate
+                )
             )
 
             if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):

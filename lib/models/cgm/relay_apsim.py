@@ -14,7 +14,7 @@ class RelayApsim(Model):
         run_job_request, 
         generated_input_values, 
         environment_type=None, 
-        season_date_generator=None,
+        season_date_generator=None
     ):
         self.JobID = run_job_request.JobID
         self.Individuals = run_job_request.Individuals
