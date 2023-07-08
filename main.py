@@ -10,6 +10,7 @@ from lib.logging.logger_config import LoggerConfig
 from lib.server.socket_server import SocketServer
 from lib.server.server_state import ServerState
 from lib.config.config import Config
+from lib.docker.docker_helper import DockerHelper
 
 config = Config()
 server_state = ServerState()
@@ -19,6 +20,18 @@ def client_connected_cb(client_reader, client_writer):
     server = SocketServer(config, server_state)
     server.client_connected_callback(client_reader, client_writer)
 
+def log_app_startup():
+    logging.debug("Started CropGen application")
+    #if config.is_running_in_docker:
+        # image_info = DockerHelper.get_image_info()
+        # if image_info:
+        #     logging.info("Docker Info: %s", image_info)
+        # else:
+        #     logging.error("Failed to retrieve Docker Info")
+
+    logging.info("Service Config: %s", config.to_json(config.pretty_print_json_in_logs))
+    
+
 # Main entry point
 if __name__ == "__main__":
 
@@ -26,8 +39,7 @@ if __name__ == "__main__":
         logger_config = LoggerConfig(config)
         logger_config.setup_logger()
 
-        logging.debug("Started CropGen application")
-        logging.info("Service Config: %s", config.to_json(config.pretty_print_json_in_logs))
+        log_app_startup()
 
         loop = asyncio.get_event_loop()
         server_coro = asyncio.start_server(

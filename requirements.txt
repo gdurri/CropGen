@@ -2,3 +2,4 @@ pymoo
 requests
 parameterized
 tzlocal
+docker

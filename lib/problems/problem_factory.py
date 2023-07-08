@@ -11,7 +11,7 @@ class ProblemFactory():
     #
     @staticmethod
     def create(config, run_job_request, cgm_server_client):
-        if run_job_request.get_is_environment_typing_run:
+        if run_job_request.get_is_environment_typing_run():
             return EnvironmentTypingProblem(config, run_job_request, cgm_server_client )
         else:
             return Problem(config, run_job_request, cgm_server_client )

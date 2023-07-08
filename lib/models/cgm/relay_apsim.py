@@ -52,10 +52,11 @@ class RelayApsim(Model):
                 start_date = season_date_generator.generate_start_date_from_season(season)
                 end_date = season_date_generator.generate_end_date_from_season(season)
 
+                self.SystemPropertyValues.append(start_date)
+                self.SystemPropertyValues.append(end_date)
+
                 for individual in range(RelayApsim.INPUT_START_INDEX, len(generated_input_values)):
                     self.add_inputs_for_individual(input_id, generated_input_values[individual])
-                    self.SystemPropertyValues.append(start_date)
-                    self.SystemPropertyValues.append(end_date)
                     input_id += 1
 
     #

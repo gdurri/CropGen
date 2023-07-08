@@ -1,5 +1,6 @@
 from tzlocal import get_localzone
 from datetime import datetime
+from datetime import timedelta
 
 #
 # Simple date time helper class
@@ -81,7 +82,7 @@ class DateTimeHelper():
     def add_seconds_to_datetime_now(seconds):
         local_timezone = get_localzone()
         now = datetime.now(local_timezone)
-        new_datetime = now + datetime.timedelta(seconds=seconds)
+        new_datetime = now + timedelta(seconds=seconds)
         # Get the current datetime with timezone
         formatted_datetime = new_datetime.strftime("%Y-%m-%d %H:%M:%S:%f %Z%z")
         return formatted_datetime
