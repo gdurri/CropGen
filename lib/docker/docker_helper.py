@@ -1,5 +1,3 @@
-import subprocess
-import json
 import docker
 import logging
 
@@ -10,6 +8,7 @@ class DockerHelper():
     #
     # Gets the image id for the current container.
     #
+    @staticmethod
     def get_image_id(image_name):
         client = docker.from_env()
         images = client.images.list()
@@ -24,10 +23,10 @@ class DockerHelper():
     #
     @staticmethod
     def get_current_image_name():
-        container_id = subprocess.check_output(['cat', '/proc/self/cgroup']).decode('utf-8').strip().split('/')[-1]
-        inspect_output = subprocess.check_output(['docker', 'inspect', container_id]).decode('utf-8')
-        container_info = json.loads(inspect_output)
-        image_name = container_info[0]['Config']['Image']
+        container_id = open('/proc/self/cgroup').read().split('/')[-1].strip()
+        client = docker.from_env()
+        container_info = client.api.inspect_container(container_id)
+        image_name = container_info['Config']['Image']
         return image_name
 
     #
@@ -37,10 +36,11 @@ class DockerHelper():
     def get_image_info():
         try:
             image_id = DockerHelper.get_image_id(DockerHelper.get_current_image_name())
-            if not image_id: return None
+            if not image_id:
+                return None
             client = docker.from_env()
             image = client.images.get(image_id)
             return image.tags[0]
-        except:
-            logging.exception("Failed to retrieve Docker Image Info.")
+        except docker.errors.DockerException as e:
+            logging.exception("Failed to retrieve Docker Image Info: {}".format(str(e)))
             return None

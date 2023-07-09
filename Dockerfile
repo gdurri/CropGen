@@ -1,3 +1,6 @@
+# Use the docker base image
+# FROM docker:latest
+
 # Install Python.
 FROM python:3.10-slim-bullseye 
 
