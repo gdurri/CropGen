@@ -38,24 +38,17 @@ class RelayApsim(Model):
     # Sets up the input values, simulation names and system property values, for a request with env typing.
     #
     def initialise_for_env_typing(self, environment_type, season_date_generator, generated_input_values):
-        if not environment_type.Environments:
-            raise Exception("Cannot construct %s because the Environments are null", self.get_type_name())
-        
-        self.SimulationNames.append(environment_type.Name)
-
         input_id = RelayApsim.INPUT_START_INDEX
 
         for environment in environment_type.Environments:
-            environment_type = environment.Type
-
             for season in environment.Seasons:
                 start_date = season_date_generator.generate_start_date_from_season(season)
                 end_date = season_date_generator.generate_end_date_from_season(season)
 
-                self.SystemPropertyValues.append(start_date)
-                self.SystemPropertyValues.append(end_date)
-
                 for individual in range(RelayApsim.INPUT_START_INDEX, len(generated_input_values)):
+                    self.SystemPropertyValues.append([str(input_id), start_date, end_date])
+                    self.SimulationNames.append([str(input_id), environment_type.Name])
+
                     self.add_inputs_for_individual(input_id, generated_input_values[individual])
                     input_id += 1
 
