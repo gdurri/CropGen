@@ -12,6 +12,11 @@ class MeanAtHighLowPercentageYears:
     @staticmethod
     def calculate(aggregate_function, results_for_individual, apsim_output_index, round_up_years):
         
+        total_years = len(results_for_individual)
+
+        if total_years == 1:
+            return results_for_individual[0].Values[apsim_output_index]
+
         high_low = aggregate_function.get_param_by_index(Constants.MEAN_AT_PARAM_HIGH_LOW)
         percentage = float(aggregate_function.get_param_by_index(Constants.MEAN_AT_PARAM_PERCENT))
 
@@ -23,8 +28,7 @@ class MeanAtHighLowPercentageYears:
             raise Exception(f"{Constants.MEAN_AT_AGGREGATE_FUNCTION_ERROR}. Unknown high/low specifier: '{high_low}'")
         if not MeanAtHighLowPercentageYears._is_supported_percentage(percentage): 
             raise Exception(f"{Constants.MEAN_AT_AGGREGATE_FUNCTION_ERROR}. Unknown percentage: '{percentage}'")
-
-        total_years = len(results_for_individual)
+        
 
         logging.debug("Calling %s for: '%d' individuals. Using high/low: '%s', percentage: '%f' and round up years: %s",
             __class__.__name__, 

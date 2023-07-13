@@ -19,8 +19,6 @@ class MultiYearResultsProcessor():
         all_algorithm_outputs,
         all_results_outputs
     ):
-        assert(len(results_for_individual) > 1)
-
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
         

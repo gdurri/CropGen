@@ -99,7 +99,7 @@ class ProblemBase(Problem):
     # Sets the is multi year flag and extract any aggregate functions if it is a multi year sim.
     #
     def _set_is_multi_year(self, results_for_individual):
-        if len(results_for_individual) > 1:
+        if self.run_job_request.get_is_environment_typing_run() or len(results_for_individual) > 1:
             logging.info("%s is running a multi year simulation.", Constants.APPLICATION_NAME)
             self.is_multi_year = True
             self.processed_aggregated_outputs = []
@@ -147,9 +147,12 @@ class ProblemBase(Problem):
 
         all_algorithm_outputs = []
         all_results_outputs = []
+        #TODO REMOVE
+        #total_inputs = len(relay_apsim_request.Inputs)
+        total_inputs = self.run_job_request.Individuals
 
         # Iterate over all of the individuals.
-        for individual in range(RelayApsim.INPUT_START_INDEX, self.run_job_request.Individuals):
+        for individual in range(RelayApsim.INPUT_START_INDEX, total_inputs):
 
             results_for_individual = response.get_apsim_results_for_individual(individual)
 
@@ -162,7 +165,7 @@ class ProblemBase(Problem):
             if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
                 self._set_is_multi_year(results_for_individual)
 
-            logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, self.run_job_request.Individuals)
+            logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, total_inputs)
 
             if not self._get_contains_results_for_individual(results_for_individual):
                 EmptyResultsProcessor.process_results(individual, self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)

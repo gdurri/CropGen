@@ -3,8 +3,8 @@ import numpy as np
 
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
-from lib.utils.date_time_helper import DateTimeHelper
 from lib.utils.apsim_season_date_generator import APSIMSeasonDateGenerator
+from lib.utils.date_time_helper import DateTimeHelper
 
 #
 # Represents an Environment Typing Problem
@@ -33,22 +33,16 @@ class EnvironmentTypingProblem(ProblemBase):
 
         start_time = DateTimeHelper.get_date_time()
 
-        # Iterate over each environment type that was supplied, calling RelayApsim for each combination.
-        for environment_type in self.run_job_request.EnvironmentTypes:
+        relay_apsim_request = RelayApsim(self.run_job_request)
+        relay_apsim_request.add_inputs_for_env_typing(
+            self.run_job_request.EnvironmentTypes, 
+            APSIMSeasonDateGenerator(self.config, self.run_job_request.APSIMSimulationClockStartDate), 
+            variable_values_for_population
+        )
 
-            relay_apsim_request = RelayApsim(
-                self.run_job_request, 
-                variable_values_for_population, 
-                environment_type, 
-                APSIMSeasonDateGenerator(
-                    self.config,
-                    self.run_job_request.APSIMSimulationClockStartDate
-                )
-            )
-
-            if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
-                super()._initialise_algorithm_array(out_objective_values)
-                return
+        if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
+            super()._initialise_algorithm_array(out_objective_values)
+            return
 
         seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
         estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration

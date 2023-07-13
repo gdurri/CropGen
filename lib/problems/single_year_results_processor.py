@@ -20,7 +20,7 @@ class SingleYearResultsProcessor():
         assert(len(results_for_individual) == 1)
         apsim_result = results_for_individual[0]
 
-        total_outputs = run_job_request.get_total_outputs()
+        total_outputs = min(run_job_request.get_total_outputs(), len(apsim_result.Values))
         algorithm_outputs = []
 
         apsim_output = ApsimOutput(apsim_result.SimulationID, apsim_result.SimulationName)

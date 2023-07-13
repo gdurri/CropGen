@@ -1,6 +1,5 @@
 import logging
 
-from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.cgm.init_workers import InitWorkers
 from lib.models.cgm.init_workers_response import InitWorkersResponse
 from lib.problems.problem_visualisation import ProblemVisualisation

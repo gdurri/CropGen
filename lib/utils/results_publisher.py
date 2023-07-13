@@ -35,6 +35,12 @@ class ResultsPublisher():
     #
     def _publish_results(self, url, results):
         json = results.to_json()
+
+        if not self.config.publish_results: 
+            logging.info("No results being published as configured not to.")
+            logging.debug("Results: '%s'", results.to_json(self.config.pretty_print_json_in_logs))
+            return None
+
         logging.info("Publishing results to: '%s'", url)
         logging.debug("Results: '%s'", results.to_json(self.config.pretty_print_json_in_logs))
 
