@@ -14,6 +14,7 @@ from lib.docker.docker_helper import DockerHelper
 
 config = Config()
 server_state = ServerState()
+docker_helper = DockerHelper()
 
 # Functions
 def client_connected_cb(client_reader, client_writer):
@@ -23,7 +24,7 @@ def client_connected_cb(client_reader, client_writer):
 def log_app_startup():
     logging.debug("Started CropGen application")
     if config.is_running_in_docker:
-        image_info = DockerHelper.get_image_info()
+        image_info = docker_helper.get_image_info()
         if image_info:
             logging.info("Docker Info: %s", image_info)
 

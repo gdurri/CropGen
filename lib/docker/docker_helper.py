@@ -22,7 +22,7 @@ class DockerHelper:
                         return image.id
             return None
         except docker.errors.DockerException as e:
-            logging.exception("Failed to get Docker image ID: {}".format(str(e)))
+            logging.warn("Failed to get Docker image ID")
             return None
 
     @staticmethod
@@ -37,7 +37,7 @@ class DockerHelper:
             image_name = container_info['Config']['Image']
             return image_name
         except docker.errors.DockerException as e:
-            logging.exception("Failed to get current Docker image name: {}".format(str(e)))
+            logging.warn("Failed to get current Docker image name")
             return None
 
     @staticmethod
@@ -53,5 +53,5 @@ class DockerHelper:
             image = client.images.get(image_id)
             return image.tags[0]
         except docker.errors.DockerException as e:
-            logging.exception("Failed to retrieve Docker image info: {}".format(str(e)))
+            logging.warn("Failed to retrieve Docker image info")
             return None

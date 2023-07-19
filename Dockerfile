@@ -1,8 +1,5 @@
-# Use the docker base image
-# FROM docker:latest
-
 # Install Python.
-FROM python:3.10-slim-bullseye 
+FROM python:3.10-slim-bullseye
 
 # Set our working directory to the CropGen root folder.
 WORKDIR /crop-gen
