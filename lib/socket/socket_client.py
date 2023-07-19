@@ -14,13 +14,17 @@ class SocketClient (SocketClientBase):
     #
     def __init__(self, config):
         super().__init__(config)
-        self.socket = socket.socket()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     #
     # Connects
     #
     def connect(self, host, port):
-        self.socket.connect((host, port))
+        try:
+            self.socket.connect((host, port))
+        except ConnectionRefusedError:
+            logging.error("Connection refused: Failed to connect to %s:%s", host, port)
+            raise
 
     #
     # Sets the timeout
@@ -28,17 +32,23 @@ class SocketClient (SocketClientBase):
     def set_timeout(self, timeout_seconds):
         # Only apply the timeout if one has been configured and it is greater than the default of 0.
         if timeout_seconds > 0:
-            self.socket.settimeout(timeout_seconds)
+            try:
+                self.socket.settimeout(timeout_seconds)
+            except socket.error as e:
+                logging.error("Socket timeout error: %s", str(e))
+                raise
 
     #
     # Writes data
     #
     def write_text(self, message):
         prepare_data = super().prepare_data_for_write(message)
-        # Send the length of the encoded data as a byte array.
-        self.socket.sendall(prepare_data.message_size_byte_array)
-        # Now send the data.
-        self.socket.sendall(prepare_data.encoded_data)
+        try:
+            self.socket.sendall(prepare_data.message_size_byte_array)
+            self.socket.sendall(prepare_data.encoded_data)
+        except socket.error as e:
+            logging.error("Socket write error: %s", str(e))
+            raise
 
     #
     # Writes a serialised error message.
@@ -51,14 +61,18 @@ class SocketClient (SocketClientBase):
     # Reads data
     #
     def read_text(self):
-        # Read the message size byte array that proceeds each message.
-        message_size_byte_array = self.socket.recv(self.config.socket_data_num_bytes_buffer_size)
-        # Convert it to an integer and then use this to read the message itself
-        # with the known size.
-        message_size_bytes = int.from_bytes(message_size_byte_array, self.config.socket_data_endianness)
-        logging.info("%s - Received message size: '%d' bytes", __class__.__name__, message_size_bytes)
-        message_data = self.read_data(message_size_bytes)
-        return super().create_message_wrapper(message_data)
+        try:
+            # Read the message size byte array that proceeds each message.
+            message_size_byte_array = self.socket.recv(self.config.socket_data_num_bytes_buffer_size)
+            # Convert it to an integer and then use this to read the message itself
+            # with the known size.
+            message_size_bytes = int.from_bytes(message_size_byte_array, self.config.socket_data_endianness)
+            logging.info("%s - Received message size: '%d' bytes", self.__class__.__name__, message_size_bytes)
+            message_data = self.read_data(message_size_bytes)
+            return super().create_message_wrapper(message_data)
+        except socket.error as e:
+            logging.error("Socket read error: %s", str(e))
+            raise
 
     #
     # Reads the data

@@ -1,3 +1,5 @@
+import logging 
+
 from lib.models.common.message_wrapper import MessageWrapper
 
 class ReadMessageData:
@@ -44,6 +46,7 @@ class SocketClientBase:
     def create_message_wrapper(self, message_data):
         # If it is an empty message, this is our disconnect message so don't decode it.
         if message_data == b'':
+            logging.info("Received a disconnect message")
             return ReadMessageData([], None, True)
         
         decoded_message_data = message_data.decode(self.config.socket_data_encoding)

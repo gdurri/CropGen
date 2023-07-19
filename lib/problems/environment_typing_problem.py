@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
@@ -18,11 +17,11 @@ class EnvironmentTypingProblem(ProblemBase):
         super().__init__(config, run_job_request, cgm_server_client)
 
     #
-    # Iterate over each population and perform calcs.
+    # Iterate over each population and perform calculations
     #
     def _evaluate(self, variable_values_for_population, out_objective_values, *args, **kwargs):
         if self.run_errors:
-            super()._initialise_algorithm_array(out_objective_values)
+            super()._initialize_algorithm_array(out_objective_values)
             return
 
         logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
@@ -41,7 +40,7 @@ class EnvironmentTypingProblem(ProblemBase):
         )
 
         if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
-            super()._initialise_algorithm_array(out_objective_values)
+            super()._initialize_algorithm_array(out_objective_values)
             return
 
         seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)

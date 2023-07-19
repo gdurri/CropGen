@@ -19,6 +19,7 @@ class MeanFunction:
 
         # Need to calculate the sum of our data to obtain the mean.
         total = 0
+
         for apsim_result in results_for_individual:
             total += apsim_result.Values[apsim_output_index]
 

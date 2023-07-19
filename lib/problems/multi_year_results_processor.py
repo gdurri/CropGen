@@ -15,6 +15,8 @@ class MultiYearResultsProcessor():
     def process_results(
         run_job_request,
         config, 
+        apsim_simulation_names_str,
+        apsim_simulation_ids_str,
         results_for_individual,
         all_algorithm_outputs,
         all_results_outputs
@@ -22,7 +24,7 @@ class MultiYearResultsProcessor():
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
         
-        apsim_output = MultiYearResultsProcessor._create_apsim_output(results_for_individual)
+        apsim_output = ApsimOutput(apsim_simulation_names_str, apsim_simulation_ids_str)
 
         for output_index in range(0, total_outputs):
             request_output = run_job_request.get_output_by_index(output_index)
@@ -31,7 +33,7 @@ class MultiYearResultsProcessor():
             if not request_output or not request_output.Optimise: continue
 
             for aggregate_function in request_output.AggregateFunctions:
-                aggregate_function_calculator = AggregateFunctionCalculator(config, aggregate_function)
+                aggregate_function_calculator = AggregateFunctionCalculator(config, apsim_simulation_names_str, aggregate_function)
                 raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual, output_index)
                 output_value = OutputValue(
                     raw_output_value, 
@@ -45,23 +47,3 @@ class MultiYearResultsProcessor():
 
         all_algorithm_outputs.append(algorithm_outputs)
         all_results_outputs.append(apsim_output)
-
-    #
-    # Creates an APSIM output, using the simulation id and name from the results.
-    #
-    @staticmethod
-    def _create_apsim_output(results_for_individual):
-
-        first_result = results_for_individual[0]
-
-        simulation_id = first_result.SimulationID
-        simulation_name = first_result.SimulationName
-
-        # Determine if there are multiple simulations and if so, assign the simulation ID to 0 and the name to MultiSim.
-        for result in results_for_individual:
-            if result.SimulationID != simulation_id:
-                simulation_id = "0"
-                simulation_name = "Multi Simulation"
-                break
-
-        return ApsimOutput(simulation_id, simulation_name)

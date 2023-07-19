@@ -9,7 +9,6 @@ from lib.utils.date_time_helper import DateTimeHelper
 # The real CGM Client
 #
 class CGMClient:
-
     #
     # Constructor
     #
@@ -27,12 +26,12 @@ class CGMClient:
             socket_client = SocketClient(self.config)
             socket_client.set_timeout(self.config.socket_timeout_test_connection_seconds)
             socket_client.connect(self.host, self.port)
+            logging.info("CGM Connection OK")
+            return True
         except Exception:
             logging.error("CGM Connection NOT OK")
             return False
-        logging.info("CGM Connection OK")
-        return True
-    
+
     #
     # Handles constructing a new socket connection to the CGM, sending the
     # message and returning the raw response.
@@ -48,8 +47,12 @@ class CGMClient:
             socket_client.connect(self.host, self.port)
             socket_client.write_text(message)
             socket_client.set_timeout(self.config.socket_timeout_seconds)
-            data =  socket_client.read_text()
-            logging.info("Received response from: %s request. Time taken: %s", message.get_type_name(), DateTimeHelper.get_elapsed_time_since(request_start_time))
+            data = socket_client.read_text()
+            logging.info(
+                "Received response from: %s request. Time taken: %s",
+                message.get_type_name(),
+                DateTimeHelper.get_elapsed_time_since(request_start_time),
+            )
             return data
         except Exception as exception:
             error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
@@ -57,12 +60,12 @@ class CGMClient:
             errors.append(error)
 
         return ReadMessageData(errors, None)
-    
+
     #
-    # Validates the read message data and captures all of the errors. 
+    # Validates the read message data and captures all of the errors.
     # If this returns true, the object is safe to use.
     #
-    def validate_cgm_call(self, read_message_data):
+    def validate_cgm_call(self, read_message_data, response_name):
         if not read_message_data:
             return [Constants.CGM_SERVER_NO_DATA_READ]
 
@@ -70,13 +73,22 @@ class CGMClient:
         if read_message_data.errors:
             return read_message_data.errors
         
-        if not read_message_data.message_wrapper or \
-           not read_message_data.message_wrapper.TypeName or \
-           not read_message_data.message_wrapper.TypeBody:
+        if read_message_data.is_disconnect_message:
+            return [
+                f'{Constants.CGM_SERVER_DISCONNECTED_WHILE_WAITING_FOR_RESPONSE}. Waiting for response type: {response_name}'
+            ]
+
+        if (
+            not read_message_data.message_wrapper
+            or not read_message_data.message_wrapper.TypeName
+            or not read_message_data.message_wrapper.TypeBody
+        ):
             return [Constants.CGM_SERVER_INVALID_RESPONSE]
 
         # This is to handle an error response.
         if read_message_data.message_wrapper.TypeName == Constants.CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE:
-            return [f'{Constants.CGM_SERVER_ERROR_RESPONSE}: {read_message_data.message_wrapper.TypeBody}']
-        
+            return [
+                f'{Constants.CGM_SERVER_ERROR_RESPONSE}: {read_message_data.message_wrapper.TypeBody}'
+            ]
+
         return []

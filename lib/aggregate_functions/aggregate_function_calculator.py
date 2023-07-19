@@ -12,9 +12,11 @@ class AggregateFunctionCalculator:
     #
     # Constructor
     #
-    def __init__(self, config, aggregate_function):
+    def __init__(self, config, apsim_simulation_names_str, aggregate_function):
         self.config = config
+        self.apsim_simulation_names_str = apsim_simulation_names_str
         self.aggregate_function = aggregate_function
+        
 
     #
     # Calculate the output value using the passed in values
@@ -23,6 +25,11 @@ class AggregateFunctionCalculator:
     def calculate_output_value(self, results_for_individual, apsim_output_index):
         calc_type = self.aggregate_function.CalcType.lower().strip()
         output_value = None
+        
+        logging.info("Calling calculate_output_value with a calc_type of: %s for results containing the following APSIM simulations: %s", 
+            calc_type, 
+            apsim_simulation_names_str
+        )
 
         if calc_type == Constants.TYPE_FAILURE_RISK:
             output_value = FailureRiskFunction.calculate(self.aggregate_function, results_for_individual, apsim_output_index)

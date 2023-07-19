@@ -12,7 +12,6 @@ class SingleYearResultsProcessor():
     @staticmethod
     def process_results(
         run_job_request,
-        config,
         results_for_individual,
         all_algorithm_outputs,
         all_results_outputs

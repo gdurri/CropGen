@@ -42,6 +42,7 @@ class Constants():
     CGM_SERVER_NO_RESPONSE_NO_EVALUATE = f"{CGM_SERVER_NO_RESPONSE}. Cannot handle evaluate"
     CGM_SERVER_INSUFFICIENT_WORKERS_AVAILABLE = f'{CGM_SERVER} - Insufficient "TotalWorkers" available to run job'
     CGM_SERVER_INVALID_RESPONSE = f"Invalid data returned from {CGM_SERVER}"
+    CGM_SERVER_DISCONNECTED_WHILE_WAITING_FOR_RESPONSE = f"{CGM_SERVER} disconnected from socket whilst waiting for a response."
     CGM_SERVER_ERROR_RESPONSE = f"Error response from {CGM_SERVER}"
     CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE = 'ExceptionResponse'
     UNKNOWN_JOB_TYPE = 'Unknown run JobType'
