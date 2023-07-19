@@ -139,15 +139,14 @@ class ProblemBase(Problem):
         for apsim_result in results_for_individual:
             self.apsim_simulation_names.add(apsim_result.SimulationName.strip())
             self.apsim_simulation_ids.add(apsim_result.SimulationID)
-        
-        delimiter = ', '
 
         total_apsim_simulations = len(self.apsim_simulation_names)
 
         if total_apsim_simulations > ProblemBase.MAX_SIMULATION_NAMES_TO_LIST:
-            self.apsim_simulation_names_str = f"Multi APSIM Simulations ({total_apsim_simulations} in total)"
+            self.apsim_simulation_names_str = f"Multiple APSIM Simulations ({total_apsim_simulations})"
             self.apsim_simulation_ids_str = 0
         else:
+            delimiter = ', '
             self.apsim_simulation_names_str = delimiter.join(self.apsim_simulation_names)
             self.apsim_simulation_ids_str = delimiter.join(self.apsim_simulation_names)
 

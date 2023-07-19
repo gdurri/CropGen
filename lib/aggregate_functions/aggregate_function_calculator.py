@@ -28,7 +28,7 @@ class AggregateFunctionCalculator:
         
         logging.info("Calling calculate_output_value with a calc_type of: %s for results containing the following APSIM simulations: %s", 
             calc_type, 
-            apsim_simulation_names_str
+            self.apsim_simulation_names_str
         )
 
         if calc_type == Constants.TYPE_FAILURE_RISK:

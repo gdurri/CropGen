@@ -12,9 +12,10 @@
     "deleteLogsOnStartup": true,
     "roundUpYearsInMeanCalculation": true,
     "minimumRequiredCGMWorkers": 1,
+    "maxRetryCGMIfResponseInvalid": 5,
     "apsimClockStartDateYearInputName": "Clock.StartDate",
     "apsimClockEndDateYearInputName": "Clock.EndDate",
-    "apsimSimulationStartDate": "1900-06-01",
+    "apsimSimulationStartDate": "1900-06-01",    
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",

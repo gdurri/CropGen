@@ -38,28 +38,43 @@ class CGMClient:
     #
     def call_cgm(self, message):
         errors = []
-        try:
-            logging.info("Calling CGM with message: '%s'", message.get_type_name())
-            logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
+        attempt = 1
+        max_attenpts = self.config.max_retry_cgm_if_response_invalid
 
-            request_start_time = DateTimeHelper.get_date_time()
-            socket_client = SocketClient(self.config)
-            socket_client.connect(self.host, self.port)
-            socket_client.write_text(message)
-            socket_client.set_timeout(self.config.socket_timeout_seconds)
-            data = socket_client.read_text()
-            logging.info(
-                "Received response from: %s request. Time taken: %s",
-                message.get_type_name(),
-                DateTimeHelper.get_elapsed_time_since(request_start_time),
-            )
-            return data
-        except Exception as exception:
-            error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
-            logging.error(error)
-            errors.append(error)
+        while attempt <= max_attenpts:
+            try:
+                logging.info("Calling CGM with message: '%s'. Attempt %d/%d", message.get_type_name(), attempt, max_attenpts)
+                logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
+
+                data = self.perform_call_cgm(message)
+                if data.is_disconnect_message or data.message_wrapper is None:
+                    attempt += 1
+                else:
+                    return data
+            except Exception as exception:
+                error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
+                logging.error(error)
+                errors.append(error)
+                attempt += 1
 
         return ReadMessageData(errors, None)
+    
+    #
+    # Handles constructing a new socket connection to the CGM, sending the
+    # message and returning the raw response.
+    #
+    def perform_call_cgm(self, message):
+        request_start_time = DateTimeHelper.get_date_time()
+        socket_client = SocketClient(self.config)
+        socket_client.connect(self.host, self.port)
+        socket_client.write_text(message)
+        socket_client.set_timeout(self.config.socket_timeout_seconds)
+        data = socket_client.read_text()
+        logging.info("Received response from: %s request. Time taken: %s",
+            message.get_type_name(),
+            DateTimeHelper.get_elapsed_time_since(request_start_time),
+        )
+        return data
 
     #
     # Validates the read message data and captures all of the errors.

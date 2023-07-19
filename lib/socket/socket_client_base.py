@@ -49,6 +49,10 @@ class SocketClientBase:
             logging.info("Received a disconnect message")
             return ReadMessageData([], None, True)
         
+        if len(message_data) == 0:
+            logging.info("Received an empty message")
+            return ReadMessageData([], None, False)
+        
         decoded_message_data = message_data.decode(self.config.socket_data_encoding)
         message_wrapper = MessageWrapper()
         errors = message_wrapper.parse_from_json_string(decoded_message_data)
