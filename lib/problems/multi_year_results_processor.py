@@ -24,7 +24,7 @@ class MultiYearResultsProcessor():
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
         
-        apsim_output = ApsimOutput(apsim_simulation_names_str, apsim_simulation_ids_str)
+        apsim_output = ApsimOutput(apsim_simulation_ids_str, apsim_simulation_names_str)
 
         for output_index in range(0, total_outputs):
             request_output = run_job_request.get_output_by_index(output_index)
