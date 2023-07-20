@@ -38,24 +38,16 @@ class CGMClient:
     #
     def call_cgm(self, message):
         errors = []
-        attempt = 1
-        max_attenpts = self.config.max_retry_cgm_if_response_invalid
 
-        while attempt <= max_attenpts:
-            try:
-                logging.info("Calling CGM with message: '%s'. Attempt %d/%d", message.get_type_name(), attempt, max_attenpts)
-                logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
-
-                data = self.perform_call_cgm(message)
-                if data.is_disconnect_message or data.message_wrapper is None:
-                    attempt += 1
-                else:
-                    return data
-            except Exception as exception:
-                error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
-                logging.error(error)
-                errors.append(error)
-                attempt += 1
+        try:
+            logging.info("Calling CGM with message: '%s'.", message.get_type_name())
+            logging.info("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
+            return self.perform_call_cgm(message)
+        
+        except Exception as exception:
+            error = f"{Constants.CGM_SERVER_EXCEPTION} ({self.host}:{self.port}) - {exception}"
+            logging.error(error)
+            errors.append(error)
 
         return ReadMessageData(errors, None)
     

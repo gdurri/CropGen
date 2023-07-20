@@ -62,11 +62,7 @@ class SocketClient (SocketClientBase):
     #
     def read_text(self):
         try:
-            # Read the message size byte array that proceeds each message.
-            message_size_byte_array = self.socket.recv(self.config.socket_data_num_bytes_buffer_size)
-            # Convert it to an integer and then use this to read the message itself
-            # with the known size.
-            message_size_bytes = int.from_bytes(message_size_byte_array, self.config.socket_data_endianness)
+            message_size_bytes = self.read_message_size_int()
             logging.info("%s - Received message size: '%d' bytes", self.__class__.__name__, message_size_bytes)
             message_data = self.read_data(message_size_bytes)
             return super().create_message_wrapper(message_data)
@@ -74,18 +70,50 @@ class SocketClient (SocketClientBase):
             logging.error("Socket read error: %s", str(e))
             raise
 
+    
+    def read_message_size_int(self):
+        data = b''
+        bytes_to_receive = self.config.socket_data_num_bytes_buffer_size
+
+        while len(data) < bytes_to_receive:
+            chunk = self.socket.recv(bytes_to_receive - len(data))
+            if not chunk:
+                # Connection closed prematurely
+                logging.warning(
+                    "%s - Connection closed prematurely. Expected %d bytes, received %d bytes.",
+                    __class__.__name__, bytes_to_receive, len(data)
+                )
+                return 0
+
+            data += chunk
+
+        # Convert the received bytes to an integer
+        received_int = int.from_bytes(data, byteorder=self.config.socket_data_endianness)
+
+        return received_int
+
     #
     # Reads the data
     #
     def read_data(self, message_size_bytes):
-        # Initialise our buffer
-        message_data = bytearray(message_size_bytes)
+        # Initialize our buffer
+        message_data = bytearray()
+
         # Now iterate calling receive each time until we've read all of the data.
         buffer_pos = 0
         while buffer_pos < message_size_bytes:
-            read_data = self.socket.recv(self.config.socket_receive_buffer_size)
+            remaining_bytes = message_size_bytes - buffer_pos
+            read_data = self.socket.recv(min(self.config.socket_receive_buffer_size, remaining_bytes))
             read_data_length = len(read_data)
-            message_data[buffer_pos: buffer_pos + read_data_length] = read_data
+            if read_data_length == 0:
+                # The connection was closed prematurely
+                logging.warning(
+                    "%s - Connection closed prematurely. Expected %d bytes, received %d bytes.",
+                    __class__.__name__, message_size_bytes, buffer_pos
+                )
+                return bytearray()  # Return an empty byte array
+
+            message_data += read_data
             buffer_pos += read_data_length
 
         logging.debug("%s - Finished reading message. Message Size Bytes: '%d'", __class__.__name__, message_size_bytes)

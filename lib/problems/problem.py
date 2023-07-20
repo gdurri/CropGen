@@ -31,8 +31,12 @@ class Problem(ProblemBase):
 
         start_time = DateTimeHelper.get_date_time()
 
-        relay_apsim_request = RelayApsim(self.run_job_request)
-        relay_apsim_request.add_inputs(variable_values_for_population)
+        relay_apsim_request = RelayApsim(self.run_job_request.JobID, self.run_job_request.Individuals)
+
+        if self.config.relay_apsim_from_file:
+            relay_apsim_request = super()._create_relay_apsim_from_file()
+        else:
+            relay_apsim_request.add_inputs(variable_values_for_population)
 
         if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
             super()._initialize_algorithm_array(out_objective_values)

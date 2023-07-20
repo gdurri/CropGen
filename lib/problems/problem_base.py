@@ -10,6 +10,7 @@ from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.models.cgm.relay_apsim import RelayApsim
+from lib.config.requests.relay_apsim_from_file import RelayApsimFromFile 
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -253,3 +254,10 @@ class ProblemBase(Problem):
             return None
 
         return response
+    
+    #
+    # Creates the relay apsim request from a file.
+    #
+    def _create_relay_apsim_from_file(self):
+        relay_apsim_from_file = RelayApsimFromFile()
+        return relay_apsim_from_file.relay_apsim

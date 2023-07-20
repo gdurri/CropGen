@@ -1,8 +1,8 @@
 from lib.models.common.model import Model
 
 #
-# A WGP Server request object that invokes APSIM runs, calling update parameters and passing in 
-# the input values that will override the input traits that were sent in the InitWorkers request.
+# An input ID wrapper. Python doesn't let you pass an int by reference. This acts a simple
+# wrapper for this as objects are passed by reference.
 #
 class InputIdWrapper():
     #
@@ -27,7 +27,7 @@ class InputIdWrapper():
     def increment_id(self): self.id += 1
 
 #
-# A WGP Server request object that invokes APSIM runs, calling update parameters and passing in 
+# A CGM Server request object that invokes APSIM runs, calling update parameters and passing in 
 # the input values that will override the input traits that were sent in the InitWorkers request.
 #
 class RelayApsim(Model):
@@ -38,10 +38,11 @@ class RelayApsim(Model):
     #
     def __init__(
         self, 
-        run_job_request
+        job_id,
+        individuals
     ):
-        self.JobID = run_job_request.JobID
-        self.Individuals = run_job_request.Individuals
+        self.JobID = job_id
+        self.Individuals = individuals
         self.Inputs = []
         self.SimulationNames = []
         self.SystemPropertyValues = []

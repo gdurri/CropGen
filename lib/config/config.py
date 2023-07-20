@@ -46,10 +46,10 @@ class Config(Model):
         self.delete_logs_on_startup = self._get_config_setting(data, 'deleteLogsOnStartup', False)
         self.round_up_years_in_mean_calculation = self._get_config_setting(data, 'roundUpYearsInMeanCalculation', False)
         self.minimum_required_cgm_workers = self._get_config_setting(data, 'minimumRequiredCGMWorkers', 1)
-        self.max_retry_cgm_if_response_invalid = self._get_config_setting(data, 'maxRetryCGMIfResponseInvalid', 5)
         self.apsim_clock_start_date_year_input_name = self._get_config_setting(data, 'apsimClockStartDateYearInputName', None)
         self.apsim_clock_end_date_year_input_name = self._get_config_setting(data, 'apsimClockEndDateYearInputName', None)
         self.apsim_simulation_start_date = self._get_config_setting(data, 'apsimSimulationStartDate', '1900-06-01')
+        self.relay_apsim_from_file = self._get_config_setting(data, 'relayApsimFromFile', False)
 
 
     #

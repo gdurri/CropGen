@@ -32,7 +32,7 @@ class EnvironmentTypingProblem(ProblemBase):
 
         start_time = DateTimeHelper.get_date_time()
 
-        relay_apsim_request = RelayApsim(self.run_job_request)
+        relay_apsim_request = RelayApsim(self.run_job_request.JobID, self.run_job_request.Individuals)
         relay_apsim_request.add_inputs_for_env_typing(
             self.run_job_request.EnvironmentTypes, 
             APSIMSeasonDateGenerator(self.config, self.run_job_request.APSIMSimulationClockStartDate), 
