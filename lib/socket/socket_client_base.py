@@ -46,11 +46,11 @@ class SocketClientBase:
     def create_message_wrapper(self, message_data):
         # If it is an empty message, this is our disconnect message so don't decode it.
         if message_data == b'':
-            logging.info("Received a disconnect message")
+            logging.debug("Received a disconnect message")
             return ReadMessageData([], None, True)
         
         if len(message_data) == 0:
-            logging.info("Received an empty message")
+            logging.debug("Received an empty message")
             return ReadMessageData([], None, False)
         
         decoded_message_data = message_data.decode(self.config.socket_data_encoding)
