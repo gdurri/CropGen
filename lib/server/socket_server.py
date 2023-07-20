@@ -30,13 +30,13 @@ class SocketServer():
     async def client_listener(self, reader, writer):
         socket_client = SocketClientAsync(self.config, reader, writer)
         client_address = writer.get_extra_info('peername')
-        logging.info("Connected to client '%s'. Waiting for commands", client_address)
+        logging.debug("Connected to client '%s'. Waiting for commands", client_address)
 
         while True:
             read_message_data = await socket_client.read_text_async()
 
             if read_message_data.is_disconnect_message:
-                logging.info("Disconnected from '%s'", client_address)
+                logging.debug("Disconnected from '%s'", client_address)
                 return
             else:
                 message_processor = MessageProcessor(self.config, socket_client, self.server_state)
