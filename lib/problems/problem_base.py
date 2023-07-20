@@ -30,10 +30,10 @@ class ProblemBase(Problem):
         self.current_iteration_id = 1
         self.is_multi_year = False
         self.processed_aggregated_outputs = []
+
+        self.apsim_simulation_id_str = ''
         self.apsim_simulation_names = set()
-        self.apsim_simulation_names_str = ''
-        self.apsim_simulation_ids = set()
-        self.apsim_simulation_ids_str = ''
+        self.apsim_simulation_name_str = ''
 
         self.results_publisher = ResultsPublisher(
             run_job_request.IterationResultsUrl,
@@ -136,20 +136,19 @@ class ProblemBase(Problem):
     #
     def _set_unique_simulation_names(self, results_for_individual):
         self.apsim_simulation_names = set()
-        self.apsim_simulation_ids = set()
+        
         for apsim_result in results_for_individual:
             self.apsim_simulation_names.add(apsim_result.SimulationName.strip())
-            self.apsim_simulation_ids.add(apsim_result.SimulationID)
+            self.apsim_simulation_id_str = apsim_result.SimulationID
 
         total_apsim_simulations = len(self.apsim_simulation_names)
 
-        if total_apsim_simulations > ProblemBase.MAX_SIMULATION_NAMES_TO_LIST:
-            self.apsim_simulation_names_str = f"Multiple APSIM Simulations ({total_apsim_simulations})"
-            self.apsim_simulation_ids_str = 0
+        if total_apsim_simulations > 1:
+            self.apsim_simulation_name_str = f"{total_apsim_simulations} APSIM Simulations"
+            self.apsim_simulation_id_str = 0
         else:
             delimiter = ', '
-            self.apsim_simulation_names_str = delimiter.join(self.apsim_simulation_names)
-            self.apsim_simulation_ids_str = delimiter.join(self.apsim_simulation_names)
+            self.apsim_simulation_name_str = delimiter.join(self.apsim_simulation_names)
 
     #
     # This initializes the out array that has to be populated as part of the
@@ -202,14 +201,14 @@ class ProblemBase(Problem):
             logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, total_inputs)
 
             if not self._get_contains_results_for_individual(results_for_individual):
-                EmptyResultsProcessor.process_results(individual, self.run_job_request, self.config, results_for_individual, all_algorithm_outputs, all_results_outputs)
+                EmptyResultsProcessor.process_results(individual, self.run_job_request, results_for_individual, all_algorithm_outputs, all_results_outputs)
 
             elif self.is_multi_year:
                 MultiYearResultsProcessor.process_results(
                     self.run_job_request, 
                     self.config, 
-                    self.apsim_simulation_names_str, 
-                    self.apsim_simulation_ids_str, 
+                    self.apsim_simulation_id_str, 
+                    self.apsim_simulation_name_str,
                     results_for_individual, 
                     all_algorithm_outputs, 
                     all_results_outputs

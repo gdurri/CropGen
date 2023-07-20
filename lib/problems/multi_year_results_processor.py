@@ -15,8 +15,8 @@ class MultiYearResultsProcessor():
     def process_results(
         run_job_request,
         config, 
-        apsim_simulation_names_str,
-        apsim_simulation_ids_str,
+        apsim_simulation_id_str, 
+        apsim_simulation_name_str,
         results_for_individual,
         all_algorithm_outputs,
         all_results_outputs
@@ -24,7 +24,7 @@ class MultiYearResultsProcessor():
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
         
-        apsim_output = ApsimOutput(apsim_simulation_ids_str, apsim_simulation_names_str)
+        apsim_output = ApsimOutput(apsim_simulation_id_str, apsim_simulation_name_str)
 
         for output_index in range(0, total_outputs):
             request_output = run_job_request.get_output_by_index(output_index)
@@ -33,7 +33,7 @@ class MultiYearResultsProcessor():
             if not request_output or not request_output.Optimise: continue
 
             for aggregate_function in request_output.AggregateFunctions:
-                aggregate_function_calculator = AggregateFunctionCalculator(config, apsim_simulation_names_str, aggregate_function)
+                aggregate_function_calculator = AggregateFunctionCalculator(config, apsim_simulation_name_str, aggregate_function)
                 raw_output_value = aggregate_function_calculator.calculate_output_value(results_for_individual, output_index)
                 output_value = OutputValue(
                     raw_output_value, 

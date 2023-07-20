@@ -15,7 +15,6 @@ class EmptyResultsProcessor():
     def process_results(
         individual,
         run_job_request,
-        config,
         results_for_individual,
         all_algorithm_outputs,
         all_results_outputs
