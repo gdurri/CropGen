@@ -38,7 +38,7 @@ class FailureRiskFunction:
                 sum_within_operator_and_value += 1
         result = sum_within_operator_and_value / total_results_for_individuals
 
-        logging.info("Result: '%f' (%d/%d).", result, sum_within_operator_and_value,total_results_for_individuals)
+        logging.debug("Result: '%f' (%d/%d).", result, sum_within_operator_and_value,total_results_for_individuals)
 
         return result
     

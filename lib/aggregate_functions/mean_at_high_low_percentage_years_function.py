@@ -48,7 +48,7 @@ class MeanAtHighLowPercentageYears:
                 result += value
             result = result / sorted_list_length
 
-        logging.info("Result: '%f' total: '%d' total years: %d years in %d calculation: %d.", result, result, total_years, percentage, sorted_list_length)
+        logging.debug("Result: '%f' total: '%d' total years: %d years in %d calculation: %d.", result, result, total_years, percentage, sorted_list_length)
 
         return result
     

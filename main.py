@@ -22,7 +22,7 @@ def client_connected_cb(client_reader, client_writer):
     server.client_connected_callback(client_reader, client_writer)
 
 def log_app_startup():
-    logging.debug("Started CropGen application")
+    logging.info("Started CropGen application")
     if config.is_running_in_docker:
         image_info = docker_helper.get_image_info()
         if image_info:
@@ -58,6 +58,6 @@ if __name__ == "__main__":
         server.close()
         loop.run_until_complete(server.wait_closed())
         loop.close()
-        logging.debug("Closing CropGen application")
+        logging.info("Closing CropGen application")
     except:
         logging.exception("Exception - CropGen Main Application catch handler")

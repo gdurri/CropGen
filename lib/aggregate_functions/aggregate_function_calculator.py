@@ -26,7 +26,7 @@ class AggregateFunctionCalculator:
         calc_type = self.aggregate_function.CalcType.lower().strip()
         output_value = None
         
-        logging.info("Calling calculate_output_value with a calc_type of: %s for results containing the following APSIM simulations: %s", 
+        logging.debug("Calling calculate_output_value with a calc_type of: %s for results containing the following APSIM simulations: %s", 
             calc_type, 
             self.apsim_simulation_names_str
         )

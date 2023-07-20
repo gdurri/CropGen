@@ -24,6 +24,6 @@ class MeanFunction:
             total += apsim_result.Values[apsim_output_index]
 
         result = total / total_results_for_individuals
-        logging.info("Result: '%f' (Total %f)", result, total)
+        logging.debug("Result: '%f' (Total %f)", result, total)
         
         return result
