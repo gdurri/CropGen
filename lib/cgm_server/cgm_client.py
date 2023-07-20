@@ -24,12 +24,12 @@ class CGMClient:
         try:
             logging.info("Testing CGM Connection")
             socket_client = SocketClient(self.config)
-            socket_client.set_timeout(self.config.socket_timeout_test_connection_seconds)
             socket_client.connect(self.host, self.port)
+            socket_client.close()
             logging.info("CGM Connection OK")
             return True
         except Exception:
-            logging.error("CGM Connection NOT OK")
+            logging.exception("CGM Connection NOT OK")
             return False
 
     #
@@ -57,11 +57,13 @@ class CGMClient:
     #
     def perform_call_cgm(self, message):
         request_start_time = DateTimeHelper.get_date_time()
+
         socket_client = SocketClient(self.config)
         socket_client.connect(self.host, self.port)
         socket_client.write_text(message)
-        socket_client.set_timeout(self.config.socket_timeout_seconds)
         data = socket_client.read_text()
+        socket_client.close()
+
         logging.info("Received response from: %s request. Time taken: %s",
             message.get_type_name(),
             DateTimeHelper.get_elapsed_time_since(request_start_time),
@@ -82,7 +84,7 @@ class CGMClient:
         
         if read_message_data.is_disconnect_message:
             return [
-                f'{Constants.CGM_SERVER_DISCONNECTED_WHILE_WAITING_FOR_RESPONSE}. Waiting for response type: {response_name}'
+                f'{Constants.CGM_SERVER_DISCONNECTED_WHILE_WAITING_FOR_RESPONSE}: {response_name}'
             ]
 
         if (

@@ -8,13 +8,16 @@ from lib.models.run.error_message import ErrorMessage
 # A socket client.
 #
 class SocketClient (SocketClientBase):
+    # 1 GB (1024 MiB)
+    MAX_BUFFER_SIZE = 2**30
 
     #
     # Constructor
     #
-    def __init__(self, config):
+    def __init__(self, config, family=socket.AF_INET, type=socket.SOCK_STREAM, protocol=0):
         super().__init__(config)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(family, type, protocol)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, SocketClient.MAX_BUFFER_SIZE)
 
     #
     # Connects
@@ -22,21 +25,30 @@ class SocketClient (SocketClientBase):
     def connect(self, host, port):
         try:
             self.socket.connect((host, port))
+            self.set_timeout(self.config.socket_timeout_seconds)
         except ConnectionRefusedError:
             logging.error("Connection refused: Failed to connect to %s:%s", host, port)
             raise
 
     #
+    # Closes the socket connection.
+    #
+    def close(self):
+        self.socket.close()
+
+    #
     # Sets the timeout
     #
     def set_timeout(self, timeout_seconds):
-        # Only apply the timeout if one has been configured and it is greater than the default of 0.
-        if timeout_seconds > 0:
-            try:
+        try:
+            if timeout_seconds > 0:
                 self.socket.settimeout(timeout_seconds)
-            except socket.error as e:
-                logging.error("Socket timeout error: %s", str(e))
-                raise
+            else:
+                # Set the socket timeout to never expire
+                self.socket.settimeout(None)
+        except socket.error as e:
+            logging.error("Socket timeout error: %s", str(e))
+            raise
 
     #
     # Writes data
@@ -63,7 +75,7 @@ class SocketClient (SocketClientBase):
     def read_text(self):
         try:
             message_size_bytes = self.read_message_size_int()
-            logging.info("%s - Received message size: '%d' bytes", self.__class__.__name__, message_size_bytes)
+            logging.debug("%s - Received message size: '%d' bytes", self.__class__.__name__, message_size_bytes)
             message_data = self.read_data(message_size_bytes)
             return super().create_message_wrapper(message_data)
         except socket.error as e:
