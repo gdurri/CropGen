@@ -7,7 +7,6 @@
     "socketTimeoutTestConnectionSeconds": 2.0,
     "socketReceiveBufferSize" : 1024,
     "resultsPublisherTimeoutSeconds": 5,
-    "publishResults": false,
     "prettyPrintJsonInLogs": true,
     "deleteLogsOnStartup": true,
     "roundUpYearsInMeanCalculation": true,
