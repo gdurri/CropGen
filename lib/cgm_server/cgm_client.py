@@ -82,11 +82,13 @@ class CGMClient:
         if read_message_data.errors:
             return read_message_data.errors
         
+        # Has the socket been disconnected whilst we were waiting for a response.
         if read_message_data.is_disconnect_message:
             return [
                 f'{Constants.CGM_SERVER_DISCONNECTED_WHILE_WAITING_FOR_RESPONSE}: {response_name}'
             ]
 
+        # If any of the message data is null.
         if (
             not read_message_data.message_wrapper
             or not read_message_data.message_wrapper.TypeName

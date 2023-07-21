@@ -8,16 +8,19 @@ from lib.models.run.error_message import ErrorMessage
 # A socket client.
 #
 class SocketClient (SocketClientBase):
-    # 1 GB (1024 MiB)
-    MAX_BUFFER_SIZE = 2**30
-
     #
     # Constructor
     #
-    def __init__(self, config, family=socket.AF_INET, type=socket.SOCK_STREAM, protocol=0):
+    def __init__(
+        self, 
+        config, 
+        family=socket.AF_INET, 
+        type=socket.SOCK_STREAM, 
+        protocol=0
+    ):
         super().__init__(config)
         self.socket = socket.socket(family, type, protocol)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, SocketClient.MAX_BUFFER_SIZE)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.max_socket_receive_size)
 
     #
     # Connects
@@ -46,7 +49,7 @@ class SocketClient (SocketClientBase):
             else:
                 # Set the socket timeout to never expire
                 self.socket.settimeout(None)
-        except socket.error as e:
+        except Exception as e:
             logging.error("Socket timeout error: %s", str(e))
             raise
 
@@ -58,7 +61,7 @@ class SocketClient (SocketClientBase):
         try:
             self.socket.sendall(prepare_data.message_size_byte_array)
             self.socket.sendall(prepare_data.encoded_data)
-        except socket.error as e:
+        except Exception as e:
             logging.error("Socket write error: %s", str(e))
             raise
 
@@ -78,56 +81,54 @@ class SocketClient (SocketClientBase):
             logging.debug("%s - Received message size: '%d' bytes", self.__class__.__name__, message_size_bytes)
             message_data = self.read_data(message_size_bytes)
             return super().create_message_wrapper(message_data)
-        except socket.error as e:
+        except Exception as e:
             logging.error("Socket read error: %s", str(e))
-            raise
 
-    
+
+    #
+    # Read the message size which is sent before the message itself.
+    #    
     def read_message_size_int(self):
+        # Read the message size
+        data = self.read_data(self.config.socket_data_num_bytes_buffer_size)
+
+        # Convert to an integer
+        try:
+            received_int = int.from_bytes(data, byteorder=self.config.socket_data_endianness)
+        except Exception as e:
+            logging.error("Error converting message size to integer: %s", str(e))
+            return None
+
+        return received_int
+
+    #
+    # Reads the data for the specified byte size.
+    #    
+    def read_data(self, bytes_to_receive):
         data = b''
-        bytes_to_receive = self.config.socket_data_num_bytes_buffer_size
 
         while len(data) < bytes_to_receive:
-            chunk = self.socket.recv(bytes_to_receive - len(data))
+            try:
+                chunk = self.socket.recv(bytes_to_receive - len(data))
+            except socket.timeout:
+                # Handle timeout (data not available)
+                logging.warning(
+                    "%s - Read timeout. Expected %d bytes, received %d bytes. Retrying...",
+                    __class__.__name__, bytes_to_receive, len(data)
+                )
+                # Retry.
+                continue
+
             if not chunk:
                 # Connection closed prematurely
                 logging.warning(
                     "%s - Connection closed prematurely. Expected %d bytes, received %d bytes.",
                     __class__.__name__, bytes_to_receive, len(data)
                 )
-                return 0
+                return b''
 
             data += chunk
 
-        # Convert the received bytes to an integer
-        received_int = int.from_bytes(data, byteorder=self.config.socket_data_endianness)
+        logging.debug("%s - Finished reading message '%d' Bytes", __class__.__name__, bytes_to_receive)
 
-        return received_int
-
-    #
-    # Reads the data
-    #
-    def read_data(self, message_size_bytes):
-        # Initialize our buffer
-        message_data = bytearray()
-
-        # Now iterate calling receive each time until we've read all of the data.
-        buffer_pos = 0
-        while buffer_pos < message_size_bytes:
-            remaining_bytes = message_size_bytes - buffer_pos
-            read_data = self.socket.recv(min(self.config.socket_receive_buffer_size, remaining_bytes))
-            read_data_length = len(read_data)
-            if read_data_length == 0:
-                # The connection was closed prematurely
-                logging.warning(
-                    "%s - Connection closed prematurely. Expected %d bytes, received %d bytes.",
-                    __class__.__name__, message_size_bytes, buffer_pos
-                )
-                return bytearray()  # Return an empty byte array
-
-            message_data += read_data
-            buffer_pos += read_data_length
-
-        logging.debug("%s - Finished reading message. Message Size Bytes: '%d'", __class__.__name__, message_size_bytes)
-
-        return message_data
+        return data

@@ -40,6 +40,7 @@ class Config(Model):
         self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 0.0)
         self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
         self.socket_receive_buffer_size = self._get_config_setting(data, 'socketReceiveBufferSize', 1024)
+        self.max_socket_receive_size = self._get_config_setting(data, 'maxSocketReceiveSize', 1000000000)        
         self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')
         self.publish_results = self._get_config_setting(data, 'publishResults', True)
         self.pretty_print_json_in_logs = self._get_config_setting(data, 'prettyPrintJsonInLogs', False)        
