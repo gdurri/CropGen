@@ -32,6 +32,9 @@ class SocketClient (SocketClientBase):
         except ConnectionRefusedError:
             logging.error("Connection refused: Failed to connect to %s:%s", host, port)
             raise
+        except socket.error as e:
+            logging.error("Socket connection error: %s", str(e))
+            raise
 
     #
     # Closes the socket connection.
@@ -121,7 +124,7 @@ class SocketClient (SocketClientBase):
 
             if not chunk:
                 # Connection closed prematurely
-                logging.warning(
+                logging.error(
                     "%s - Connection closed prematurely. Expected %d bytes, received %d bytes.",
                     __class__.__name__, bytes_to_receive, len(data)
                 )

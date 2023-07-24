@@ -168,11 +168,10 @@ class ProblemBase(Problem):
     #
     def _handle_evaluate_value_for_population(
         self,
-        relay_apsim_request,
+        response,
         out_objective_values,
         variable_values_for_population
     ):
-        response = self._call_relay_apsim(relay_apsim_request)
         if not response:
             return False
 
@@ -252,7 +251,7 @@ class ProblemBase(Problem):
             logging.error(error)
             return None
 
-        return response
+        return response    
     
     #
     # Creates the relay apsim request from a file.
@@ -260,3 +259,22 @@ class ProblemBase(Problem):
     def _create_relay_apsim_from_file(self):
         relay_apsim_from_file = RelayApsimFromFile()
         return relay_apsim_from_file.relay_apsim
+
+    #
+    # Stitches multiple RunApsimResponses into one.
+    #
+    def _stitch_responses_into_response(self, responses):
+        run_apsim_response = RunApsimResponse()
+
+        for response in responses:            
+            run_apsim_response.ID = response.ID
+
+            if response.Fields:
+                for field in response.Fields:
+                    run_apsim_response.Fields.append(field)
+
+            if response.Rows:
+                for row in response.Rows:
+                    run_apsim_response.Rows.append(row)
+
+        return run_apsim_response

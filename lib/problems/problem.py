@@ -31,14 +31,9 @@ class Problem(ProblemBase):
 
         start_time = DateTimeHelper.get_date_time()
 
-        relay_apsim_request = RelayApsim(self.run_job_request.JobID, self.run_job_request.Individuals)
+        response = self._perform_relay_apsim_request(variable_values_for_population)
 
-        if self.config.relay_apsim_from_file:
-            relay_apsim_request = super()._create_relay_apsim_from_file()
-        else:
-            relay_apsim_request.add_inputs(variable_values_for_population)
-
-        if not super()._handle_evaluate_value_for_population(relay_apsim_request, out_objective_values, variable_values_for_population):
+        if not super()._handle_evaluate_value_for_population(response, out_objective_values, variable_values_for_population):
             super()._initialize_algorithm_array(out_objective_values)
             return
 
@@ -54,3 +49,63 @@ class Problem(ProblemBase):
 
         # Increment our iteration ID.
         self.current_iteration_id += 1
+
+    #
+    # Creates the relay apsim request.
+    #
+    def _perform_relay_apsim_request(self, variable_values_for_population):
+
+        if (self.config.max_individuals_in_one_relay_apsim_request > 0 and 
+            self.config.max_individuals_in_one_relay_apsim_request < len(variable_values_for_population)
+        ):
+            return self._perform_relay_apsim_staggered_requests(variable_values_for_population)
+        else:
+            return self._perform_relay_apsim_one_request(variable_values_for_population)
+    
+    #
+    # Creates the relay apsim request.
+    #
+    def _perform_relay_apsim_staggered_requests(self, variable_values_for_population):
+        
+        max_individuals = self.config.max_individuals_in_one_relay_apsim_request
+
+        # Calculate the number of chunks based on the max_individuals value
+        num_chunks = (len(variable_values_for_population) + max_individuals - 1) // max_individuals
+
+        if (self.config.max_individuals_in_one_relay_apsim_request > 0):
+            logging.info("Splitting individuals into %d separate RelayApsim requests", num_chunks)
+
+        # Initialize an empty list to store the responses
+        responses = []
+        individual = RelayApsim.INPUT_START_INDEX
+
+        # Split the variable_values_for_population into chunks and process each chunk
+        for chunk_index in range(num_chunks):
+            # Calculate the start and end index for each chunk
+            start_index = chunk_index * max_individuals
+            end_index = (chunk_index + 1) * max_individuals
+            inputs_to_process = variable_values_for_population[start_index:end_index]
+
+            # Create a new RelayApsim object for each chunk
+            relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(inputs_to_process))
+
+            for input_index in range(len(inputs_to_process)):
+                relay_apsim_request.add_inputs_for_individual(individual, inputs_to_process[input_index])
+                individual += 1
+
+            # Call _call_relay_apsim for the current chunk and store the response
+            response = self._call_relay_apsim(relay_apsim_request)
+            responses.append(response)
+
+        response = super()._stitch_responses_into_response(responses)
+        return response
+    
+    #
+    # Creates the relay apsim request.
+    #
+    def _perform_relay_apsim_one_request(self, variable_values_for_population):
+        
+        relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(variable_values_for_population))
+        relay_apsim_request.add_inputs(variable_values_for_population)
+        response = self._call_relay_apsim(relay_apsim_request)
+        return response

@@ -15,6 +15,8 @@
     "apsimClockStartDateYearInputName": "Clock.StartDate",
     "apsimClockEndDateYearInputName": "Clock.EndDate",
     "apsimSimulationStartDate": "1900-06-01",
+    "_remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
+    "maxIndividualsInOneRelayApsimRequest": 10,
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",
@@ -23,5 +25,6 @@
     "publishResultsDocker": true,
     "prettyPrintJsonInLogsDocker": false,
     "relayApsimFromFileDocker": false,
+    "_remoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
     "endOfDockerOverrides": "______________________"
 }

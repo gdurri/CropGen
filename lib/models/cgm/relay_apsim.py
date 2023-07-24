@@ -80,6 +80,7 @@ class RelayApsim(Model):
         for individual in range(RelayApsim.INPUT_START_INDEX, len(generated_input_values)):
             self.add_inputs_for_individual(individual, generated_input_values[individual])
 
+
     #
     # Adds all of the inputs.
     #

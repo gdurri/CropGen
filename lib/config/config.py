@@ -51,7 +51,9 @@ class Config(Model):
         self.apsim_clock_end_date_year_input_name = self._get_config_setting(data, 'apsimClockEndDateYearInputName', None)
         self.apsim_simulation_start_date = self._get_config_setting(data, 'apsimSimulationStartDate', '1900-06-01')
         self.relay_apsim_from_file = self._get_config_setting(data, 'relayApsimFromFile', False)
-
+        self.remote_logger_url = self._get_config_setting(data, 'remoteLoggerUrl', None)
+        self.max_individuals_in_one_relay_apsim_request = self._get_config_setting(data, 'maxIndividualsInOneRelayApsimRequest', 0)
+        
 
     #
     # Safely gets a config setting, taking into consideration docker
