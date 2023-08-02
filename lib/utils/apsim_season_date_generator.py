@@ -29,7 +29,7 @@ class APSIMSeasonDateGenerator():
     #   
     def generate_start_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
         date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)
-        season_date_time = DateTimeHelper.update_date_time_year(date_time, season - 1)
+        season_date_time = DateTimeHelper.update_date_time_year(date_time, season)
         return DateTimeHelper.date_to_str(season_date_time, date_format)
 
     #
@@ -37,7 +37,7 @@ class APSIMSeasonDateGenerator():
     #   
     def generate_end_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
         date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)
-        season_date_time = DateTimeHelper.update_date_time_year(date_time, season)
+        season_date_time = DateTimeHelper.update_date_time_year(date_time, season + 1)
         return DateTimeHelper.date_to_str(season_date_time, date_format)
     
     #
