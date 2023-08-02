@@ -16,7 +16,7 @@
     "apsimClockEndDateYearInputName": "Clock.EndDate",
     "apsimSimulationStartDate": "1900-06-01",
     "_remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
-    "maxIndividualsInOneRelayApsimRequest": 10,
+    "maxIndividualsInOneRelayApsimRequest": 0,
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",
