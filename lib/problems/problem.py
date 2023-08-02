@@ -51,29 +51,29 @@ class Problem(ProblemBase):
         self.current_iteration_id += 1
 
     #
-    # Creates the relay apsim request.
+    # Creates request(s) and runs apsim.
     #
     def _perform_relay_apsim_request(self, variable_values_for_population):
 
-        if (self.config.max_individuals_in_one_relay_apsim_request > 0 and 
-            self.config.max_individuals_in_one_relay_apsim_request < len(variable_values_for_population)
+        max_individuals = self.run_job_request.MaxIndividualsInOneRelayApsimRequest
+
+        if (max_individuals and
+            max_individuals > 0 and 
+            max_individuals < len(variable_values_for_population)
         ):
-            return self._perform_relay_apsim_staggered_requests(variable_values_for_population)
+            return self._perform_relay_apsim_staggered_requests(variable_values_for_population, max_individuals)
         else:
             return self._perform_relay_apsim_one_request(variable_values_for_population)
     
     #
-    # Creates the relay apsim request.
+    # Creates request(s) and runs apsim.
     #
-    def _perform_relay_apsim_staggered_requests(self, variable_values_for_population):
+    def _perform_relay_apsim_staggered_requests(self, variable_values_for_population, max_individuals):
         
-        max_individuals = self.config.max_individuals_in_one_relay_apsim_request
-
         # Calculate the number of chunks based on the max_individuals value
         num_chunks = (len(variable_values_for_population) + max_individuals - 1) // max_individuals
 
-        if (self.config.max_individuals_in_one_relay_apsim_request > 0):
-            logging.info("Splitting individuals into %d separate RelayApsim requests", num_chunks)
+        logging.info("Splitting individuals into %d separate RelayApsim requests", num_chunks)
 
         # Initialize an empty list to store the responses
         responses = []
@@ -101,7 +101,7 @@ class Problem(ProblemBase):
         return response
     
     #
-    # Creates the relay apsim request.
+    # Creates request(s) and runs apsim.
     #
     def _perform_relay_apsim_one_request(self, variable_values_for_population):
         

@@ -27,6 +27,8 @@ class RunJobRequest(Model):
         self.Inputs = []
         self.Outputs = []
         self.EnvironmentTypes = []
+        self.APSIMSimulationClockStartDate = ''
+        self.MaxIndividualsInOneRelayApsimRequest = None
 
     #
     # Parses the JSON data into this class.
@@ -50,6 +52,7 @@ class RunJobRequest(Model):
             self.Outputs = Output.parse_outputs(json_object, errors)
             self.EnvironmentTypes = RunJobRequest.parse_environment_types(json_object, errors)
             self.APSIMSimulationClockStartDate = JsonHelper.get_non_mandatory_attribute(json_object, 'APSIMSimulationClockStartDate', None)
+            self.MaxIndividualsInOneRelayApsimRequest = JsonHelper.get_non_mandatory_attribute(json_object, 'MaxIndividualsInOneRelayApsimRequest', None)
         except Exception as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 

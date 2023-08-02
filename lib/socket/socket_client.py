@@ -20,7 +20,9 @@ class SocketClient (SocketClientBase):
     ):
         super().__init__(config)
         self.socket = socket.socket(family, type, protocol)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.max_socket_receive_size)
+
+        if self.config.max_socket_receive_size:
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.max_socket_receive_size)
 
     #
     # Connects

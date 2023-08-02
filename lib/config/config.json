@@ -6,9 +6,9 @@
     "socketDataEncoding": "utf-8",
     "socketTimeoutTestConnectionSeconds": 2.0,
     "socketReceiveBufferSize" : 1024,
-    "maxSocketReceiveSize" : 1000000000,
     "resultsPublisherTimeoutSeconds": 5,
     "prettyPrintJsonInLogs": true,
+    "_publishResults": false,
     "deleteLogsOnStartup": true,
     "roundUpYearsInMeanCalculation": true,
     "minimumRequiredCGMWorkers": 1,
@@ -16,7 +16,6 @@
     "apsimClockEndDateYearInputName": "Clock.EndDate",
     "apsimSimulationStartDate": "1900-06-01",
     "_remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
-    "maxIndividualsInOneRelayApsimRequest": 0,
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",
