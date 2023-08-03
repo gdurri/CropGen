@@ -106,7 +106,7 @@ if __name__ == '__main__':
     # python environment_type_csv_convert.py data\\Dalby_ET1.csv
 
     if len(sys.argv) != 2:
-        print("Usage: python script.py <csv_file>")
+        print("Usage: python environment_type_csv_convert.py <csv_file>")
         sys.exit(1)
 
     csv_file = sys.argv[1].lower()
