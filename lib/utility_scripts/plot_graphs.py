@@ -22,6 +22,8 @@ def plot_graph_for_csv(
 
     df = pd.read_csv(csv_file)
 
+    column_headings = df.columns.tolist()
+
     fig = px.scatter(
         df, 
         x=input_trait_one_name, 
