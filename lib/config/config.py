@@ -50,6 +50,10 @@ class Config(Model):
         self.apsim_clock_start_date_year_input_name = self._get_config_setting(data, 'apsimClockStartDateYearInputName', None)
         self.apsim_clock_end_date_year_input_name = self._get_config_setting(data, 'apsimClockEndDateYearInputName', None)
         self.apsim_simulation_start_date = self._get_config_setting(data, 'apsimSimulationStartDate', '1900-06-01')
+        self.apsim_simulation_start_date = self._get_config_setting(data, 'apsimSimulationStartDate', '1900-06-01')
+        self.apsim_simulation_start_date_add_year = self._get_config_setting(data, 'apsimSimulationStartDateAddYear', 0)
+        self.apsim_simulation_end_date_add_year = self._get_config_setting(data, 'apsimSimulationEndDateAddYear', 0)
+        
         self.relay_apsim_from_file = self._get_config_setting(data, 'relayApsimFromFile', False)
         self.remote_logger_url = self._get_config_setting(data, 'remoteLoggerUrl', None)
         

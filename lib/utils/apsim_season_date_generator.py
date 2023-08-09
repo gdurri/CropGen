@@ -10,6 +10,7 @@ class APSIMSeasonDateGenerator():
     #
     def __init__(self, config, apsim_clock_start_date):
         self.apsim_clock_start_date = self.set_start_date(config, apsim_clock_start_date)
+        self.config = config
 
     #
     # Sets the start date. Defaults to the config value but if the param is set it will use this instead.
@@ -28,18 +29,22 @@ class APSIMSeasonDateGenerator():
     # Generates a start date for the given season.
     #   
     def generate_start_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
-        date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)
-        season_date_time = DateTimeHelper.update_date_time_year(date_time, season)
-        return DateTimeHelper.date_to_str(season_date_time, date_format)
+        return self.generate_date_for_season(season, self.config.apsim_simulation_start_date_add_year, date_format)
 
     #
     # Generates an end date for the given season.
     #   
     def generate_end_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
-        date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)
-        season_date_time = DateTimeHelper.update_date_time_year(date_time, season + 1)
-        return DateTimeHelper.date_to_str(season_date_time, date_format)
+        return self.generate_date_for_season(season, self.config.apsim_simulation_end_date_add_year, date_format)
     
+    #
+    #
+    #
+    def generate_date_for_season(self, season, add_years_to_season, date_format):
+        date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)
+        season_date_time = DateTimeHelper.update_date_time_year(date_time, season + add_years_to_season)
+        return DateTimeHelper.date_to_str(season_date_time, date_format)
+
     #
     # Returns the type name.
     #

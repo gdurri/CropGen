@@ -1,6 +1,8 @@
 import logging
 import requests
 
+from http import HTTPStatus
+
 #
 # A class that is responsible for publishing the "Problem" results.
 #
@@ -55,7 +57,7 @@ class ResultsPublisher():
             logging.exception(f"Failed to publish results to {url}")
             return None
         
-        if response.ok:
+        if HTTPStatus.OK:
             logging.info("Successfully published results to: '%s'", url)
         else:
             logging.error("Failed to publish results to: '%s'. Reason: '%s'", url, response.reason)

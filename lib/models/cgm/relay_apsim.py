@@ -1,32 +1,6 @@
 from lib.models.common.model import Model
 
 #
-# An input ID wrapper. Python doesn't let you pass an int by reference. This acts a simple
-# wrapper for this as objects are passed by reference.
-#
-class InputIdWrapper():
-    #
-    # Constructor
-    #
-    def __init__(self, id):
-        self.id = id
-
-    #
-    # Getter
-    #
-    def get_id(self): return self.id
-
-    #
-    # Setter
-    #
-    def set_id(self, id): self.id = id
-
-    #
-    # Increments the id by 1
-    #
-    def increment_id(self): self.id += 1
-
-#
 # A CGM Server request object that invokes APSIM runs, calling update parameters and passing in 
 # the input values that will override the input traits that were sent in the InitWorkers request.
 #
@@ -51,28 +25,28 @@ class RelayApsim(Model):
     # Adds all of the input values, simulation names and system property values, for all of the env types.
     #
     def add_inputs_for_env_typing(self, environment_types, season_date_generator, generated_input_values):
-        input_id = InputIdWrapper(RelayApsim.INPUT_START_INDEX)
+        for input_id in range(0, len(generated_input_values)):
 
-        # Iterate over each environment type that was supplied.
-        for environment_type in environment_types:
-            self.add_inputs_for_env_type(environment_type, season_date_generator, generated_input_values, input_id)
+            input_values = generated_input_values[input_id]
+
+            # Iterate over each environment type that was supplied.
+            for environment_type in environment_types:
+                self.add_inputs_for_env_type(environment_type, season_date_generator, input_id, input_values)
 
     #
     # Adds all of the input values, simulation names and system property values, for a specific env type.
     #
-    def add_inputs_for_env_type(self, environment_type, season_date_generator, generated_input_values, input_id):
+    def add_inputs_for_env_type(self, environment_type, season_date_generator, input_id, input_values):
         for environment in environment_type.Environments:
             for season in environment.Seasons:
                 start_date = season_date_generator.generate_start_date_from_season(season)
                 end_date = season_date_generator.generate_end_date_from_season(season)
 
-                for individual in range(0, len(generated_input_values)):
-                    self.SystemPropertyValues.append([str(input_id.get_id()), start_date, end_date])
-                    self.SimulationNames.append([str(input_id.get_id()), environment_type.Name])
+                self.SystemPropertyValues.append([str(input_id), start_date, end_date])
+                self.SimulationNames.append([str(input_id), environment_type.Name])
 
-                    self.add_inputs_for_individual(input_id.get_id(), generated_input_values[individual])
-                    input_id.increment_id()
-
+                self.add_inputs_for_individual(input_id, input_values)
+    
     #
     # Adds all of the inputs.
     #
