@@ -1,8 +1,8 @@
-import logging
-
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
+from lib.config.apsim_simulation_data import APSimSimulationData
 from lib.utils.date_time_helper import DateTimeHelper
+from lib.utils.array_utils import ArrayUtils
 
 #
 # Represents a Problem
@@ -23,11 +23,7 @@ class Problem(ProblemBase):
             super()._initialize_algorithm_array(out_objective_values)
             return
 
-        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
-            self.current_iteration_id, 
-            self.run_job_request.Iterations,
-            len(variable_values_for_population)
-        )
+        super()._log_processing_iteration(len(variable_values_for_population))
 
         start_time = DateTimeHelper.get_date_time()
 
@@ -36,16 +32,8 @@ class Problem(ProblemBase):
         if not super()._handle_evaluate_value_for_population(response, out_objective_values, variable_values_for_population):
             super()._initialize_algorithm_array(out_objective_values)
             return
-
-        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
-        estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
-
-        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated finish date time: %s (%s)",  
-            self.current_iteration_id, 
-            DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
-            DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining),
-            DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)
-        )
+        
+        super()._log_time_remaining(start_time)
 
         # Increment our iteration ID.
         self.current_iteration_id += 1
@@ -55,47 +43,43 @@ class Problem(ProblemBase):
     #
     def _perform_relay_apsim_request(self, variable_values_for_population):
 
-        max_individuals = self.run_job_request.MaxIndividualsInOneRelayApsimRequest
+        max_simulations = self.run_job_request.MaxSimulationsPerRequest
+        apsim_data = APSimSimulationData()
+        simulation_names = apsim_data.get_simulation_names(self.run_job_request.JobID)
 
-        if (max_individuals and
-            max_individuals > 0 and 
-            max_individuals < len(variable_values_for_population)
+        if (max_simulations and
+            max_simulations > 0 and
+            simulation_names
         ):
-            return self._perform_relay_apsim_staggered_requests(variable_values_for_population, max_individuals)
+            return self._perform_relay_apsim_staggered_requests(variable_values_for_population, simulation_names, max_simulations)
         else:
             return self._perform_relay_apsim_one_request(variable_values_for_population)
     
     #
     # Creates request(s) and runs apsim.
     #
-    def _perform_relay_apsim_staggered_requests(self, variable_values_for_population, max_individuals):
+    def _perform_relay_apsim_staggered_requests(self, variable_values_for_population, simulation_names, max_simulations):
         
-        # Calculate the number of chunks based on the max_individuals value
-        num_chunks = (len(variable_values_for_population) + max_individuals - 1) // max_individuals
-
-        logging.info("Splitting individuals into %d separate RelayApsim requests", num_chunks)
+        split_simulation_names = ArrayUtils._split_arr(simulation_names, max_simulations)
 
         # Initialize an empty list to store the responses
         responses = []
-        individual = RelayApsim.INPUT_START_INDEX
-
-        # Split the variable_values_for_population into chunks and process each chunk
-        for chunk_index in range(num_chunks):
-            # Calculate the start and end index for each chunk
-            start_index = chunk_index * max_individuals
-            end_index = (chunk_index + 1) * max_individuals
-            inputs_to_process = variable_values_for_population[start_index:end_index]
-
+              
+        for simulation_names in split_simulation_names:
             # Create a new RelayApsim object for each chunk
-            relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(inputs_to_process))
+            relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(variable_values_for_population))
 
-            for input_index in range(len(inputs_to_process)):
-                relay_apsim_request.add_inputs_for_individual(individual, inputs_to_process[input_index])
-                individual += 1
+            for simulation_name in simulation_names:
+                individual = RelayApsim.INPUT_START_INDEX
+                for input_index in range(len(variable_values_for_population)):
+                    relay_apsim_request.add_inputs_for_individual(individual, variable_values_for_population[input_index])
+                    relay_apsim_request.SimulationNames.append([str(input_index), simulation_name])
+                    individual += 1
 
-            # Call _call_relay_apsim for the current chunk and store the response
+            # Call relay apsim for the current chunk and store the response
             response = self._call_relay_apsim(relay_apsim_request)
             responses.append(response)
+        
 
         response = super()._stitch_responses_into_response(responses)
         return response

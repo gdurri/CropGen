@@ -1,4 +1,3 @@
-from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.models.run.run_job_request import RunJobRequest
 from lib.utils.constants import Constants
 

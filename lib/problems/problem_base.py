@@ -11,6 +11,7 @@ from lib.utils.results_publisher import ResultsPublisher
 from lib.models.cgm.run_apsim_response import RunApsimResponse
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.config.requests.relay_apsim_from_file import RelayApsimFromFile 
+from lib.utils.date_time_helper import DateTimeHelper
 
 #
 # The base class for Problems, provides some useful problem specific functionality.
@@ -278,3 +279,37 @@ class ProblemBase(Problem):
                     run_apsim_response.Rows.append(row)
 
         return run_apsim_response
+    
+    #
+    # Logs that we are processing a specific iteration.
+    #
+    def _log_processing_iteration(self, total_individuals):
+
+        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
+            self.current_iteration_id, 
+            self.run_job_request.Iterations,
+            total_individuals
+        )
+    
+    #
+    # Logs the remaining time.
+    #
+    def _log_time_remaining(self, start_time):
+        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
+        estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
+
+        logging.info("Finished processing APSIM iteration: %d. Time taken: %s.%s",  
+            self.current_iteration_id, 
+            DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
+            self._generate_time_remaining_log(estimated_seconds_remaining)
+        )
+
+    #
+    # Simple helper for generating the remaining time log, based on if it's the last iteration or not.
+    #
+    @staticmethod
+    def _generate_time_remaining_log(estimated_seconds_remaining):
+        if estimated_seconds_remaining > 0:
+            return f" Estimated finish date time: {DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)} ({DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)})"
+        
+        return " No more iterations to process..."

@@ -17,7 +17,6 @@
     "apsimSimulationStartDate": "1900-06-01",
     "apsimSimulationStartDateAddYear": 1,
     "apsimSimulationEndDateAddYear": 2,
-
     "remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
     
     "dockerOverrides": "______________________",
@@ -27,6 +26,6 @@
     "publishResultsDocker": true,
     "prettyPrintJsonInLogsDocker": false,
     "relayApsimFromFileDocker": false,
-    "_remoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
+    "remoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
     "endOfDockerOverrides": "______________________"
 }

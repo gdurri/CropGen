@@ -5,6 +5,7 @@ from lib.models.run.input import Input
 from lib.models.run.output import Output
 from lib.models.run.environment_typing.simulation import Simulation
 from lib.utils.json_helper import JsonHelper
+from lib.config.apsim_simulation_data import APSimSimulationData
 
 #
 # Model that represents a run job request sent from the jobs server
@@ -28,7 +29,7 @@ class RunJobRequest(Model):
         self.Outputs = []
         self.EnvironmentTypes = []
         self.APSIMSimulationClockStartDate = ''
-        self.MaxIndividualsInOneRelayApsimRequest = None
+        self.MaxSimulationsPerRequest = None
 
     #
     # Parses the JSON data into this class.
@@ -52,7 +53,7 @@ class RunJobRequest(Model):
             self.Outputs = Output.parse_outputs(json_object, errors)
             self.EnvironmentTypes = RunJobRequest.parse_environment_types(json_object, errors)
             self.APSIMSimulationClockStartDate = JsonHelper.get_non_mandatory_attribute(json_object, 'APSIMSimulationClockStartDate', None)
-            self.MaxIndividualsInOneRelayApsimRequest = JsonHelper.get_non_mandatory_attribute(json_object, 'MaxIndividualsInOneRelayApsimRequest', None)
+            self.MaxSimulationsPerRequest = JsonHelper.get_non_mandatory_attribute(json_object, 'MaxSimulationsPerRequest', None)
         except Exception as error:
             errors.append(f"Failed to parse {self.get_type_name()} JSON: '{message}'. Error: '{error}'")
 
@@ -171,12 +172,20 @@ class RunJobRequest(Model):
     # Gets the list of simulations to be ran.
     #
     def get_simulations_to_run(self):
-        simulations = []
-        for env_type in self.EnvironmentTypes:
-            simulation_name = env_type.Name
-            if simulation_name not in simulations:
-                simulations.append(simulation_name)
-        return simulations
+        if self.get_is_environment_typing_run():
+            simulations = []
+            for env_type in self.EnvironmentTypes:
+                simulation_name = env_type.Name
+                if simulation_name not in simulations:
+                    simulations.append(simulation_name)
+            return simulations
+        
+        elif self.MaxSimulationsPerRequest:
+            apsim_data = APSimSimulationData()
+            simulation_names = apsim_data.get_simulation_names(self.JobID)
+            if simulation_names: return simulation_names
+
+        return []
     
     #
     # Get a collection of system property names that we want to override.
@@ -186,7 +195,7 @@ class RunJobRequest(Model):
             return []
         
         # If we have some environment types then we want to manipulate the clock start and end date (year only)
-        # so that we can run specific simulations, for specific years. If this is the case, add the APSIM 
+        # so that we can run specific simulations, for specific years.
         return [
             config.apsim_clock_start_date_year_input_name,
             config.apsim_clock_end_date_year_input_name
@@ -196,7 +205,7 @@ class RunJobRequest(Model):
     # Determines if this is an environment typing run.
     #
     def get_is_environment_typing_run(self):
-        return len(self.EnvironmentTypes) > 0
+        return self.EnvironmentTypes and len(self.EnvironmentTypes) > 0
     
     #
     # Returns the type name.

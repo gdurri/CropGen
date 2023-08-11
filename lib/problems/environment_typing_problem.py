@@ -25,11 +25,7 @@ class EnvironmentTypingProblem(ProblemBase):
             super()._initialize_algorithm_array(out_objective_values)
             return
 
-        logging.info("Processing APSIM iteration (%d of %d) with %d individuals", 
-            self.current_iteration_id, 
-            self.run_job_request.Iterations,
-            len(variable_values_for_population)
-        )
+        super()._log_processing_iteration(len(variable_values_for_population))
 
         start_time = DateTimeHelper.get_date_time()
 
@@ -40,15 +36,7 @@ class EnvironmentTypingProblem(ProblemBase):
             super()._initialize_algorithm_array(out_objective_values)
             return
 
-        seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
-        estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
-
-        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. Estimated finish date time: %s (%s)",  
-            self.current_iteration_id, 
-            DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
-            DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining),
-            DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)
-        )
+        super()._log_time_remaining(start_time)
 
         # Increment our iteration ID.
         self.current_iteration_id += 1
