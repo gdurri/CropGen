@@ -5,6 +5,7 @@ from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
+from lib.models.config.crop_gen_config_response import CropGenConfigResponse
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 
@@ -40,11 +41,13 @@ class MessageProcessor():
         # It is valid so check how to process it by testing the TypeName
         type_name_lower = message_wrapper.TypeName.lower().strip()
 
-        if type_name_lower == Constants.RUN_CROP_GEN:
+        if type_name_lower == Constants.RUN_MESSAGE:
             with self.run_job_sync:
                 await self._process_run_message(message_wrapper.TypeBody)
-        elif  type_name_lower == Constants.STATUS:
+        elif  type_name_lower == Constants.STATUS_MESSAGE:
             await self._get_status()
+        elif  type_name_lower == Constants.CONFIG_MESSAGE:
+            await self._process_config_message()
         else:
             await self.socket_client.write_error_async([f"{Constants.UNKNOWN_TYPE_NAME}: '{message_wrapper.TypeName}'."])
 
@@ -95,7 +98,7 @@ class MessageProcessor():
     #
     async def _send_run_response_message(self, job_id, successful = True, errors = []):
         message = RunCropGenResponse(job_id, successful, errors)
-        await self.socket_client.write_text_async(message)
+        await self.socket_client.write_text_async(message)    
 
     #
     # Gets the current status of the application. This can be 
@@ -103,4 +106,11 @@ class MessageProcessor():
     #
     async def _get_status(self):
         message = StatusResponse(self.server_state.get_running_job_id())
+        await self.socket_client.write_text_async(message)
+
+    #
+    # Processes a config message.
+    #
+    async def _process_config_message(self):
+        message = CropGenConfigResponse(False, ["Not Implemented.."])
         await self.socket_client.write_text_async(message)

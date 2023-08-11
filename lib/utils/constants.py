@@ -11,8 +11,9 @@ class Constants():
     CGM_SERVER = 'CGM Server'
 
     # Messages - Comparisons are made after converting the value to test to lowercase.
-    RUN_CROP_GEN = 'runcropgen'
-    STATUS = 'status'
+    RUN_MESSAGE = 'runcropgen'
+    STATUS_MESSAGE = 'status'
+    CONFIG_MESSAGE = 'cropgenconfig'
 
     # Calc functions
     TYPE_FAILURE_RISK = 'failurerisk'

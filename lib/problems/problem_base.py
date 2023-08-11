@@ -17,9 +17,6 @@ from lib.utils.date_time_helper import DateTimeHelper
 # The base class for Problems, provides some useful problem specific functionality.
 #
 class ProblemBase(Problem):
-
-    MAX_SIMULATION_NAMES_TO_LIST = 10
-
     #
     # Constructor
     #
@@ -298,7 +295,7 @@ class ProblemBase(Problem):
         seconds_taken_one_iteration = DateTimeHelper.get_elapsed_seconds_since(start_time)
         estimated_seconds_remaining = (self.run_job_request.Iterations - self.current_iteration_id) * seconds_taken_one_iteration
 
-        logging.info("Finished processing APSIM iteration: %d. Time taken: %s.%s",  
+        logging.info("Finished processing APSIM iteration: %d. Time taken: %s. %s",  
             self.current_iteration_id, 
             DateTimeHelper.seconds_to_hhmmss_ms(seconds_taken_one_iteration),
             self._generate_time_remaining_log(estimated_seconds_remaining)
@@ -310,6 +307,6 @@ class ProblemBase(Problem):
     @staticmethod
     def _generate_time_remaining_log(estimated_seconds_remaining):
         if estimated_seconds_remaining > 0:
-            return f" Estimated finish date time: {DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)} ({DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)})"
+            return f"Estimated finish date time: {DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)} ({DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)})"
         
-        return " No more iterations to process..."
+        return "No more iterations to process..."
