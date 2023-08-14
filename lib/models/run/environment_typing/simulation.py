@@ -1,6 +1,6 @@
 from lib.models.common.model import Model
 from lib.utils.json_helper import JsonHelper
-from lib.models.run.environment_typing.environment import Environment
+from lib.models.run.environment_typing.environment_data import EnvironmentData
 
 #
 # Represents a simulation within an environment type.
@@ -23,7 +23,7 @@ class Simulation(Model):
 
         parsed_environments = []
         for environment in environments:
-            parsed_environments.append(Environment.parse(environment, errors))
+            parsed_environments.append(EnvironmentData.parse(environment, errors))
 
         return Simulation(name, parsed_environments)
 

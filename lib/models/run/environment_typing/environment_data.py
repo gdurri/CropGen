@@ -4,7 +4,7 @@ from lib.utils.json_helper import JsonHelper
 #
 # Represents an environment within a simulation.
 #
-class Environment(Model):
+class EnvironmentData(Model):
     #
     # Constructor
     #
@@ -19,7 +19,7 @@ class Environment(Model):
     def parse(json_object, errors):
         type = JsonHelper.get_attribute(json_object, 'Type', errors)
         seasons = JsonHelper.get_attribute(json_object, 'Seasons', errors)            
-        return Environment(type, seasons)
+        return EnvironmentData(type, seasons)
 
     #
     # Returns the type name.
