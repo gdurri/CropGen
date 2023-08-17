@@ -28,14 +28,14 @@ class APSIMSeasonDateGenerator():
     #
     # Generates a start date for the given season.
     #   
-    def generate_start_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
-        return self.generate_date_for_season(season, self.config.apsim_simulation_start_date_add_year, date_format)
+    def generate_start_date_from_season(self, season):
+        return self.generate_date_for_season(season, self.config.apsim_simulation_start_date_add_year, self.config.apsim_clock_date_format)
 
     #
     # Generates an end date for the given season.
     #   
-    def generate_end_date_from_season(self, season, date_format=DateTimeHelper.APSIM_CLOCK_DATE_FORMAT):
-        return self.generate_date_for_season(season, self.config.apsim_simulation_end_date_add_year, date_format)
+    def generate_end_date_from_season(self, season):
+        return self.generate_date_for_season(season, self.config.apsim_simulation_end_date_add_year, self.config.apsim_clock_date_format)
     
     #
     #

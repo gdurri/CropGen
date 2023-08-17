@@ -55,6 +55,7 @@ class EnvironmentTypingProblem(ProblemBase):
     # Logs the results for the simulations so that we can easily see the returned seasons.
     #
     def _log_results_for_simulations(self, response):
+        if not response: return
         results_dict = {}
 
         for row in response.Rows:

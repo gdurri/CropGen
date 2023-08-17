@@ -15,9 +15,10 @@
     "apsimClockStartDateYearInputName": "Clock.StartDate",
     "apsimClockEndDateYearInputName": "Clock.EndDate",
     "apsimSimulationStartDate": "1900-06-01",
-    "apsimSimulationStartDateAddYear": 1,
-    "apsimSimulationEndDateAddYear": 2,
-    "_remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
+    "apsimClockDateFormat": "%m/%d/%Y",
+    "apsimSimulationStartDateAddYear": 0,
+    "apsimSimulationEndDateAddYear": 1,
+    "remoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
     
     "dockerOverrides": "______________________",
     "socketServerHostDocker": "0.0.0.0",

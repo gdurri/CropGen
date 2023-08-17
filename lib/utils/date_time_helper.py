@@ -9,7 +9,6 @@ class DateTimeHelper():
     # Constants
     DATE_FORMAT = '%Y-%m-%d'
     TIME_FORMAT = '%H.%M.%S'
-    APSIM_CLOCK_DATE_FORMAT = "%d/%m/%Y"
     DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
     #

@@ -78,6 +78,7 @@ class Problem(ProblemBase):
 
             # Call relay apsim for the current chunk and store the response
             response = self._call_relay_apsim(relay_apsim_request)
+            if not response: return None
             responses.append(response)
         
 
