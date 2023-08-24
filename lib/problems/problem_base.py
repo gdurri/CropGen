@@ -241,7 +241,7 @@ class ProblemBase(Problem):
         # Convert the raw socket data into a RunApsimResponse object.
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        logging.info("Received %s: '%s'", response.get_type_name(), response.to_json(self.config.pretty_print_json_in_logs))
+        logging.debug("Received %s: '%s'", response.get_type_name(), response.to_json(self.config.pretty_print_json_in_logs))
 
         if not self._get_contains_results(response):
             error = Constants.NO_APSIM_RESULTS

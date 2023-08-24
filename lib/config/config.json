@@ -24,7 +24,7 @@
     "socketServerHostDocker": "0.0.0.0",
     "socketServerPortDocker": 27746,
     "socketTimeoutTestConnectionSecondsDocker": 5.0,
-    "publishResultsDocker": true,
+    "publishResultsDocker": false,
     "prettyPrintJsonInLogsDocker": false,
     "relayApsimFromFileDocker": false,
     "remoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",

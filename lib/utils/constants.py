@@ -13,7 +13,8 @@ class Constants():
     # Messages - Comparisons are made after converting the value to test to lowercase.
     RUN_MESSAGE = 'runcropgen'
     STATUS_MESSAGE = 'status'
-    CONFIG_MESSAGE = 'cropgenconfig'
+    GET_CONFIG_MESSAGE = 'getcropgenconfig'
+    SET_CONFIG_MESSAGE = 'setcropgenconfig'
 
     # Calc functions
     TYPE_FAILURE_RISK = 'failurerisk'

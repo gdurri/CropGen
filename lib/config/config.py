@@ -96,7 +96,7 @@ class Config(Model):
     ):
         value = default_if_not_present
         if self._get_config_exists(data, config_key):
-            value = data[config_key]        
+            value = data[config_key]
         return value
 
     #

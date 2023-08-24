@@ -23,10 +23,10 @@ def client_connected_cb(client_reader, client_writer):
 
 def log_app_startup():
     logging.info("Started CropGen application")
-    if config.is_running_in_docker:
-        image_info = docker_helper.get_image_info()
-        if image_info:
-            logging.info("Docker Info: %s", image_info)
+    # if config.is_running_in_docker:
+    #     image_info = docker_helper.get_image_info()
+    #     if image_info:
+    #         logging.info("Docker Info: %s", image_info)
 
     logging.info("Service Config: %s", config.to_json(config.pretty_print_json_in_logs))
     

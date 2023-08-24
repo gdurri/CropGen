@@ -5,7 +5,8 @@ from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
-from lib.models.config.crop_gen_config_response import CropGenConfigResponse
+from lib.models.config.get_crop_gen_config_response import GetCropGenConfigResponse
+from lib.models.config.set_crop_gen_config_response import SetCropGenConfigResponse
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 
@@ -46,8 +47,10 @@ class MessageProcessor():
                 await self._process_run_message(message_wrapper.TypeBody)
         elif  type_name_lower == Constants.STATUS_MESSAGE:
             await self._get_status()
-        elif  type_name_lower == Constants.CONFIG_MESSAGE:
-            await self._process_config_message()
+        elif  type_name_lower == Constants.GET_CONFIG_MESSAGE:
+            await self._get_config()
+        elif  type_name_lower == Constants.SET_CONFIG_MESSAGE:
+            await self._set_config()
         else:
             await self.socket_client.write_error_async([f"{Constants.UNKNOWN_TYPE_NAME}: '{message_wrapper.TypeName}'."])
 
@@ -109,8 +112,15 @@ class MessageProcessor():
         await self.socket_client.write_text_async(message)
 
     #
-    # Processes a config message.
+    # Gets the CropGen config.
     #
-    async def _process_config_message(self):
-        message = CropGenConfigResponse(False, ["Not Implemented.."])
+    async def _get_config(self):
+        message = GetCropGenConfigResponse(self.config.to_json())
+        await self.socket_client.write_text_async(message)
+
+    #
+    # Sets the CropGen config.
+    #
+    async def _set_config(self):
+        message = SetCropGenConfigResponse(False, ["Not Implemented.."])
         await self.socket_client.write_text_async(message)

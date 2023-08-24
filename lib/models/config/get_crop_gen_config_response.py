@@ -3,13 +3,12 @@ from lib.models.common.model import Model
 #
 # The config response message.
 #
-class CropGenConfigResponse(Model):
+class GetCropGenConfigResponse(Model):
     #
     # Constructor
     #
-    def __init__(self, successful, errors):
-        self.Successful = successful
-        self.Errors = errors
+    def __init__(self, config):
+        self.Config = config
 
     #
     # Returns the type name.
