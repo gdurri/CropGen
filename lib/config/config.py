@@ -27,7 +27,7 @@ class Config(Model):
             data = json.load(json_config_file)
 
         return data
-
+    
     #
     # Populates itself using the config JSON data.
     #
@@ -39,9 +39,8 @@ class Config(Model):
         self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
         self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 0.0)
         self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
-        self.socket_receive_buffer_size = self._get_config_setting(data, 'socketReceiveBufferSize', 1024)
         self.max_socket_receive_size = self._get_config_setting(data, 'maxSocketReceiveSize', None)        
-        self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 'info')
+        self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 5)
         self.publish_results = self._get_config_setting(data, 'publishResults', True)
         self.pretty_print_json_in_logs = self._get_config_setting(data, 'prettyPrintJsonInLogs', False)        
         self.delete_logs_on_startup = self._get_config_setting(data, 'deleteLogsOnStartup', False)
@@ -53,7 +52,6 @@ class Config(Model):
         self.apsim_clock_date_format = self._get_config_setting(data, 'apsimClockDateFormat', "%m/%d/%Y")
         self.apsim_simulation_start_date_add_year = self._get_config_setting(data, 'apsimSimulationStartDateAddYear', 0)
         self.apsim_simulation_end_date_add_year = self._get_config_setting(data, 'apsimSimulationEndDateAddYear', 0)
-        
         self.relay_apsim_from_file = self._get_config_setting(data, 'relayApsimFromFile', False)
         self.remote_logger_url = self._get_config_setting(data, 'remoteLoggerUrl', None)
         

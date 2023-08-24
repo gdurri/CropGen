@@ -7,6 +7,7 @@ from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
 from lib.models.config.get_crop_gen_config_response import GetCropGenConfigResponse
 from lib.models.config.set_crop_gen_config_response import SetCropGenConfigResponse
+from lib.models.config.set_crop_gen_config import SetCropGenConfig
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 
@@ -50,7 +51,7 @@ class MessageProcessor():
         elif  type_name_lower == Constants.GET_CONFIG_MESSAGE:
             await self._get_config()
         elif  type_name_lower == Constants.SET_CONFIG_MESSAGE:
-            await self._set_config()
+            await self._set_config(message_wrapper.TypeBody)
         else:
             await self.socket_client.write_error_async([f"{Constants.UNKNOWN_TYPE_NAME}: '{message_wrapper.TypeName}'."])
 
@@ -121,6 +122,17 @@ class MessageProcessor():
     #
     # Sets the CropGen config.
     #
-    async def _set_config(self):
-        message = SetCropGenConfigResponse(False, ["Not Implemented.."])
-        await self.socket_client.write_text_async(message)
+    async def _set_config(self, message):
+
+        if self.server_state.get_running_job_id() != '':
+            await self.socket_client.write_text_async(
+                SetCropGenConfigResponse(False, ["Can't set config as currently running a job"])
+            )
+            return
+        
+        set_crop_gen_config = SetCropGenConfig()
+        set_crop_gen_config.parse_from_json_string(message)
+
+        await self.socket_client.write_text_async(
+            SetCropGenConfigResponse(False , ["Not Implemented.."])
+        )
