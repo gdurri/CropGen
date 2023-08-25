@@ -1,3 +1,4 @@
+import logging
 import json
 import os
 
@@ -9,52 +10,62 @@ from lib.models.common.model import Model
 class Config(Model):
     # The environment variable that is created only when running in docker.
     RUNNING_IN_DOCKER_ENV = 'RUNNING_IN_DOCKER'
+    CONFIG_FILE_FULL_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+    IS_RUNNING_IN_DOCKER = os.environ.get(RUNNING_IN_DOCKER_ENV, False)
 
     #
     # Constructor.
     #
-    def __init__(self):
-        self.is_running_in_docker = self._is_running_in_docker()
-        self._populate_from_data(self._parse())
+    def __init__(self) -> None:
+        super().__init__()
 
     #
     # Parses the config JSON file and stores it in memory.
     #
     def _parse(self):
-        config_file_full_path = os.path.join(os.path.dirname(__file__), 'config.json')
-        
-        with open(config_file_full_path) as json_config_file:
+        with open(Config.CONFIG_FILE_FULL_PATH) as json_config_file:
             data = json.load(json_config_file)
 
-        return data
+        self._populate_from_data(data)
     
     #
     # Populates itself using the config JSON data.
     #
     def _populate_from_data(self, data):
-        self.socket_server_host = self._get_config_setting(data, 'socketServerHost', 'localhost')
-        self.socket_server_port = self._get_config_setting(data, 'socketServerPort', 8000)
-        self.socket_data_num_bytes_buffer_size = self._get_config_setting(data, 'socketDataNumBytesBufferSize', 4)
-        self.socket_data_endianness = self._get_config_setting(data, 'socketDataEndianness', 'big')        
-        self.socket_data_encoding = self._get_config_setting(data, 'socketDataEncoding', 'utf-8')
-        self.socket_timeout_seconds = self._get_config_setting(data, 'socketTimeoutSeconds', 0.0)
-        self.socket_timeout_test_connection_seconds = self._get_config_setting(data, 'socketTimeoutTestConnectionSeconds', 2.0)
-        self.max_socket_receive_size = self._get_config_setting(data, 'maxSocketReceiveSize', None)        
-        self.results_publisher_timeout_seconds = self._get_config_setting(data, 'resultsPublisherTimeoutSeconds', 5)
-        self.publish_results = self._get_config_setting(data, 'publishResults', True)
-        self.pretty_print_json_in_logs = self._get_config_setting(data, 'prettyPrintJsonInLogs', False)        
-        self.delete_logs_on_startup = self._get_config_setting(data, 'deleteLogsOnStartup', False)
-        self.round_up_years_in_mean_calculation = self._get_config_setting(data, 'roundUpYearsInMeanCalculation', False)
-        self.minimum_required_cgm_workers = self._get_config_setting(data, 'minimumRequiredCGMWorkers', 1)
-        self.apsim_clock_start_date_year_input_name = self._get_config_setting(data, 'apsimClockStartDateYearInputName', None)
-        self.apsim_clock_end_date_year_input_name = self._get_config_setting(data, 'apsimClockEndDateYearInputName', None)
-        self.apsim_simulation_start_date = self._get_config_setting(data, 'apsimSimulationStartDate', '1900-06-01')
-        self.apsim_clock_date_format = self._get_config_setting(data, 'apsimClockDateFormat', "%m/%d/%Y")
-        self.apsim_simulation_start_date_add_year = self._get_config_setting(data, 'apsimSimulationStartDateAddYear', 0)
-        self.apsim_simulation_end_date_add_year = self._get_config_setting(data, 'apsimSimulationEndDateAddYear', 0)
-        self.relay_apsim_from_file = self._get_config_setting(data, 'relayApsimFromFile', False)
-        self.remote_logger_url = self._get_config_setting(data, 'remoteLoggerUrl', None)
-        
+        self.SocketServerHost = self._get_config_setting(data, 'SocketServerHost', 'localhost')
+        self.SocketServerPort = self._get_config_setting(data, 'SocketServerPort', 8000)
+        self.SocketDataNumBytesBufferSize = self._get_config_setting(data, 'SocketDataNumBytesBufferSize', 4)
+        self.SocketDataEndianness = self._get_config_setting(data, 'SocketDataEndianness', 'big')        
+        self.SocketDataEncoding = self._get_config_setting(data, 'SocketDataEncoding', 'utf-8')
+        self.SocketTimeoutSeconds = self._get_config_setting(data, 'SocketTimeoutSeconds', 0.0)
+        self.SocketTimeoutTestConnectionSeconds = self._get_config_setting(data, 'SocketTimeoutTestConnectionSeconds', 2.0)
+        self.MaxSocketReceiveSize = self._get_config_setting(data, 'MaxSocketReceiveSize', None)        
+        self.ResultsPublisherTimeoutSeconds = self._get_config_setting(data, 'ResultsPublisherTimeoutSeconds', 5)
+        self.PublishResults = self._get_config_setting(data, 'PublishResults', True)
+        self.PrettyPrintJsonInLogs = self._get_config_setting(data, 'PrettyPrintJsonInLogs', False)        
+        self.DeleteLogsOnStartup = self._get_config_setting(data, 'DeleteLogsOnStartup', False)
+        self.RoundUpYearsInMeanCalculation = self._get_config_setting(data, 'RoundUpYearsInMeanCalculation', False)
+        self.MinimumRequiredCGMWorkers = self._get_config_setting(data, 'MinimumRequiredCGMWorkers', 1)
+        self.ApsimClockStartDateYearInputName = self._get_config_setting(data, 'ApsimClockStartDateYearInputName', None)
+        self.ApsimClockEndDateYearInputName = self._get_config_setting(data, 'ApsimClockEndDateYearInputName', None)
+        self.ApsimSimulationStartDate = self._get_config_setting(data, 'ApsimSimulationStartDate', '1900-06-01')
+        self.ApsimClockDateFormat = self._get_config_setting(data, 'ApsimClockDateFormat', "%m/%d/%Y")
+        self.ApsimSimulationStartDateAddYear = self._get_config_setting(data, 'ApsimSimulationStartDateAddYear', 0)
+        self.ApsimSimulationEndDateAddYear = self._get_config_setting(data, 'ApsimSimulationEndDateAddYear', 0)
+        self.RelayApsimFromFile = self._get_config_setting(data, 'RelayApsimFromFile', False)
+        self.RemoteLoggerUrl = self._get_config_setting(data, 'RemoteLoggerUrl', None)
+        self.RestartAfterConfigUpdate = self._get_config_setting(data, 'RestartAfterConfigUpdate', False)
+
+    #
+    # Write the data back to disk.
+    #
+    def write_to_disk(self):
+        try:
+            with open(Config.CONFIG_FILE_FULL_PATH, 'w') as json_config_file:
+                json_config_file.write(self.to_json(True))
+
+        except Exception:
+            logging.exception("Error while writing config to disk.")
 
     #
     # Safely gets a config setting, taking into consideration docker
@@ -72,17 +83,10 @@ class Config(Model):
         docker_override_config_key = f"{config_key}Docker"
 
         # Check for a Docker config override key.
-        if self._get_config_exists(data, docker_override_config_key) and self.is_running_in_docker:
+        if self._get_config_exists(data, docker_override_config_key) and Config.IS_RUNNING_IN_DOCKER:
             return self._get_config_value(data, docker_override_config_key, default_if_not_present)
 
         return self._get_config_value(data, config_key, default_if_not_present)
-
-    #
-    # Checks if we are running in docker, using the env var.
-    #
-    def _is_running_in_docker(self):
-        return os.environ.get(Config.RUNNING_IN_DOCKER_ENV, False)
-
     #
     # Safely extracts the value using the key, or defaults if it's not present.
     #

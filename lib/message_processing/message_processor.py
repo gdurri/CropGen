@@ -1,3 +1,4 @@
+import json
 import threading
 import logging
 
@@ -7,7 +8,7 @@ from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
 from lib.models.config.get_crop_gen_config_response import GetCropGenConfigResponse
 from lib.models.config.set_crop_gen_config_response import SetCropGenConfigResponse
-from lib.models.config.set_crop_gen_config import SetCropGenConfig
+from lib.config.config import Config
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 
@@ -130,9 +131,11 @@ class MessageProcessor():
             )
             return
         
-        set_crop_gen_config = SetCropGenConfig()
-        set_crop_gen_config.parse_from_json_string(message)
+        set_crop_gen_config = Config()
+        json_data = json.loads(message)
+        set_crop_gen_config._populate_from_data(json_data)
+        set_crop_gen_config.write_to_disk()
 
         await self.socket_client.write_text_async(
-            SetCropGenConfigResponse(False , ["Not Implemented.."])
+            SetCropGenConfigResponse(True)
         )

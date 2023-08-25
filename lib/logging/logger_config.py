@@ -30,7 +30,7 @@ class LoggerConfig:
     # Configures the logger.
     #
     def setup_logger(self):
-        if self.config.delete_logs_on_startup:
+        if self.config.DeleteLogsOnStartup:
             self._delete_all_log_files()
 
         if not os.path.exists(self.log_directory):
@@ -48,11 +48,11 @@ class LoggerConfig:
     # Adds a remote logger.
     #    
     def add_remote_logger(self):
-        if not self.config.remote_logger_url:
+        if not self.config.RemoteLoggerUrl:
             return
 
         # Use the custom handler
-        handler = CustomHttpsHandler(self.config.remote_logger_url)
+        handler = CustomHttpsHandler(self.config.RemoteLoggerUrl)
 
         # Add the handler to the root logger
         root_logger = logging.getLogger()

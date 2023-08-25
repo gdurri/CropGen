@@ -13,6 +13,7 @@ from lib.config.config import Config
 from lib.docker.docker_helper import DockerHelper
 
 config = Config()
+config._parse()
 server_state = ServerState()
 docker_helper = DockerHelper()
 
@@ -28,7 +29,7 @@ def log_app_startup():
     #     if image_info:
     #         logging.info("Docker Info: %s", image_info)
 
-    logging.info("Service Config: %s", config.to_json(config.pretty_print_json_in_logs))
+    logging.info("Service Config: %s", config.to_json(config.PrettyPrintJsonInLogs))
     
 
 # Main entry point
@@ -43,8 +44,8 @@ if __name__ == "__main__":
         loop = asyncio.get_event_loop()
         server_coro = asyncio.start_server(
             client_connected_cb,
-            host=config.socket_server_host,
-            port=config.socket_server_port
+            host=config.SocketServerHost,
+            port=config.SocketServerPort
         )
 
         server = loop.run_until_complete(server_coro)

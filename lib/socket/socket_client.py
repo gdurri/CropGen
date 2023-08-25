@@ -21,8 +21,8 @@ class SocketClient (SocketClientBase):
         super().__init__(config)
         self.socket = socket.socket(family, type, protocol)
 
-        if self.config.max_socket_receive_size:
-            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.max_socket_receive_size)
+        if self.config.MaxSocketReceiveSize:
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.MaxSocketReceiveSize)
 
     #
     # Connects
@@ -30,7 +30,7 @@ class SocketClient (SocketClientBase):
     def connect(self, host, port):
         try:
             self.socket.connect((host, port))
-            self.set_timeout(self.config.socket_timeout_seconds)
+            self.set_timeout(self.config.SocketTimeoutSeconds)
         except ConnectionRefusedError:
             logging.error("Connection refused: Failed to connect to %s:%s", host, port)
             raise
@@ -95,11 +95,11 @@ class SocketClient (SocketClientBase):
     #    
     def read_message_size_int(self):
         # Read the message size
-        data = self.read_data(self.config.socket_data_num_bytes_buffer_size)
+        data = self.read_data(self.config.SocketDataNumBytesBufferSize)
 
         # Convert to an integer
         try:
-            received_int = int.from_bytes(data, byteorder=self.config.socket_data_endianness)
+            received_int = int.from_bytes(data, byteorder=self.config.SocketDataEndianness)
         except Exception as e:
             logging.error("Error converting message size to integer: %s", str(e))
             return None

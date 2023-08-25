@@ -197,8 +197,8 @@ class RunJobRequest(Model):
         # If we have some environment types then we want to manipulate the clock start and end date (year only)
         # so that we can run specific simulations, for specific years.
         return [
-            config.apsim_clock_start_date_year_input_name,
-            config.apsim_clock_end_date_year_input_name
+            config.ApsimClockStartDateYearInputName,
+            config.ApsimClockEndDateYearInputName
         ]
 
     #

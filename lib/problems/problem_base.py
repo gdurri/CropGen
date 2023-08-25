@@ -187,7 +187,7 @@ class ProblemBase(Problem):
             # This shouldn't happen, but just in case...
             if not results_for_individual:
                 self.run_errors.append(
-                    f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json(self.config.pretty_print_json_in_logs)}'
+                    f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json(self.config.PrettyPrintJsonInLogs)}'
                 )
                 return False
 
@@ -241,7 +241,7 @@ class ProblemBase(Problem):
         # Convert the raw socket data into a RunApsimResponse object.
         response = RunApsimResponse()
         response.parse_from_json_string(read_message_data.message_wrapper.TypeBody)
-        logging.debug("Received %s: '%s'", response.get_type_name(), response.to_json(self.config.pretty_print_json_in_logs))
+        logging.debug("Received %s: '%s'", response.get_type_name(), response.to_json(self.config.PrettyPrintJsonInLogs))
 
         if not self._get_contains_results(response):
             error = Constants.NO_APSIM_RESULTS
@@ -254,9 +254,9 @@ class ProblemBase(Problem):
     #
     # Creates the relay apsim request from a file.
     #
-    def _create_relay_apsim_from_file(self):
-        relay_apsim_from_file = RelayApsimFromFile()
-        return relay_apsim_from_file.relay_apsim
+    # def _create_relay_apsim_from_file(self):
+    #     relay_apsim_from_file = RelayApsimFromFile()
+    #     return relay_apsim_from_file.relay_apsim
 
     #
     # Stitches multiple RunApsimResponses into one.

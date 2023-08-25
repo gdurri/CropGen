@@ -16,7 +16,7 @@ class APSIMSeasonDateGenerator():
     # Sets the start date. Defaults to the config value but if the param is set it will use this instead.
     #
     def set_start_date(self, config, apsim_clock_start_date):
-        start_date_to_use = config.apsim_simulation_start_date
+        start_date_to_use = config.ApsimSimulationStartDate
         if apsim_clock_start_date:
             start_date_to_use = apsim_clock_start_date
 
@@ -29,13 +29,13 @@ class APSIMSeasonDateGenerator():
     # Generates a start date for the given season.
     #   
     def generate_start_date_from_season(self, season):
-        return self.generate_date_for_season(season, self.config.apsim_simulation_start_date_add_year, self.config.apsim_clock_date_format)
+        return self.generate_date_for_season(season, self.config.ApsimSimulationStartDateAddYear, self.config.ApsimClockDateFormat)
 
     #
     # Generates an end date for the given season.
     #   
     def generate_end_date_from_season(self, season):
-        return self.generate_date_for_season(season, self.config.apsim_simulation_end_date_add_year, self.config.apsim_clock_date_format)
+        return self.generate_date_for_season(season, self.config.ApsimSimulationEndDateAddYear, self.config.ApsimClockDateFormat)
     
     #
     #

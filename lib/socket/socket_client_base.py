@@ -34,11 +34,11 @@ class SocketClientBase:
 
         # Send the length of the encoded data as a byte array.
         message_size_byte_array = len(data).to_bytes(
-            self.config.socket_data_num_bytes_buffer_size, 
-            self.config.socket_data_endianness
+            self.config.SocketDataNumBytesBufferSize, 
+            self.config.SocketDataEndianness
         )
 
-        return WriteMessageData(message_size_byte_array, data.encode(self.config.socket_data_encoding))
+        return WriteMessageData(message_size_byte_array, data.encode(self.config.SocketDataEncoding))
     
     #
     # Takes the message and converts it into a message wrapper.
@@ -53,7 +53,7 @@ class SocketClientBase:
             logging.debug("Received an empty message")
             return ReadMessageData([], None, False)
         
-        decoded_message_data = message_data.decode(self.config.socket_data_encoding)
+        decoded_message_data = message_data.decode(self.config.SocketDataEncoding)
         message_wrapper = MessageWrapper()
         errors = message_wrapper.parse_from_json_string(decoded_message_data)
         

@@ -36,7 +36,7 @@ class AggregateFunctionCalculator:
         elif calc_type == Constants.TYPE_MEAN:
             output_value = MeanFunction.calculate(results_for_individual, apsim_output_index)
         elif calc_type == Constants.TYPE_MEAN_AT_HIGH_LOW_PERCENTAGE_YEARS:
-            output_value = MeanAtHighLowPercentageYears.calculate(self.aggregate_function, results_for_individual, apsim_output_index, self.config.round_up_years_in_mean_calculation)
+            output_value = MeanAtHighLowPercentageYears.calculate(self.aggregate_function, results_for_individual, apsim_output_index, self.config.RoundUpYearsInMeanCalculation)
         else:
             logging.error("Unknown Aggregate Function calc_type supplied: %s", calc_type)
 

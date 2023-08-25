@@ -38,20 +38,20 @@ class ResultsPublisher():
     def _publish_results(self, url, results):
         json = results.to_json()
 
-        if not self.config.publish_results: 
+        if not self.config.PublishResults: 
             logging.warn("No results being published as configured not to.")
-            logging.debug("Results: '%s'", results.to_json(self.config.pretty_print_json_in_logs))
+            logging.debug("Results: '%s'", results.to_json(self.config.PrettyPrintJsonInLogs))
             return None
 
         logging.info("Publishing results to: '%s'", url)
-        logging.debug("Results: '%s'", results.to_json(self.config.pretty_print_json_in_logs))
+        logging.debug("Results: '%s'", results.to_json(self.config.PrettyPrintJsonInLogs))
 
         try:
             response = requests.put(
                 headers={'Content-type': 'application/json'},
                 url=url, 
                 data=json,
-                timeout=self.config.results_publisher_timeout_seconds
+                timeout=self.config.ResultsPublisherTimeoutSeconds
             )
         except Exception:
             logging.exception(f"Failed to publish results to {url}")

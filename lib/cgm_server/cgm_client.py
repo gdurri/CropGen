@@ -41,7 +41,7 @@ class CGMClient:
 
         try:
             logging.info("Calling CGM with message: '%s'.", message.get_type_name())
-            logging.debug("Message data: %s", message.to_json(self.config.pretty_print_json_in_logs))
+            logging.debug("Message data: %s", message.to_json(self.config.PrettyPrintJsonInLogs))
             return self.perform_call_cgm(message)
         
         except Exception as exception:
