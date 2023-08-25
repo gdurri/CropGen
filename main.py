@@ -9,10 +9,10 @@ import logging
 from lib.logging.logger_config import LoggerConfig
 from lib.server.socket_server import SocketServer
 from lib.server.server_state import ServerState
-from lib.config.config import Config
+from lib.config.crop_gen_config import CropGenConfig
 from lib.docker.docker_helper import DockerHelper
 
-config = Config()
+config = CropGenConfig()
 config._parse()
 server_state = ServerState()
 docker_helper = DockerHelper()

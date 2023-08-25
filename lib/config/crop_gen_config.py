@@ -1,13 +1,14 @@
 import logging
 import json
 import os
+import shutil
 
 from lib.models.common.model import Model
 
 #
 # The config for this application.
 #
-class Config(Model):
+class CropGenConfig(Model):
     # The environment variable that is created only when running in docker.
     RUNNING_IN_DOCKER_ENV = 'RUNNING_IN_DOCKER'
     CONFIG_FILE_FULL_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -23,7 +24,7 @@ class Config(Model):
     # Parses the config JSON file and stores it in memory.
     #
     def _parse(self):
-        with open(Config.CONFIG_FILE_FULL_PATH) as json_config_file:
+        with open(CropGenConfig.CONFIG_FILE_FULL_PATH) as json_config_file:
             data = json.load(json_config_file)
 
         self._populate_from_data(data)
@@ -57,15 +58,31 @@ class Config(Model):
         self.RestartAfterConfigUpdate = self._get_config_setting(data, 'RestartAfterConfigUpdate', False)
 
     #
-    # Write the data back to disk.
+    # Creates a backup of the config file (appends .bak to it.)
+    #
+    def backup_config_file(self):
+        try:
+            if os.path.exists(CropGenConfig.CONFIG_FILE_FULL_PATH):
+                backup_path = CropGenConfig.CONFIG_FILE_FULL_PATH + ".bak"
+                if os.path.exists(backup_path):
+                    os.remove(backup_path)
+                shutil.copy2(CropGenConfig.CONFIG_FILE_FULL_PATH, backup_path)
+        except Exception:
+            logging.exception("Error while creating config backup.")
+
+    #
+    # Writes this config, back to disk.
     #
     def write_to_disk(self):
         try:
-            with open(Config.CONFIG_FILE_FULL_PATH, 'w') as json_config_file:
+            self.backup_config_file()
+            with open(CropGenConfig.CONFIG_FILE_FULL_PATH, 'w') as json_config_file:
                 json_config_file.write(self.to_json(True))
-
         except Exception:
             logging.exception("Error while writing config to disk.")
+            return False
+
+        return True
 
     #
     # Safely gets a config setting, taking into consideration docker
@@ -83,7 +100,7 @@ class Config(Model):
         docker_override_config_key = f"{config_key}Docker"
 
         # Check for a Docker config override key.
-        if self._get_config_exists(data, docker_override_config_key) and Config.IS_RUNNING_IN_DOCKER:
+        if self._get_config_exists(data, docker_override_config_key) and CropGenConfig.IS_RUNNING_IN_DOCKER:
             return self._get_config_value(data, docker_override_config_key, default_if_not_present)
 
         return self._get_config_value(data, config_key, default_if_not_present)
@@ -106,3 +123,9 @@ class Config(Model):
     #
     def _get_config_exists(self, data, config_key):
         return config_key in data
+    
+    #
+    # Returns the type name.
+    #
+    def get_type_name(self):
+        return __class__.__name__

@@ -3,3 +3,4 @@ requests
 parameterized
 tzlocal
 docker
+psutil

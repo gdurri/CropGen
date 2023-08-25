@@ -7,7 +7,7 @@ class SetCropGenConfigResponse(Model):
     #
     # Constructor
     #
-    def __init__(self, successful, errors):
+    def __init__(self, successful, errors=[]):
         self.Successful = successful
         self.Errors = errors
 
