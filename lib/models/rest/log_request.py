@@ -1,3 +1,5 @@
+import datetime
+
 from lib.models.common.model import Model
 
 #
@@ -12,10 +14,9 @@ class LogRequest(Model):
         record
     ):
         self.Filename =  record.filename
-        self.Timestamp = record.asctime
-        #self.Timestamp = record.timestamp
+        self.Timestamp = datetime.datetime.now().isoformat()
         self.LogLevel = record.levelname
-        self.Message = record.message
+        self.Message = record.getMessage()
     
     #
     # Returns the type name.

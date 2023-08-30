@@ -17,6 +17,9 @@
     "ApsimClockDateFormat": "%m/%d/%Y",
     "ApsimSimulationStartDateAddYear": 0,
     "ApsimSimulationEndDateAddYear": 1,
+    "ConsoleLogLevel":"INFO",
+    "FileLogLevel":"DEBUG",
+    "RemoteLogLevel":"INFO",
     "RemoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
     "RestartAfterConfigUpdate": false,
     
@@ -26,7 +29,6 @@
     "SocketTimeoutTestConnectionSecondsDocker": 5.0,
     "PublishResultsDocker": true,
     "PrettyPrintJsonInLogsDocker": false,
-    "RelayApsimFromFileDocker": false,
     "RemoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
     "EndOfDockerOverrides": "______________________"
 }

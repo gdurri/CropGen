@@ -2,11 +2,11 @@ import json
 import threading
 import logging
 
+from lib.logging.logger_config import LoggerConfig
 from lib.cgm_server.cgm_client_factory import CGMClientFactory
 from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
-from lib.models.config.get_crop_gen_config_response import GetCropGenConfigResponse
 from lib.models.config.set_crop_gen_config_response import SetCropGenConfigResponse
 from lib.config.crop_gen_config import CropGenConfig
 from lib.utils.constants import Constants
@@ -28,6 +28,13 @@ class MessageProcessor():
         self.run_job_sync = threading.Lock()
         self.run_message_processor = RunMessageProcessor(config)
 
+        self.message_handlers = {
+            Constants.RUN_MESSAGE: self._process_run_message,
+            Constants.STATUS_MESSAGE: self._get_status,
+            Constants.GET_CONFIG_MESSAGE: self._get_config,
+            Constants.SET_CONFIG_MESSAGE: self._set_config
+        }
+
     #
     # Determines how to process the message and if possible, passes on to the
     # relevant processor
@@ -39,21 +46,11 @@ class MessageProcessor():
             return
         
         message_wrapper = read_message_data.message_wrapper
-
         logging.info("Received '%s' message.", message_wrapper.TypeName)
-
-        # It is valid so check how to process it by testing the TypeName
         type_name_lower = message_wrapper.TypeName.lower().strip()
 
-        if type_name_lower == Constants.RUN_MESSAGE:
-            with self.run_job_sync:
-                await self._process_run_message(message_wrapper.TypeBody)
-        elif  type_name_lower == Constants.STATUS_MESSAGE:
-            await self._get_status()
-        elif  type_name_lower == Constants.GET_CONFIG_MESSAGE:
-            await self._get_config()
-        elif  type_name_lower == Constants.SET_CONFIG_MESSAGE:
-            await self._set_config(message_wrapper.TypeBody)
+        if type_name_lower in self.message_handlers:
+            await self.message_handlers[type_name_lower](message_wrapper.TypeBody)
         else:
             await self.socket_client.write_error_async([f"{Constants.UNKNOWN_TYPE_NAME}: '{message_wrapper.TypeName}'."])
 
@@ -110,14 +107,14 @@ class MessageProcessor():
     # Gets the current status of the application. This can be 
     # used to determine whether a job is currently running.
     #
-    async def _get_status(self):
+    async def _get_status(self, message):
         message = StatusResponse(self.server_state.get_running_job_id())
         await self.socket_client.write_text_async(message)
 
     #
     # Gets the CropGen config.
     #
-    async def _get_config(self):
+    async def _get_config(self, message):
         await self.socket_client.write_text_async(self.config)
 
     #
@@ -139,6 +136,11 @@ class MessageProcessor():
         await self.socket_client.write_text_async(
             SetCropGenConfigResponse(success)
         )
+
+        # Re-initialise the logger because i
+        logger_config = LoggerConfig(self.config)
+        logger_config.setup_logger()
+        logging.info("Service Config: %s", self.config.to_json(self.config.PrettyPrintJsonInLogs))
 
         if self.config.RestartAfterConfigUpdate:
             Restart.perform_restart()

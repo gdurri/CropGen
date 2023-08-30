@@ -12,6 +12,7 @@ class CropGenConfig(Model):
     # The environment variable that is created only when running in docker.
     RUNNING_IN_DOCKER_ENV = 'RUNNING_IN_DOCKER'
     CONFIG_FILE_FULL_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+    OVERRIDE_CONFIG_FILE_FULL_PATH = os.path.join(os.path.dirname(__file__), 'config_override.json')
     IS_RUNNING_IN_DOCKER = os.environ.get(RUNNING_IN_DOCKER_ENV, False)
 
     #
@@ -24,7 +25,12 @@ class CropGenConfig(Model):
     # Parses the config JSON file and stores it in memory.
     #
     def _parse(self):
-        with open(CropGenConfig.CONFIG_FILE_FULL_PATH) as json_config_file:
+        config_file_to_use = CropGenConfig.CONFIG_FILE_FULL_PATH
+
+        if os.path.exists(CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH):
+            config_file_to_use = CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH
+
+        with open(config_file_to_use) as json_config_file:
             data = json.load(json_config_file)
 
         self._populate_from_data(data)
@@ -53,30 +59,18 @@ class CropGenConfig(Model):
         self.ApsimClockDateFormat = self._get_config_setting(data, 'ApsimClockDateFormat', "%m/%d/%Y")
         self.ApsimSimulationStartDateAddYear = self._get_config_setting(data, 'ApsimSimulationStartDateAddYear', 0)
         self.ApsimSimulationEndDateAddYear = self._get_config_setting(data, 'ApsimSimulationEndDateAddYear', 0)
-        self.RelayApsimFromFile = self._get_config_setting(data, 'RelayApsimFromFile', False)
+        self.ConsoleLogLevel = self._get_config_setting(data, 'ConsoleLogLevel', "INFO")
+        self.FileLogLevel = self._get_config_setting(data, 'FileLogLevel', "DEBUG")
+        self.RemoteLogLevel = self._get_config_setting(data, 'RemoteLogLevel', "INFO")
         self.RemoteLoggerUrl = self._get_config_setting(data, 'RemoteLoggerUrl', None)
         self.RestartAfterConfigUpdate = self._get_config_setting(data, 'RestartAfterConfigUpdate', False)
-
-    #
-    # Creates a backup of the config file (appends .bak to it.)
-    #
-    def backup_config_file(self):
-        try:
-            if os.path.exists(CropGenConfig.CONFIG_FILE_FULL_PATH):
-                backup_path = CropGenConfig.CONFIG_FILE_FULL_PATH + ".bak"
-                if os.path.exists(backup_path):
-                    os.remove(backup_path)
-                shutil.copy2(CropGenConfig.CONFIG_FILE_FULL_PATH, backup_path)
-        except Exception:
-            logging.exception("Error while creating config backup.")
 
     #
     # Writes this config, back to disk.
     #
     def write_to_disk(self):
         try:
-            self.backup_config_file()
-            with open(CropGenConfig.CONFIG_FILE_FULL_PATH, 'w') as json_config_file:
+            with open(CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH, 'w') as json_config_file:
                 json_config_file.write(self.to_json(True))
         except Exception:
             logging.exception("Error while writing config to disk.")

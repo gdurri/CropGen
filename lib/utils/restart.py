@@ -14,8 +14,9 @@ class Restart():
     @staticmethod
     def perform_restart():
         try:
-            python = sys.executable
-            # Use sys.argv to pass the original command-line arguments
-            os.execv(python, [python] + sys.argv)
+            logging.warn("perform_restart is not implemented!")
+            # python = sys.executable
+            # # Use sys.argv to pass the original command-line arguments
+            # os.execv(python, [python] + sys.argv)
         except Exception:
             logging.exception("Failed to restart program")
