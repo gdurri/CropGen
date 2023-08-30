@@ -1,2 +1,3 @@
 lib/utility_scripts
+lib/config/config_override.json
 logs
