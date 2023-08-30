@@ -129,7 +129,6 @@ class MessageProcessor():
             return
         
         json_data = json.loads(message)
-        self.config = CropGenConfig()
         self.config._populate_from_data(json_data)
         success = self.config.write_to_disk()
 

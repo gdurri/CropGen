@@ -1,8 +1,6 @@
 import logging
 import json
 import os
-import shutil
-
 from lib.models.common.model import Model
 
 #
@@ -28,6 +26,7 @@ class CropGenConfig(Model):
         config_file_to_use = CropGenConfig.CONFIG_FILE_FULL_PATH
 
         if os.path.exists(CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH):
+            logging.warn("Found an override config: %s. This will be used to configure CropGen.", CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH)
             config_file_to_use = CropGenConfig.OVERRIDE_CONFIG_FILE_FULL_PATH
 
         with open(config_file_to_use) as json_config_file:
@@ -98,6 +97,7 @@ class CropGenConfig(Model):
             return self._get_config_value(data, docker_override_config_key, default_if_not_present)
 
         return self._get_config_value(data, config_key, default_if_not_present)
+    
     #
     # Safely extracts the value using the key, or defaults if it's not present.
     #
