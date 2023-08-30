@@ -146,12 +146,11 @@ class RunJobRequest(Model):
     def get_display_output_names(self):
         output_names = []
         for output in self.Outputs:
-            if output.Optimise:
-                if output.AggregateFunctions:
-                    for aggregate_function in output.AggregateFunctions:
-                        output_names.append(aggregate_function.DisplayName)
-                else:
-                    output_names.append(output.ApsimOutputName)
+            if output.AggregateFunctions:
+                for aggregate_function in output.AggregateFunctions:
+                    output_names.append(aggregate_function.DisplayName)
+            else:
+                output_names.append(output.ApsimOutputName)
         return output_names
     
     #

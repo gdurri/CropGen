@@ -32,8 +32,8 @@ class EmptyResultsProcessor():
         for output_index in range(0, total_outputs):
             request_output = run_job_request.get_output_by_index(output_index)
 
-            # If there is no output or we're not optimising this output, then just skip and move onto the next one.
-            if not request_output or not request_output.Optimise: continue
+            # If there is no output move onto the next one.
+            if not request_output: continue
 
             for aggregate_function in request_output.AggregateFunctions:
                 raw_output_value = 0
@@ -44,8 +44,11 @@ class EmptyResultsProcessor():
                     aggregate_function.Multiplier
                 )
 
+                # If we're optimising this value then we need to store it in the algorithm outputs.
+            if request_output.Optimise:
                 algorithm_outputs.append(output_value.get_output_value_for_algorithm())
-                apsim_output.outputs.append(output_value)
+            
+            apsim_output.outputs.append(output_value)
 
         all_algorithm_outputs.append(algorithm_outputs)
         all_results_outputs.append(apsim_output)

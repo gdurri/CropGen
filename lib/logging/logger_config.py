@@ -51,8 +51,10 @@ class LoggerConfig:
 
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.DEBUG)
-
-        formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(levelname)s] - %(name)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S %Z%z')
+        formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s] - %(name)s - %(message)s', 
+            datefmt='%Y-%m-%d %H:%M:%S %Z%z'
+        )
 
         # Console handler
         console_level = LoggerConfig.string_to_logging_level(self.config.ConsoleLogLevel)
@@ -115,18 +117,20 @@ class LoggerConfig:
         level_mapping = {
             "debug": logging.DEBUG,
             "info": logging.INFO,
+            "information": logging.INFO,
+            "warn": logging.WARNING,
             "warning": logging.WARNING,
             "error": logging.ERROR,
             "critical": logging.CRITICAL
         }
         
         trimmed_level_str = level_str.strip().lower()
+        level = logging.INFO
         
-        if trimmed_level_str in level_mapping:
-            return level_mapping[trimmed_level_str]
-        else:
-            # Default to info if no mapping was found.
-            return logging.INFO
+        if trimmed_level_str in level_mapping: 
+            level = level_mapping[trimmed_level_str]
+
+        return level
 
 
 #
