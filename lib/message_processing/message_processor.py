@@ -8,7 +8,6 @@ from lib.message_processing.run_message_processor import RunMessageProcessor
 from lib.models.run.run_crop_gen_response import RunCropGenResponse
 from lib.models.status.status_response  import StatusResponse
 from lib.models.config.set_crop_gen_config_response import SetCropGenConfigResponse
-from lib.config.crop_gen_config import CropGenConfig
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 from lib.utils.restart import Restart

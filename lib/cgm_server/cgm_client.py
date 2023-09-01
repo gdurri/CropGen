@@ -2,6 +2,7 @@ import logging
 
 from lib.utils.constants import Constants
 from lib.socket.socket_client import SocketClient
+from lib.socket.socket_client_singleton import SocketClientSingleton
 from lib.socket.socket_client_base import ReadMessageData
 from lib.utils.date_time_helper import DateTimeHelper
 
@@ -16,6 +17,7 @@ class CGMClient:
         self.host = host
         self.port = port
         self.config = config
+        SocketClientSingleton(SocketClient(config))
 
     #
     # Tests whether we can connect to the CGM server over our socket.
@@ -23,9 +25,7 @@ class CGMClient:
     def test_cgm_connection(self):
         try:
             logging.info("Testing CGM Connection")
-            socket_client = SocketClient(self.config)
-            socket_client.connect(self.host, self.port)
-            socket_client.close()
+            SocketClientSingleton.get_instance().connect(self.host, self.port)
             logging.info("CGM Connection OK")
             return True
         except Exception:
@@ -58,11 +58,8 @@ class CGMClient:
     def perform_call_cgm(self, message):
         request_start_time = DateTimeHelper.get_date_time()
 
-        socket_client = SocketClient(self.config)
-        socket_client.connect(self.host, self.port)
-        socket_client.write_text(message)
-        data = socket_client.read_text()
-        socket_client.close()
+        SocketClientSingleton.get_instance().write_text(message)
+        data = SocketClientSingleton.get_instance().read_text()
 
         logging.info("Received response from: %s request. Time taken: %s",
             message.get_type_name(),

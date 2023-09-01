@@ -253,7 +253,7 @@ class ProblemBase(Problem):
     #
     # Stitches multiple RunApsimResponses into one.
     #
-    def _stitch_responses_into_response(self, responses):
+    def _stitch_responses_together(self, responses):
         run_apsim_response = RunApsimResponse()
 
         for response in responses:            
@@ -300,5 +300,4 @@ class ProblemBase(Problem):
     def _generate_time_remaining_log(estimated_seconds_remaining):
         if estimated_seconds_remaining > 0:
             return f"Estimated finish date time: {DateTimeHelper.add_seconds_to_datetime_now(estimated_seconds_remaining)} ({DateTimeHelper.seconds_to_hhmmss_ms(estimated_seconds_remaining)})"
-        
         return "No more iterations to process..."

@@ -1,3 +1,5 @@
+import logging
+
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
 from lib.config.apsim_simulation_data import APSimSimulationData
@@ -59,16 +61,20 @@ class Problem(ProblemBase):
     # Creates request(s) and runs apsim.
     #
     def _perform_relay_apsim_staggered_requests(self, variable_values_for_population, simulation_names, max_simulations):
-        
         split_simulation_names = ArrayUtils._split_arr(simulation_names, max_simulations)
+        total_relay_apsim_requests = len(split_simulation_names)
+
+        logging.info("Relay Apsim requests are being split into %d requests", total_relay_apsim_requests)
 
         # Initialize an empty list to store the responses
         responses = []
               
         for simulation_names in split_simulation_names:
+            current_relay_apsim_request = 1
+
             # Create a new RelayApsim object for each chunk
             relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(variable_values_for_population))
-
+           
             for simulation_name in simulation_names:
                 individual = RelayApsim.INPUT_START_INDEX
                 for input_index in range(len(variable_values_for_population)):
@@ -76,13 +82,22 @@ class Problem(ProblemBase):
                     relay_apsim_request.SimulationNames.append([str(input_index), simulation_name])
                     individual += 1
 
+            logging.info("Relay Apsim request %d of %d. SimulationNames: %s. Total Inputs for request: %d", 
+                current_relay_apsim_request,
+                total_relay_apsim_requests,
+                ",".join(simulation_names),
+                len(relay_apsim_request.Inputs)
+            )
+
             # Call relay apsim for the current chunk and store the response
             response = self._call_relay_apsim(relay_apsim_request)
             if not response: return None
             responses.append(response)
+
+            current_relay_apsim_request += 1
         
 
-        response = super()._stitch_responses_into_response(responses)
+        response = super()._stitch_responses_together(responses)
         return response
     
     #
