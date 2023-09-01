@@ -64,13 +64,18 @@ class Problem(ProblemBase):
         split_simulation_names = ArrayUtils._split_arr(simulation_names, max_simulations)
         total_relay_apsim_requests = len(split_simulation_names)
 
-        logging.info("Relay Apsim requests are being split into %d requests", total_relay_apsim_requests)
+        logging.info("Relay Apsim requests are being split into %d requests. MaxSimulations has been set to: %d. TotalSimulations: %d", 
+            total_relay_apsim_requests,
+            max_simulations,
+            len(simulation_names)
+        )
 
         # Initialize an empty list to store the responses
         responses = []
               
+        current_relay_apsim_request = 1
+
         for simulation_names in split_simulation_names:
-            current_relay_apsim_request = 1
 
             # Create a new RelayApsim object for each chunk
             relay_apsim_request = RelayApsim(self.run_job_request.JobID, len(variable_values_for_population))
@@ -82,9 +87,10 @@ class Problem(ProblemBase):
                     relay_apsim_request.SimulationNames.append([str(input_index), simulation_name])
                     individual += 1
 
-            logging.info("Relay Apsim request %d of %d. SimulationNames: %s. Total Inputs for request: %d", 
+            logging.info("Relay Apsim request %d of %d. Iteration: %d. SimulationNames: %s. Total Inputs for request: %d", 
                 current_relay_apsim_request,
                 total_relay_apsim_requests,
+                self.current_iteration_id,
                 ",".join(simulation_names),
                 len(relay_apsim_request.Inputs)
             )

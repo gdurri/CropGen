@@ -29,6 +29,7 @@
     "SocketTimeoutTestConnectionSecondsDocker": 5.0,
     "PublishResultsDocker": true,
     "PrettyPrintJsonInLogsDocker": false,
-    "RemoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
+    "RemoteLoggerUrlDocker": "",
+    "_RemoteLoggerUrlDocker": "https://jobs.cgmwgp.com/api/CropGen/logs",
     "EndOfDockerOverrides": "______________________"
 }
