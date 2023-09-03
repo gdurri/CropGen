@@ -25,12 +25,29 @@ class SocketClient (SocketClientBase):
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.config.MaxSocketReceiveSize)
 
     #
+    # Destructor.
+    #
+    def __del__(self):
+        try:
+            self.close()
+            logging.info("SocketClient object destroyed, socket closed.")
+        except Exception as e:
+            logging.error("Error during SocketClient object destruction: %s", str(e))
+
+    #
+    # Closes the socket connection.
+    #
+    def close(self):
+        logging.info("SocketClient - Closing socket connection.")
+        self.socket.close()
+
+    #
     # Connects
     #
     def connect(self, host, port):
         try:
             self.socket.connect((host, port))
-            self.set_timeout(self.config.SocketTimeoutSeconds)
+            self._set_timeout(self.config.SocketTimeoutSeconds)
         except ConnectionRefusedError:
             logging.error("Connection refused: Failed to connect to %s:%s", host, port)
             raise
@@ -39,15 +56,9 @@ class SocketClient (SocketClientBase):
             raise
 
     #
-    # Closes the socket connection.
-    #
-    def close(self):
-        self.socket.close()
-
-    #
     # Sets the timeout
     #
-    def set_timeout(self, timeout_seconds):
+    def _set_timeout(self, timeout_seconds):
         try:
             if timeout_seconds > 0:
                 self.socket.settimeout(timeout_seconds)
@@ -111,7 +122,6 @@ class SocketClient (SocketClientBase):
     #    
     def read_data(self, bytes_to_receive):
         data = b''
-
         while len(data) < bytes_to_receive:
             try:
                 chunk = self.socket.recv(bytes_to_receive - len(data))
