@@ -71,7 +71,7 @@ class CGMClient:
     # Validates the read message data and captures all of the errors.
     # If this returns true, the object is safe to use.
     #
-    def validate_cgm_call(self, read_message_data, response_name):
+    def validate_cgm_call(self, read_message_data, request, response_name):
         if not read_message_data:
             return [Constants.CGM_SERVER_NO_DATA_READ]
 
@@ -96,6 +96,7 @@ class CGMClient:
         # This is to handle an error response.
         if read_message_data.message_wrapper.TypeName == Constants.CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE:
             return [
+                f'{request.get_type_name()}: {request.to_json(True)}',
                 f'{Constants.CGM_SERVER_ERROR_RESPONSE}: {read_message_data.message_wrapper.TypeBody}'
             ]
 

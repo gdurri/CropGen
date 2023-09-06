@@ -230,7 +230,7 @@ class ProblemBase(Problem):
     def _call_relay_apsim(self, relay_apsim_request):
         # Call CGM which will in turn call APSIM.
         read_message_data = self.cgm_server_client.call_cgm(relay_apsim_request)
-        self.run_errors = self.cgm_server_client.validate_cgm_call(read_message_data, 'RunApsimResponse')
+        self.run_errors = self.cgm_server_client.validate_cgm_call(read_message_data, relay_apsim_request, 'RunApsimResponse')
 
         # If there were any errors then bail out (these errors are logged later on.)
         if self.run_errors:
