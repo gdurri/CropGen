@@ -107,7 +107,7 @@ class Problem(ProblemBase):
         return response
     
     #
-    # Creates request(s) and runs apsim.
+    # Creates request and runs apsim.
     #
     def _perform_relay_apsim_one_request(self, variable_values_for_population):
         
