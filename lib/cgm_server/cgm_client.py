@@ -95,8 +95,10 @@ class CGMClient:
 
         # This is to handle an error response.
         if read_message_data.message_wrapper.TypeName == Constants.CGM_SERVER_TYPE_NAME_EXCEPTION_RESPONSE:
+            # If there is an exception thrown in CGM, it is useful to log out the request that may have caused it.
+            # Log request name and body first, followed by the exception.
             return [
-                f'{request.get_type_name()}: {request.to_json(True)}',
+                f'{request.get_type_name()}: {request.to_json()}',
                 f'{Constants.CGM_SERVER_ERROR_RESPONSE}: {read_message_data.message_wrapper.TypeBody}'
             ]
 

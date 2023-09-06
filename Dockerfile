@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set our working directory to the CropGen root folder.
 WORKDIR /crop-gen
+
+# Expose port 27746
+EXPOSE 27746
+
 # Copy all of our app files (see .dockerignore for files/directories that should be ignored)
 COPY . .
 
