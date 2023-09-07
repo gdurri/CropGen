@@ -16,6 +16,7 @@ class InitWorkers(Model):
         self.SystemPropertyNames = run_job_request.get_system_property_names(config)
         self.Outputs = run_job_request.get_apsim_output_names()
         self.SimulationNamesToLoad = run_job_request.get_simulations_to_run()
+        self.PreRunSimulations = config.InitWorkersPreRunSimulations
 
     #
     # Returns the type name.
