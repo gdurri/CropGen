@@ -1,14 +1,14 @@
 version: '3'
 
 services:
-  crop-gen-app:
+  cropgen:
+    image: ${DOCKER_REGISTRY-}cropgen
+    container_name: cropgen
     build:
       context: .
       dockerfile: Dockerfile
-    image: cropgen
-    container_name: cropgen
     ports:
-      - 27746:27746
+      - "27746:27746"
     networks:
       - q-network
 

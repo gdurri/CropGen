@@ -18,6 +18,16 @@
 			"dependsOn": [
 				"docker-build"
 			],
+			"dockerRun": {
+				"containerName": "cropgen",
+				"image": "cropgen:latest",				
+				"ports": [
+				  {
+					"containerPort": 27746,
+					"hostPort": 27746
+				  }
+				]
+			},
 			"python": {
 				"file": "main.py"
 			}
