@@ -23,8 +23,8 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/.lib/utility_scripts
+**/.lib/utility_scripts
+**/.logs
 LICENSE
 README.md
-lib/utility_scripts
-lib/config/config_override.json
-logs
