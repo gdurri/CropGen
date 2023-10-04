@@ -31,6 +31,7 @@ class Output(Model):
         outputs = JsonHelper.get_attribute(json_object, 'Outputs', errors)
 
         if not outputs:
+            errors.append("No outputs supplied.")
             return []
 
         parsed_outputs = [] 

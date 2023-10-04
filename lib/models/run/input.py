@@ -21,6 +21,7 @@ class Input(Model):
         inputs = JsonHelper.get_attribute(json_object, 'Inputs', errors)
 
         if not inputs:
+            errors.append("No inputs supplied.")
             return []
         
         parsed_inputs = [] 

@@ -11,6 +11,7 @@ from lib.models.config.set_crop_gen_config_response import SetCropGenConfigRespo
 from lib.utils.constants import Constants
 from lib.utils.run_message_validator import RunMessageValidator
 from lib.utils.restart import Restart
+from lib.config.crop_gen_config import CropGenConfig
 
 #
 # Processes messages coming into the service
@@ -141,4 +142,4 @@ class MessageProcessor():
         logging.info("Service Config: %s", self.config.to_json(self.config.PrettyPrintJsonInLogs))
 
         if self.config.RestartAfterConfigUpdate:
-            Restart.perform_restart()
+            Restart.perform_restart(CropGenConfig.IS_RUNNING_IN_DOCKER)
