@@ -27,8 +27,9 @@ class Restart():
     #
     @staticmethod
     def perform_restart_docker():
-        docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-        docker_client.containers.get("cropgen").restart()
+        logging.warn("perform_restart_docker is not implemented!")
+        # docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        # docker_client.containers.get("cropgen").restart()
 
     #
     # Restarts this program, when not running in docker.
