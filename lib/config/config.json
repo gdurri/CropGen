@@ -5,7 +5,7 @@
     "SocketDataEndianness": "big",
     "SocketDataEncoding": "utf-8",
     "SocketTimeoutTestConnectionSeconds": 2.0,
-    "ResultsPublisherTimeoutSeconds": 5,
+    "ResultsPublisherTimeoutSeconds": 30,
     "PublishResults": true,
     "PrettyPrintJsonInLogs": true,
     "DeleteLogsOnStartup": true,

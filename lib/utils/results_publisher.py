@@ -48,16 +48,17 @@ class ResultsPublisher():
 
         try:
             response = requests.put(
-                headers={'Content-type': 'application/json'},
-                url=url, 
+                url=url,
                 data=json,
+                headers={'Content-type': 'application/json'},
                 timeout=self.config.ResultsPublisherTimeoutSeconds
             )
+
         except Exception:
             logging.exception(f"Failed to publish results to {url}")
             return None
         
-        if HTTPStatus.OK:
+        if response.status_code == HTTPStatus.OK:
             logging.info("Successfully published results to: '%s'", url)
         else:
             logging.error("Failed to publish results to: '%s'. Reason: '%s'", url, response.reason)

@@ -46,7 +46,7 @@ class CropGenConfig(Model):
         self.SocketTimeoutSeconds = self._get_config_setting(data, 'SocketTimeoutSeconds', 0.0)
         self.SocketTimeoutTestConnectionSeconds = self._get_config_setting(data, 'SocketTimeoutTestConnectionSeconds', 2.0)
         self.MaxSocketReceiveSize = self._get_config_setting(data, 'MaxSocketReceiveSize', 0)        
-        self.ResultsPublisherTimeoutSeconds = self._get_config_setting(data, 'ResultsPublisherTimeoutSeconds', 5)
+        self.ResultsPublisherTimeoutSeconds = self._get_config_setting(data, 'ResultsPublisherTimeoutSeconds', 30)
         self.PublishResults = self._get_config_setting(data, 'PublishResults', True)
         self.PrettyPrintJsonInLogs = self._get_config_setting(data, 'PrettyPrintJsonInLogs', False)        
         self.DeleteLogsOnStartup = self._get_config_setting(data, 'DeleteLogsOnStartup', False)
