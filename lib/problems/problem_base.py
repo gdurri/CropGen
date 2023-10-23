@@ -3,9 +3,9 @@ import logging
 import numpy as np
 
 from lib.models.rest.iteration_results_message import IterationResultsMessage
-from lib.problems.single_year_results_processor import SingleYearResultsProcessor
-from lib.problems.multi_year_results_processor import MultiYearResultsProcessor
-from lib.problems.empty_results_processor import EmptyResultsProcessor
+from lib.results_processors.single_year_results_processor import SingleYearResultsProcessor
+from lib.results_processors.multi_year_results_processor import MultiYearResultsProcessor
+from lib.results_processors.empty_results_processor import EmptyResultsProcessor
 from lib.utils.constants import Constants
 from lib.utils.results_publisher import ResultsPublisher
 from lib.models.cgm.run_apsim_response import RunApsimResponse
@@ -189,9 +189,11 @@ class ProblemBase(Problem):
                     f'{Constants.NO_APSIM_RESULT_FOR_INDIVIDUALS}. Individual: {individual}. RunApsimResponse: {response.to_json(self.config.PrettyPrintJsonInLogs)}'
                 )
                 return False
+            
+            is_first = self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX
 
             # The first time through we capture whether this is a multi or single year sim.
-            if self.current_iteration_id == 1 and individual == RelayApsim.INPUT_START_INDEX:
+            if is_first:
                 self._set_first_iteration_values(results_for_individual)
 
             logging.debug("Processing APSIM result for individual (%d of %d)", individual + 1, total_inputs)
@@ -207,7 +209,8 @@ class ProblemBase(Problem):
                     self.apsim_simulation_name_str,
                     results_for_individual, 
                     all_algorithm_outputs, 
-                    all_results_outputs
+                    all_results_outputs,
+                    is_first
                 )
 
             else:

@@ -9,7 +9,6 @@ from lib.aggregate_functions.aggregate_function_calculator import AggregateFunct
 # Helper for processing the single year results.
 #
 class MultiYearResultsProcessor():
-    
     #
     # Handles the results for a single year sim.
     #
@@ -21,7 +20,8 @@ class MultiYearResultsProcessor():
         apsim_simulation_name_str,
         results_for_individual,
         all_algorithm_outputs,
-        all_results_outputs
+        all_results_outputs,
+        is_first
     ):
         total_outputs = run_job_request.get_total_outputs()
         algorithm_outputs = []
@@ -48,7 +48,8 @@ class MultiYearResultsProcessor():
                 MultiYearResultsProcessor.process_output(
                     request_output,
                     algorithm_outputs,
-                    apsim_output
+                    apsim_output,
+                    is_first
                 )
 
         all_algorithm_outputs.append(algorithm_outputs)
@@ -90,9 +91,11 @@ class MultiYearResultsProcessor():
     def process_output(
         request_output,
         algorithm_outputs,
-        apsim_output
+        apsim_output,
+        is_first
     ):
-        logging.warn("Processing Apsim Output: '%s', in a MultiYear simulation, without any aggregate functions. Returning 0.0", request_output.ApsimOutputName)
+        if is_first:
+            logging.warn("Processing Apsim Output: '%s', in a MultiYear simulation, without any aggregate functions. Returning 0.0", request_output.ApsimOutputName)
 
         output_value = OutputValue(
             0.0, 

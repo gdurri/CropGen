@@ -61,10 +61,17 @@ class CGMClient:
         SocketClientSingleton.get_instance().write_text(message)
         data = SocketClientSingleton.get_instance().read_text()
 
-        logging.info("Received response from: %s request. Time taken: %s",
-            message.get_type_name(),
-            DateTimeHelper.get_elapsed_time_since(request_start_time),
-        )
+        if data.is_disconnect_message:
+            logging.warning("Received disconnected response from: %s request. Time taken: %s",
+                message.get_type_name(),
+                DateTimeHelper.get_elapsed_time_since(request_start_time),
+            )
+        else:
+            logging.info("Received response from: %s request. Time taken: %s",
+                message.get_type_name(),
+                DateTimeHelper.get_elapsed_time_since(request_start_time),
+            )
+
         return data
 
     #
