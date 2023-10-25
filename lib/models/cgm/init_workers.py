@@ -15,7 +15,7 @@ class InitWorkers(Model):
         self.InputTraits = run_job_request.get_input_names()
         self.SystemPropertyNames = run_job_request.get_system_property_names(config)
         self.Outputs = run_job_request.get_apsim_output_names()
-        self.SimulationNamesToLoad = run_job_request.get_simulations_to_run()
+        self.ResetRunner = run_job_request.get_should_reset_runner()
         self.PreRunSimulations = config.InitWorkersPreRunSimulations
 
     #

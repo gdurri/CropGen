@@ -187,6 +187,21 @@ class RunJobRequest(Model):
         return []
     
     #
+    # Determines whether the APSIM runner should be reset each Relay Apsim request or whether it should
+    # use a fixed runner all of the way through the job.
+    #
+    def get_should_reset_runner(self):
+        reset_runner = (
+            self.get_is_environment_typing_run() or 
+            (
+                self.MaxSimulationsPerRequest is not None and 
+                self.MaxSimulationsPerRequest != 0
+            )
+        )
+
+        return reset_runner
+    
+    #
     # Get a collection of system property names that we want to override.
     #
     def get_system_property_names(self, config):
