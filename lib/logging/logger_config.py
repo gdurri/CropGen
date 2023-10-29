@@ -4,7 +4,6 @@ import logging.handlers
 import logging.config
 import os.path
 import requests
-import pytz
 
 from http import HTTPStatus
 from lib.models.rest.log_request import LogRequest
@@ -26,10 +25,7 @@ class LoggerConfig:
     def setup_logger(self, is_starting_up=False):
         if is_starting_up and self.config.DeleteLogsOnStartup:
             self._delete_all_log_files()
-
-        # Set the timezone to Australia/Brisbane using pytz
-        brisbane_timezone = pytz.timezone('Australia/Brisbane')
-
+            
         if not os.path.exists(self.log_directory):
             os.makedirs(self.log_directory)
 

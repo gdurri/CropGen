@@ -38,7 +38,7 @@ class APSIMSeasonDateGenerator():
         return self.generate_date_for_season(season, self.config.ApsimSimulationEndDateAddYear, self.config.ApsimClockDateFormat)
     
     #
-    #
+    # Generates the date for a given season.
     #
     def generate_date_for_season(self, season, add_years_to_season, date_format):
         date_time = DateTimeHelper.get_date_from_str(self.apsim_clock_start_date)

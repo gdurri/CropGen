@@ -4,4 +4,3 @@ parameterized
 tzlocal
 docker
 psutil
-pytz

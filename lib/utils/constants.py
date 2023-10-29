@@ -52,7 +52,7 @@ class Constants():
     NO_APSIM_RESULT_FOR_INDIVIDUALS = "Couldn't find an APSIM result for a given individual."
     NO_APSIM_RESULTS = "No results have been returned from APSIM."
     APSIM_OUTPUTS_NOT_EQUAL_TO_REQUESTED = "Total APSIM outputs doesn't match the total requested outputs"
-    CROP_GEN_IS_ALREADY_RUNNING_A_JOB = 'Cannot run CropGen because it is busy running a job'
+    CROP_GEN_IS_ALREADY_RUNNING_A_JOB = 'CropGen is already running a job'
     UNKNOWN_TYPE_NAME = 'Unknown TypeName'
     AGGREGATE_FUNCTION_ERROR = 'Cannot perform aggregate function.'
     FAILURE_RISK_AGGREGATE_FUNCTION_ERROR = f"{AGGREGATE_FUNCTION_ERROR} - Type: '{TYPE_FAILURE_RISK}'"

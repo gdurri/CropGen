@@ -1,17 +1,8 @@
 import logging 
 
 from lib.models.common.message_wrapper import MessageWrapper
-
-class ReadMessageData:
-    def __init__(self, errors, message_wrapper, is_disconnect_message = False):
-        self.errors = errors
-        self.message_wrapper = message_wrapper
-        self.is_disconnect_message = is_disconnect_message
-
-class WriteMessageData:
-    def __init__(self, message_size_byte_array, encoded_data):
-        self.message_size_byte_array = message_size_byte_array
-        self.encoded_data = encoded_data
+from lib.socket.read_message_data  import ReadMessageData
+from lib.socket.write_message_data  import WriteMessageData
 
 #
 # A socket client base class.
