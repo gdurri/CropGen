@@ -4,6 +4,7 @@ import logging
 from lib.models.cgm.relay_apsim import RelayApsim
 from lib.problems.problem_base import ProblemBase
 from lib.utils.apsim_season_date_generator import APSIMSeasonDateGenerator
+from lib.utils.constants import Constants
 from lib.utils.date_time_helper import DateTimeHelper
 
 #
@@ -15,6 +16,7 @@ class EnvironmentTypingProblem(ProblemBase):
     # Construct problem with the given dimensions and variable ranges
     #
     def __init__(self, config, run_job_request, cgm_server_client):
+        logging.info("%s has received a request for an Environment Typing run.", Constants.APPLICATION_NAME)
         super().__init__(config, run_job_request, cgm_server_client)
 
     #

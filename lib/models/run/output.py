@@ -40,7 +40,6 @@ class Output(Model):
             apsim_output_name = JsonHelper.get_attribute(output_value, 'ApsimOutputName', errors)
             apsim_output_type = JsonHelper.get_non_mandatory_attribute(output_value, 'ApsimOutputType', ApsimOutputType.General)
             optimise = JsonHelper.get_non_mandatory_attribute(output_value, 'Optimise', True)
-            if optimise: total_outputs_to_optimise +=1
             maximise = JsonHelper.get_non_mandatory_attribute(output_value, 'Maximise', False)
             multiplier = JsonHelper.get_non_mandatory_attribute(output_value, 'Multiplier', 1)
             aggregate_functions = AggregateFunction.parse_aggregate_functions(output_value, errors)
@@ -49,9 +48,13 @@ class Output(Model):
                 apsim_output_name, apsim_output_type, optimise, maximise, multiplier, aggregate_functions
             ))
 
+            # Keep track of the items that should be optimised.
+            if optimise: 
+                total_outputs_to_optimise +=1
+
         # Final check to ensure that we have at least one output to optimise
         if not total_outputs_to_optimise:
-            errors.append("No outputs have been configured to optimise.")
+            errors.append(f"No outputs have been configured to optimise. Total outputs: '{len(parsed_outputs)}'")
             return []
             
         return parsed_outputs

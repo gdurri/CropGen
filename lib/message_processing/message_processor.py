@@ -64,7 +64,9 @@ class MessageProcessor():
 
         # If it's invalid, report the error and exit out of this.
         if not valid:
-            await self._send_run_response_message(job_id, False, run_message_validator.get_errors())
+            errors = run_message_validator.get_errors()            
+            logging.info("JobID: '%s' is invalid. Errors: %s", job_id, errors)
+            await self._send_run_response_message(job_id, False, errors)
             return
 
         # Report back the job has been accepted and will be processed.
