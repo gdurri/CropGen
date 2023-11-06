@@ -4,6 +4,3 @@ parameterized
 tzlocal
 docker
 psutil
-coverage
-pytest
-pytest-cov
