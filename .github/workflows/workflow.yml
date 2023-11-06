@@ -33,8 +33,20 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    - name: Run unit tests
-      run: python run_tests.py
+    # - name: Run unit tests
+    #   run: python run_tests.py
+
+    - name: Run unit tests with coverage
+      run: coverage run run_tests.py
+
+    - name: Generate code coverage report
+      run: coverage report -m
+
+    - name: Upload code coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: .coverage
 
     # - name: Login to Docker Hub
     #   run: docker login -u <DOCKERHUB_USERNAME> -p <DOCKERHUB_PASSWORD>
