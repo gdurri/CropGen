@@ -41,6 +41,36 @@
                 ],
                 "projectType": "general"
             }
+        },
+        {
+            "name": "RunTests",
+            "type": "python",
+            "request": "launch",
+            "program": "run_tests.py",
+            "console": "integratedTerminal",
+            "args": [""]
         }
+
+        // {
+        //     "name": "Run",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "lib//utility_scripts//environment_type_csv_convert.py",
+        //     "console": "integratedTerminal",
+        //     //"args": ["all"],
+        //     "args": ["C:\\Projects\\uq\\CGM\\crop_gen\\lib\\utility_scripts\\data\\sorghum-factorials_et0.csv"]
+        // }
+
+        // {
+        //     "name": "Run",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "lib//utility_scripts//plot_graphs.py",
+        //     "console": "integratedTerminal",
+        //     "args": [
+        //         "C:\\CropGenResults\\CropGen_Results.12\\optimal_individuals_JobID-12.csv", 
+        //         "C:\\CropGenResults\\CropGen_Results.12\\all_individuals_JobID-12.csv"
+        //     ]
+        // }
     ]
 }
