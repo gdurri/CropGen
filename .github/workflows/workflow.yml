@@ -1,5 +1,6 @@
-name: CropGen Unit Tests
+name: CropGen Workflow
 
+# Set when this runs.
 on:
   push:
     branches:
@@ -8,9 +9,10 @@ on:
     branches:
       - main
 
+# Add the job.
 jobs:
   test:
-    name: Run Unit Tests
+    name: CropGen Workflow.
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,3 +35,12 @@ jobs:
 
     - name: Run unit tests
       run: python run_tests.py
+
+    # - name: Login to Docker Hub
+    #   run: docker login -u <DOCKERHUB_USERNAME> -p <DOCKERHUB_PASSWORD>
+    #   env:
+    #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    # - name: Push Docker image to Docker Hub
+    #   run: docker push <DOCKERHUB_USERNAME>/<REPOSITORY_NAME>:latest
