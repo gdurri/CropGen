@@ -1,6 +1,7 @@
 import unittest
 import test.all_tests
 import coverage
+import sys
 
 testSuite = test.all_tests.create_test_suite()
 
@@ -14,7 +15,7 @@ result = unittest.TextTestRunner().run(testSuite)
 cov.stop()
 # Generate the HTML coverage report
 cov.save()
-cov.html_report(directory='coverage_report')
+cov.report(show_missing=False)
 
 if not result.wasSuccessful():
     sys.exit(1)
