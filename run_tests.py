@@ -12,7 +12,9 @@ result = unittest.TextTestRunner().run(testSuite)
 
 # Stop and save the coverage data
 cov.stop()
+# Generate the HTML coverage report
 cov.save()
+cov.html_report(directory='coverage_report')
 
 if not result.wasSuccessful():
     sys.exit(1)
