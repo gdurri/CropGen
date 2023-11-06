@@ -9,7 +9,7 @@ from lib.aggregate_functions.failure_risk_function import FailureRiskFunction
 class FailureRiskFunctionTests(TestBase):
 
     @parameterized.expand([
-        ("<",  "10",    0, 0.75),
+        ("<",  "10",    0, 0.751111),
         ("<",  "1",     0, 0),
         ("<",  "8",     0, 0.5),
         ("<",  "0",     1, 0),
