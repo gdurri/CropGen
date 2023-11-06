@@ -2,4 +2,7 @@ import unittest
 import test.all_tests
 
 testSuite = test.all_tests.create_test_suite()
-text_runner = unittest.TextTestRunner().run(testSuite)
+result = unittest.TextTestRunner().run(testSuite)
+
+if not result.wasSuccessful():
+    exit(1)
