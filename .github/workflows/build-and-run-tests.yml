@@ -1,0 +1,58 @@
+name: BuildAndRunTests
+
+# Set when this runs.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Add the job.
+jobs:
+  build:
+    
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Step 1
+    # Checkout the code.
+    - 
+      name: Check out code
+      uses: actions/checkout@v3
+
+
+    # Step 2
+    # Setup python version matrix.
+    - 
+      name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+      
+
+    # Step 3
+    # Print out the python version.
+    - 
+      name: Display Python version
+      run: python -c "import sys; print(sys.version)"
+    
+  
+    # Step 4
+    # Install dependencies.
+    - 
+      name: Install dependencies
+      run: pip install -r requirements.txt
+
+    
+    # Step 5
+    # Run the unit tests.
+    - 
+      name: Run unit tests
+      run: python run_tests.py

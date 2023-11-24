@@ -1,0 +1,149 @@
+name: BuildAndPushDockerImage
+
+# Set when this runs.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Add the job.
+jobs:
+  build:
+    
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    runs-on: ubuntu-latest
+
+    # Sets up any env variables that can be used by all of the steps.
+    env:
+      DOCKER_REPOSITORY: "cropgen"
+      DOCKER_DEFAULT_IMAGE_TAG: "latest"
+      # Default the new tag to 100, later on, we interigate the registry to find the latest docker image tag.
+      DOCKER_NEW_IMAGE_TAG: "100"
+      DOCKER_REMOTE_IMAGE_TAGS_LIST: ""
+
+    steps:
+    
+    # Step 1
+    # Checkout the code.
+    - 
+      name: Check out code
+      uses: actions/checkout@v3
+
+
+    # Step 2
+    # Setup python version matrix.
+    - 
+      name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+      
+
+    # Step 3
+    # Print out the python version.
+    - 
+      name: Display Python version
+      run: python -c "import sys; print(sys.version)"
+    
+  
+    # Step 4
+    # Install dependencies.
+    - 
+      name: Install dependencies
+      run: pip install -r requirements.txt
+
+    
+    # Step 5
+    # Logs into Docker.
+    - 
+      name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+          username: ${{ secrets.DHUB_USERNAME }}
+          password: ${{ secrets.DHUB_PASSWORD }}
+          registry: ${{ secrets.DHUB_REGISTRY }}
+
+
+    # Step 6
+    # Install JQ so that we can parse the JSON that is returned from the docker tag list.
+    - 
+      name: Install jq
+      run: sudo apt-get install jq
+
+
+    # Step 7
+    # Find all of the docker tags.
+    -
+        name: Find Docker Tags
+        run: |
+            REGISTRY_URL="https://${{ secrets.DHUB_REGISTRY }}/v2/${{ env.DOCKER_REPOSITORY }}/tags/list"
+
+            # Retrieve Docker registry credentials from secrets
+            USERNAME="${{ secrets.DHUB_USERNAME }}"
+            PASSWORD="${{ secrets.DHUB_PASSWORD }}"
+
+            # List tags and capture the output
+            TAGS_LIST_JSON=$(curl -u "${USERNAME}:${PASSWORD}" -X GET "${REGISTRY_URL}")
+
+            # Print the entire list of tags for debugging
+            echo "All Docker Tags JSON: $TAGS_LIST_JSON"
+    
+            # Extract tags from JSON and filter numeric tags
+            TAGS_LIST=$(echo "$TAGS_LIST_JSON" | jq -r '.tags[]' | grep -E '^[0-9]+$')
+            HIGHEST_NUMERIC_TAG=$(echo "$TAGS_LIST" | sort -n | tail -n 1)
+
+            # Calculate the next tag or default to 100 if none is found
+            if [ -n "$HIGHEST_NUMERIC_TAG" ]; then
+              DOCKER_NEW_IMAGE_TAG=$((HIGHEST_NUMERIC_TAG + 1))
+            else
+              DOCKER_NEW_IMAGE_TAG=100
+            fi
+
+            # Update the environment variable for later use
+            echo "DOCKER_NEW_IMAGE_TAG=${DOCKER_NEW_IMAGE_TAG}" >> $GITHUB_ENV
+
+        env:
+            REGISTRY_USERNAME: ${{ secrets.DHUB_USERNAME }}
+            REGISTRY_PASSWORD: ${{ secrets.DHUB_PASSWORD }}
+            REGISTRY_URL: ${{ secrets.DHUB_REGISTRY }}
+
+
+    # Step 8
+    # Logs out the tag version that it is going to use.
+    - 
+        name: Log out the new DOCKER_NEW_IMAGE_TAG
+        run: |
+            echo "Using DOCKER_NEW_IMAGE_TAG: ${{ env.DOCKER_NEW_IMAGE_TAG }}"
+            
+
+    # Step 9
+    # Builds the docker image, using the compose file.
+    - 
+        name: Build Docker Image
+        run: |
+            docker-compose build --no-cache
+            
+    
+    # Step 10
+    # For diagnostics, prints the list of docker images on disk that match that tag.
+    - 
+        name: Log out built Docker Images
+        run: |
+            docker images ${{ secrets.DHUB_REGISTRY }}/${{ env.DOCKER_REPOSITORY }}:${{ env.DOCKER_NEW_IMAGE_TAG }}
+
+
+    # Step 11
+    # Finally, push the newly created and tagged, docker image.
+    - 
+        name: Push to Docker Hub
+        run: |
+            docker push ${{ secrets.DHUB_REGISTRY }}/${{ env.DOCKER_REPOSITORY }}:${{ env.DOCKER_NEW_IMAGE_TAG }}
+
+
+            
