@@ -28,6 +28,16 @@
             ]
         },
         {
+            "name": "RunZmq",
+            "type": "python",
+            "request": "launch",
+            "program": "main_zmq.py",
+            "console": "integratedTerminal",
+            "args": [
+                ""
+            ]
+        },
+        {
             "name": "Docker: Python - General",
             "type": "docker",
             "request": "launch",

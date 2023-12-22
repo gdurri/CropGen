@@ -4,3 +4,4 @@ parameterized
 tzlocal
 docker
 psutil
+pyzmq
