@@ -23,6 +23,7 @@
     "RemoteLoggerUrl": "http://localhost:8084/api/CropGen/logs",
     "RestartAfterConfigUpdate": false,
     "InitWorkersPreRunSimulations": false,
+    "AlwaysResetRunner": true,
     
     "DockerOverrides": "______________________",
     "SocketServerHostDocker": "0.0.0.0",
